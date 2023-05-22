@@ -10,19 +10,24 @@ QJsonValue JsonPacker::getJsonVersionValue(I_CardFrame *item)
     //  метод item->getValue() возвращает QMap<QString, QVariant>, состоящий из одного элемента
     //  .first() возвращает первое значение (QVariant)
 
-    if(QString(item->metaObject()->className()).contains("ComboBox")){
+    //  переменная для исключения постоянного вызова методов при условии
+    QString className = item->metaObject()->className();
+
+    if(className.contains("ComboBox")){
         //  картеж из текста : данные
         m_settingsCardJsonValue = item->getValue().first().toJsonObject();
 
         return m_settingsCardJsonValue;
     }
 
-    if(QString(item->metaObject()->className()).contains("SpinBox")){
+    if(className.contains("SpinBox")){
         m_settingsCardJsonValue = item->getValue().first().toInt();
 
         return m_settingsCardJsonValue;
     }
 
     //  Если у нас ничего не подошло, то возвращаемое значение имеет формат строки
-    return item->getValue().first().toString();
+    m_settingsCardJsonValue = item->getValue().first().toString();
+
+    return m_settingsCardJsonValue;
 }
