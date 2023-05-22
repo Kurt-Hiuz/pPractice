@@ -42,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent)
     QVBoxLayout *settingsContainer = new QVBoxLayout();
 
     workspaceManager = new WorkspaceManager();
-    connect(workspaceManager, &WorkspaceManager::updateUiComboBoxSignal, this, &MainWindow::updateUiComboBoxSlot);
+    connect(workspaceManager, &WorkspaceManager::signalUpdateUiComboBox, this, &MainWindow::updateUiComboBoxSlot);
     connect(workspaceManager, &WorkspaceManager::signalStatusServer, this, &MainWindow::slotStatusServer);  //  связка для отображения статуса сервера, вывод в консоль
 
     m_selectWorkspaceFrame = new SelectWorkspaceFrame(this);
@@ -105,12 +105,6 @@ void MainWindow::slotDeleteSocketFromListWidget(QMap<QTcpSocket *, QString> mapS
 
 }
 
-void MainWindow::slotAddTreatmentToPossibleTreatmentsComboBox(QString treatmentToAdd)
-{
-//    ui->possibleTreatmetsComboBox->addItem(treatmentToAdd);
-    qDebug() << "MainWindow::slotAddTreatmentToPossibleTreatmentsComboBox:      " << treatmentToAdd;
-}
-
 void MainWindow::slotShowContextMenu(const QPoint &pos)
 {
     QPoint globalPos;
@@ -152,12 +146,6 @@ void MainWindow::slotDisconnectClient()
         }
     }
 }
-
-//void MainWindow::slotChatServer(QString message)    //  обработчик чата
-//{
-//    ui->ChatTextBrowser->append(QTime::currentTime().toString()+" | <font color = black><\\font>"+message);
-//}
-
 
 void MainWindow::on_chooseWorkspaceDirPushButton_clicked()   //  по нажатию на "Choose save directory"
 {

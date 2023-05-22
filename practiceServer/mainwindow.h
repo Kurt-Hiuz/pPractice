@@ -1,6 +1,43 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+///     Класс MainWindow определяет главную форму приложения
+///     Переменные:
+///         delimiter - строка разделитель для чата
+///         * серверные:
+///             socket - создаваемый сокет сервера
+///             ui - сама форма
+///             server - экземпляр класса сервера
+///             nextBlockSize - размер блока сообщения
+///         * менеджеры:
+///             workspaceManager - отвечает за работу с рабочей директорией
+///         * графические компоненты:
+///             m_selectWorkspaceFrame - фрейм выбора рабочей папки
+///             m_possibleProcessingFrame - фрейм возможных обработок
+///             m_changePortLineEditFrame - фрейм смены порта сервера
+///             m_maxConnectionSpinBoxFrame - фрейм смены максимального количества подключений
+///         * работа с JSON:
+///             m_jsonPacker - упаковщик в json формат графические компоненты
+///             m_currentJsonObject - для работы с json объектами
+///             m_currentJsonValue - для работы с json значениями
+///             m_currentJsonArray - для работы с json массивами
+///     Сигналы:
+///         signalNewWorkspaceFolder - установка новой рабочей папки на сервере
+///         signalSocketDisplayed - сообщение серверу, что клиент отобразился
+///         signalDisconnectSocket - сообщение серверу, что клиент убран
+///         signalUpdatePossibleProcessing - сообщение серверу о новых обработках
+///     Слоты:
+///         slotStatusServer - отображение статуса сервера
+///         slotAddSocketToListWidget - отображение добавляемых сокетов
+///         slotDeleteSocketFromListWidget - сигнал для принудительного удаления сокетов
+///         slotShowContextMenu - отображение контекстного меню
+///         slotDisconnectClient - обработка отключения клиента
+///         on_chooseWorkspaceDirPushButton_clicked - по нажатию на "Выбрать рабочую папку"
+///         on_clientsListWidget_customContextMenuRequested - отображение контекстного меню
+///         on_openJSONSettingsFilePushButton_clicked - по нажатию на "Открыть файл настроек"
+///         on_saveSettingsPushButton_clicked - по нажатию на "Сохранить настройки"
+///         updateUiComboBoxSlot - обновление комбобокса
+
 ///  ========================    классы для работы сервера
 #include <QTcpServer>           //  Работа с сервером
 #include <QTcpSocket>           //  работа с сокетами
@@ -29,11 +66,12 @@
 #include <QTreeView>            //  отображение в виде дерева
 ///  ========================
 ///
-///  ========================   свои классы
+///  ========================   классы проекта
 #include "components/frames/cardFrame/I_cardframe.h"    //  интерфейс работы с карточками настройки
 #include "helperClasses/jsonPacker/json_packer.h"       //  упаковщик карточки в json вариант
 #include "helperClasses/managers/workspaceManager/workspace_manager.h"  //  менеджер рабочего пространства
-#include "server.h" //  работа с сервером
+#include "server.h"             //  работа с сервером
+///  ========================
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -52,8 +90,8 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    Server* server;     //  создаем экземпляр сервера
-    WorkspaceManager *workspaceManager; //  данная сущность отвечает за работу с рабочей директорией
+    Server* server;
+    WorkspaceManager *workspaceManager;
 
     I_CardFrame *m_selectWorkspaceFrame;
     I_CardFrame *m_possibleProcessingFrame;
@@ -62,47 +100,32 @@ private:
 
     JsonPacker m_jsonPacker;
 
-    QString delimiter = "<font color = black><\\font>=======================<br>";  //  создаем разделитель для сообщений
+    QString delimiter = "<font color = black><\\font>=======================<br>";
 
-    QJsonObject m_currentJsonObject;    // Текущий json объект, с которым производится работа
+    QJsonObject m_currentJsonObject;
     QJsonValue m_currentJsonValue;
     QJsonArray m_currentJsonArray;
 
-    quint16 nextBlockSize;  //  размер блока сообщения
+    quint16 nextBlockSize;
 
 public slots:
-    void slotStatusServer(QString status);  //  обработчик статуса сервера
-
-    void slotAddSocketToListWidget(QTcpSocket* socketToAdd);    //  обработчик отображения добавляемых сокетов
-
-    void slotDeleteSocketFromListWidget(QMap<QTcpSocket*, QString> mapSockets);    //  обработчик удаления отключившихся сокетов
-
-    void slotAddTreatmentToPossibleTreatmentsComboBox(QString treatmentToAdd);  //  обработчик добавления новой обработки
-
-    void slotShowContextMenu(const QPoint &pos);   //  обработчик контекстного меню
-
+    void slotStatusServer(QString status);
+    void slotAddSocketToListWidget(QTcpSocket* socketToAdd);
+    void slotDeleteSocketFromListWidget(QMap<QTcpSocket*, QString> mapSockets);
+    void slotShowContextMenu(const QPoint &pos);
     void slotDisconnectClient();
-//    void slotChatServer(QString message);   //  обработчик чата на стороне сервера
-
-    void on_chooseWorkspaceDirPushButton_clicked();  //  по нажатию на "Choose save directory"
+    void on_chooseWorkspaceDirPushButton_clicked();
 
 private slots:
     void on_clientsListWidget_customContextMenuRequested(const QPoint &pos);
-
     void on_openJSONSettingsFilePushButton_clicked();
-
-//    void on_saveSettingsPushButton_clicked();
-
     void on_saveSettingsPushButton_clicked();
-
     void updateUiComboBoxSlot(const QString &fileName);
 
 signals:
-    void signalNewWorkspaceFolder(QString); //  сигнал для установки новой рабочей папки
-//    void signalNewSaveDir(QString);   //  сигнал для обработки директории сохранения
-    void signalSocketDisplayed(QTcpSocket* displayedSocket);   //  сигнал для обработки уже отобразившихся сокетов
-    void signalDisconnectSocket(int socketDiscriptor);  //  сигнал для принудительного удаления сокета
-    void signalSaveSettings();
+    void signalNewWorkspaceFolder(QString);
+    void signalSocketDisplayed(QTcpSocket* displayedSocket);
+    void signalDisconnectSocket(int socketDiscriptor);
     void signalUpdatePossibleProcessing(QVariant newPossibleProcessingData);
 };
 

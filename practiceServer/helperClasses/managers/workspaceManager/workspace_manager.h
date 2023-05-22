@@ -4,23 +4,23 @@
 ///     Класс WorkspaceManager определяет зону ответственности за рабочую папку
 ///     Конструктор принимает абсолютный путь папки, над которой требуется менеджмент
 ///     Переменные:
-///     rootFolder - абсолютный путь рабочей директории
-///     settingsFolder - путь до папки Settings
-///     dataFolder - путь до папки Data
-///     entryFolder - путь до папки Entry
-///     expectationFolder - путь до папки Excectation
-///     storageFolder - путь до папки Storage
-///     parentUi - ссылка на родителя
-///     m_settingsManager - экземпляр менеджера папки Settings
-///     workspaceWatcher - наблюдатель за состоянием рабочего пространства
+///         rootFolder - абсолютный путь рабочей директории
+///         settingsFolder - путь до папки Settings
+///         dataFolder - путь до папки Data
+///         entryFolder - путь до папки Entry
+///         expectationFolder - путь до папки Excectation
+///         storageFolder - путь до папки Storage
+///         parentUi - ссылка на родителя
+///         m_settingsManager - экземпляр менеджера папки Settings
+///         workspaceWatcher - наблюдатель за состоянием рабочего пространства
 ///     Методы:
-///     createWorkspaceFolders() - создаёт структуру папки и возвращает отчёт в консоль
-///     saveSettings() - принимает json объект и создаёт из него файл.json, возвращая отчёт в консоль
-///     setRootFolder() - устанавливает новые пути для папок
+///         createWorkspaceFolders() - создаёт структуру папки и возвращает отчёт в консоль
+///         saveSettings() - принимает json объект и создаёт из него файл.json, возвращая отчёт в консоль
+///         setRootFolder() - устанавливает новые пути для папок
 ///     Слоты:
-///     workspaceFileChanged() - обработка сигнала от QFileSystemWatcher::directoryChanged
+///         workspaceFileChanged() - обработка сигнала от QFileSystemWatcher::directoryChanged
 ///     Сигналы:
-///     updateUiComboBoxSignal() - сигнал для смены данных в ComboBox обработок
+///         signalUpdateUiComboBox() - сигнал для смены данных в ComboBox обработок
 
 ///  ========================    классы проекта
 #include "helperClasses/managers/workspaceManager/settingsManager/settings_manager.h"   //  менеджер для папки /Settings
@@ -39,6 +39,7 @@
 ///
 ///  ========================    классы для работы класса
 #include <QObject>              //  класс для работы connect()
+///  ========================
 
 class WorkspaceManager : public QObject
 {
@@ -51,7 +52,7 @@ public:
     void setRootFolder(QString incomingRootFolder);
 
 signals:
-    void updateUiComboBoxSignal(const QString &fileName);
+    void signalUpdateUiComboBox(const QString &fileName);
     void signalStatusServer(QString status);
 
 private:
