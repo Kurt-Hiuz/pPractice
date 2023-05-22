@@ -3,11 +3,12 @@
 
 ///     Класс JsonParser определяет, ликвидная ли json запись
 ///     Методы:
-///     isJson() - возвращает булевое значение, парся данные в формате QByteArray
+///         isJson() - возвращает булевое значение, парся данные в формате QByteArray
 
 ///  ========================    классы для работы с данными
-#include <QJsonParseError>
-#include <QJsonDocument>
+#include <QJsonParseError>      //  класс, от которого наследуемся
+#include <QJsonDocument>        //  работа с json документами
+///  ========================
 
 class JsonParser : public QJsonParseError
 {

@@ -4,16 +4,16 @@
 ///     Класс SettingsManager определяет зону ответственности за папку настроек
 ///     Конструктор принимает абсолютный путь папки настроек, над которой требуется менеджмент
 ///     Переменные:
-///     rootFolder - абсолютный путь папки настроек
-///     serverSettingsFileName - абсолютный путь файла настроек
-///     possibleProcessingFileName - абсолютный путь файла обработок
-///     settingsfilesWatcher - наблюдатель за файлами
+///         rootFolder - абсолютный путь папки настроек
+///         serverSettingsFileName - абсолютный путь файла настроек
+///         possibleProcessingFileName - абсолютный путь файла обработок
+///         settingsfilesWatcher - наблюдатель за файлами
 ///     Методы:
-///     saveSettings() - принимает json объект и создаёт из него файл.json, возвращая отчёт в консоль
+///         saveSettings() - принимает json объект и создаёт из него файл.json, возвращая отчёт в консоль
 ///     Сигналы:
-///     processingFileChangedSignal - передает путь до измененного файла обработок
+///         processingFileChangedSignal - передает путь до измененного файла обработок
 ///     Слоты:
-///     processingFileChanged - обрабатывает слот наблюдателя за possibleProcessing.json
+///         processingFileChanged - обрабатывает слот наблюдателя за possibleProcessing.json
 
 ///  ========================    классы для работы с json
 #include <QJsonObject>          //  работа с json объектами
@@ -29,6 +29,7 @@
 ///
 ///  ========================    классы для работы
 #include <QObject>              //  работа с MainWindow
+///  ========================
 
 class SettingsManager : public QObject
 {

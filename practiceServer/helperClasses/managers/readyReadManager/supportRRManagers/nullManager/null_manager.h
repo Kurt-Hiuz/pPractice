@@ -3,15 +3,15 @@
 
 ///     Класс NullManager реализует интерфейс I_MessageManager
 ///     обозначает отсутствие обработчика сообщений (заглушку)
-///     Переменные:
 ///     Методы:
-///     readDataFromStream() - чтение данных с потока
-///     writeDataFromStream() - запись данных в поток
-///     processData() - обрабатывает приходящие данные
-///     typeOfMessage() - возвращает строку тип менеджера
+///         readDataFromStream() - чтение данных с потока
+///         writeDataFromStream() - запись данных в поток
+///         processData() - обрабатывает приходящие данные
+///         typeOfMessage() - возвращает строку тип менеджера
 
 ///  ========================    классы проекта
 #include "../I_message_manager.h"   //  реализуем интерфейс
+///  ========================
 
 class NullManager : public I_MessageManager
 {

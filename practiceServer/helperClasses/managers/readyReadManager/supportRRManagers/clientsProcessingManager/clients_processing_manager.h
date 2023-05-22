@@ -3,12 +3,14 @@
 
 ///     Класс ClientsProcessingManager реализует интерфейс I_MessageManager
 ///     обрабатывает всё необходимое, что связанное с обработками
-///     Переменные:
 ///     Методы:
-///     readDataFromStream() - чтение данных с потока
-///     writeDataFromStream() - запись данных в поток
-///     processData() - обрабатывает приходящие данные
-///     typeOfMessage() - возвращает строку тип менеджера
+///         readDataFromStream() - чтение данных с потока
+///         writeDataFromStream() - запись данных в поток
+///         processData() - обрабатывает приходящие данные
+///         typeOfMessage() - возвращает строку тип менеджера
+///     Сигналы:
+///         signalStatusRRManager() - отправка статуса ReadyReadManager'у
+///         signalSendToOneRRManager() - отправка сообщения одному клиенту через ReadyReadManager
 
 ///  ========================    классы проекта
 #include "../I_message_manager.h"   //  реализуем интерфейс

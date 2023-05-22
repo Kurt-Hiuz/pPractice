@@ -3,19 +3,19 @@
 
 ///     Класс UpdateProcessingDialog реализует интерфейс I_DialogWindow
 ///     Переменные:
-///     jsonDataTextEdit - поле для отображения содержимого json файла
-///     dataLabel - метка с подсказкой/данными для наглядности
-///     openJsonFilePushButton - кнопка для открытия json файла
-///     closeDialogPushButton - кнопка для закрытия диалогового окна
-///     applyDataPushButton - кнопка для подтверждения новых данных
-///     m_currentJsonObject - json объект для работы с файлом
-///     m_jsonParser - сущность, определяющая ликвидность принимаемой json структуры
+///         jsonDataTextEdit - поле для отображения содержимого json файла
+///         dataLabel - метка с подсказкой/данными для наглядности
+///         openJsonFilePushButton - кнопка для открытия json файла
+///         closeDialogPushButton - кнопка для закрытия диалогового окна
+///         applyDataPushButton - кнопка для подтверждения новых данных
+///         m_currentJsonObject - json объект для работы с файлом
+///         m_jsonParser - сущность, определяющая ликвидность принимаемой json структуры
 ///     Методы:
-///     createInterface() - создание графического представления
-///     Приватные слоты:
-///     on_openJsonFilePushButton_clicked() - устанавливает путь до файла с json данными
-///     on_closeDialogPushButton_clicked() - закрывает текущее окно
-///     on_applyDataPushButton_clicked() - возвращает сообщение о записи данных в ранее открытый файл
+///         createInterface() - создание графического представления
+///     Слоты:
+///         on_openJsonFilePushButton_clicked() - устанавливает путь до файла с json данными
+///         on_closeDialogPushButton_clicked() - закрывает текущее окно
+///         on_applyDataPushButton_clicked() - возвращает сообщение о записи данных в ранее открытый файл
 
 ///  ========================    заголовочные файлы проекта
 #include "components/dialogs/I_dialogwindow.h"  //  реализуемый интерфейс
@@ -39,6 +39,7 @@
 ///  ========================    классы для работы с json
 #include <QJsonObject>          //  работа с json объектами
 #include <QJsonDocument>        //  работа с json документами
+///  ========================
 
 class UpdateProcessingDialog : public I_DialogWindow
 {
