@@ -31,24 +31,6 @@ Server::Server(bool &server_started){
     connect(readyReadManager, &ReadyReadManager::signalSendToOneRRManager, this, &Server::slotSendToOneClient);
 }
 
-void Server::slotNewWorkspaceFolder(QString newFolderPath) //  пока неработающий обработчик новой директории
-{
-    this->workspaceFolder = newFolderPath;  //  установили новую директорию
-
-    entryFolder = workspaceFolder+"/Data/Entry";    //  папка для файлов извне
-    readyReadManager->setEntryFolder(entryFolder);
-
-    storageFolder = workspaceFolder+"/Data/Storage";    //  папка для хранения конечных файлов
-    expectationFolder = workspaceFolder+"/Data/Expectation";    //  папка для файлов в состоянии ожидания
-
-    fileSystemWatcher = new QFileSystemWatcher;
-    fileSystemWatcher->addPath(entryFolder);    //  устанавливаем на слежку папку для приходящих извне файлов
-
-    connect(fileSystemWatcher, &QFileSystemWatcher::directoryChanged, this, &Server::slotEntryFolderChanged);
-
-    qDebug() << "Server::slotNewWorkspaceFolder:        " << this->entryFolder;
-}
-
 void Server::SendPossibleProcessing(QTcpSocket* socketForSend, QMap<QString,QVariant> possibleProcessingData)
 {
     Data.clear();   //  может быть мусор
@@ -112,6 +94,41 @@ void Server::slotUpdatePossibleProcessing(QVariant newPossibleProcessingData)
 
     emit signalStatusServer("Список обработок отправлен всем клиентам!");
     qDebug() << "Server::slotUpdatePossibleProcessing:      " << this->possibleProcessing;
+}
+
+void Server::slotSetServerFolders(QMap<QString, QString> &subFolders)
+{
+    for(auto it = subFolders.begin(); it != subFolders.end(); it++){
+
+        if(it.key() == "Root"){
+            this->workspaceFolder = it.value();  //  установили новую директорию
+            continue;
+        }
+
+        if(it.key() == "Entry"){
+            entryFolder = it.value();    //  папка для файлов извне
+            readyReadManager->setEntryFolder(entryFolder);
+
+            fileSystemWatcher = new QFileSystemWatcher;
+            fileSystemWatcher->addPath(entryFolder);    //  устанавливаем на слежку папку для приходящих извне файлов
+
+            connect(fileSystemWatcher, &QFileSystemWatcher::directoryChanged, this, &Server::slotEntryFolderChanged);
+            continue;
+        }
+
+        if(it.key() == "Storage"){
+            storageFolder = it.value();    //  папка для хранения конечных файлов
+            continue;
+        }
+
+        if(it.key() == "Expectation"){
+            expectationFolder = it.value();    //  папка для файлов в состоянии ожидания
+            continue;
+        }
+    }
+
+    qDebug() << "Server::slotSetServerFolders:      " << this->entryFolder;
+    qDebug() << "Server::slotSetServerFolders:      " << entryFolder << storageFolder << expectationFolder;
 }
 
 void Server::incomingConnection(qintptr socketDescriptor){  //  обработчик нового подключения

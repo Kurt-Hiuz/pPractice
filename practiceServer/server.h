@@ -97,16 +97,16 @@ private slots:
     void slotStatusServer(QString status);
     void slotSendToAllClients(QString typeOfMsg, QString str);
     void slotSendToOneClient(QTcpSocket* sendSocket, QString typeOfMsg, QString str);
+    void slotEntryFolderChanged(const QString &fileName);  //  обработчик изменений в директории
 
 public slots:
     void incomingConnection(qintptr socketDescriptor);  //  обработчик новых подключений
     void slotReadyRead();   //  обработчик полученных от клиента сообщений и файлов
     void slotDisconnect();  //  обработчик отключившихся клиентов
-    void slotNewWorkspaceFolder(QString newFolderPath);  //  обработчик новой директории
-    void slotEntryFolderChanged(const QString & fileName);  //  обработчик изменений в директории
     void slotSocketDisplayed(QTcpSocket* displayedSocket);  //  обработчик для размещенного сокета
     void slotDisconnectSocket(int socketDiscriptorToDelete);    //  обработчик для принудительного удаления сокета
     void slotUpdatePossibleProcessing(QVariant newPossibleProcessingData);
+    void slotSetServerFolders(QMap<QString, QString> &subFolders);
 
 signals:
     void signalStatusServer(QString);   //  слот для обработки состояния сервера
