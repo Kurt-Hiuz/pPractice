@@ -38,7 +38,7 @@ void ServerFileManager::processData(QDataStream &inStream)
 
         emit signalStatusRRManager("Файл "+fileName+" создан на клиенте");  //  уведомляем
 
-        emit signalSendToServer("Request part of file", "Downloading new part of file...");    //  запрашиваем первую часть файла
+        emit signalSendToServer("Request part of processing file", "Downloading new part of file...");    //  запрашиваем первую часть файла
     } else {
 
         if((fileSize - file->size()) < blockData){  //  если разница между плановым и текущим размером файла меньше блока байтов
@@ -59,7 +59,7 @@ void ServerFileManager::processData(QDataStream &inStream)
         if(file->size() < fileSize){    //  если размер до сих пор не полон
             emit signalStatusRRManager("Текущий размер файла "+fileName+" от сервера = "+QString::number(file->size())+"\n"+"Ожидаемый размер = "+QString::number(fileSize));
 
-            emit signalSendToServer("Request part of file", "<font color = black><\\font>Downloading new part of file...<font color = black><\\font>");    //  запрашиваем первую часть файла
+            emit signalSendToServer("Request part of processing file", "<font color = black><\\font>Downloading new part of file...<font color = black><\\font>");    //  запрашиваем первую часть файла
         } else {
             //  оформляем чат на стороне Сервера
             emit signalStatusRRManager("Server: send file by name \""+fileName+"\"");
