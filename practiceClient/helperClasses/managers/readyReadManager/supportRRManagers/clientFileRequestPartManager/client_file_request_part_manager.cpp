@@ -56,6 +56,8 @@ void ClientFileRequestPartManager::setFilePath(QString &filePath)
     fileSize = file->size();
     if(!file->open(QIODevice::ReadOnly)){
         emit signalStatusRRManager("Невозможно открыть файл "+filePath+" для дальнейшей отправки");
+        delete file; //  удаляем файл
+        file = nullptr; //  удаляем файл
         return;
     }
 }
