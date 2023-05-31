@@ -123,7 +123,6 @@ private slots:
     void updateUiComboBoxSlot(const QString &fileName);
 
 signals:
-    void signalNewWorkspaceFolder(QString);
     void signalSocketDisplayed(QTcpSocket* displayedSocket);
     void signalDisconnectSocket(int socketDiscriptor);
     void signalUpdatePossibleProcessing(QVariant newPossibleProcessingData);

@@ -32,7 +32,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(server, &Server::signalStatusServer, this, &MainWindow::slotStatusServer);  //  связка для отображения статуса сервера, вывод в консоль
     connect(server, &Server::signalAddSocketToListWidget, this, &MainWindow::slotAddSocketToListWidget);    //  связка для отображения добавления клиентов в clientsListWidget
     connect(server, &Server::signalDeleteSocketFromListWidget, this, &MainWindow::slotDeleteSocketFromListWidget);  //  связка для удаления сокета из clientsListWidget
-    connect(this, &MainWindow::signalNewWorkspaceFolder, server, &Server::slotNewWorkspaceFolder);  //  связка для отображения новой директории
     connect(this, &MainWindow::signalSocketDisplayed, server, &Server::slotSocketDisplayed);    //  связка для отправки подключившемуся сокету список доступных обработок
     connect(this, &MainWindow::signalDisconnectSocket, server, &Server::slotDisconnectSocket);  //  связка для принудительного удаления сокета
     connect(this, &MainWindow::signalUpdatePossibleProcessing, server, &Server::slotUpdatePossibleProcessing);  //  связка для обновления списка обработок у клиентоав
@@ -44,6 +43,7 @@ MainWindow::MainWindow(QWidget *parent)
     workspaceManager = new WorkspaceManager();
     connect(workspaceManager, &WorkspaceManager::signalUpdateUiComboBox, this, &MainWindow::updateUiComboBoxSlot);
     connect(workspaceManager, &WorkspaceManager::signalStatusServer, this, &MainWindow::slotStatusServer);  //  связка для отображения статуса сервера, вывод в консоль
+    connect(workspaceManager, &WorkspaceManager::signalSetServerFolders, server, &Server::slotSetServerFolders);
 
     m_selectWorkspaceFrame = new SelectWorkspaceFrame(this);
     m_possibleProcessingFrame = new PossibleProcessingComboBoxFrame(this);
