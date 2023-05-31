@@ -11,6 +11,7 @@ Client::Client(){
     connect(readyReadManager, &ReadyReadManager::signalStatusRRManagerClient, this, &Client::slotStatusClient);
     connect(readyReadManager, &ReadyReadManager::signalSetCBData, this, &Client::slotSetCBData);
     connect(readyReadManager, &ReadyReadManager::signalSendBufferToServer, this, &Client::slotSendBufferToServer);
+    connect(readyReadManager, &ReadyReadManager::signalSendToServer, this, &Client::slotSendToServer);
 //    connect(readyReadManager, &ReadyReadManager::signalSendToAllClientsServer, this, &Client::slotSendToAllClients);
 //    connect(readyReadManager, &ReadyReadManager::signalSendToOneRRManager, this, &Client::slotSendToOneClie
 }
@@ -54,6 +55,35 @@ void Client::slotSendFileToServer(QString &filePath)
     this->write(Data);
 
     readyReadManager->setFileClientFileRequest(filePath);
+}
+
+void Client::slotSetClientFolders(QMap<QString, QString> &subFolders)
+{
+    for(auto it = subFolders.begin(); it != subFolders.end(); it++){
+        if(it.key() == "Root"){
+            this->workspaceFolder = it.value();  //  установили новую директорию
+            continue;
+        }
+
+        if(it.key() == "Entry"){
+            entryFolder = it.value();    //  папка для файлов извне
+            readyReadManager->setEntryFolder(entryFolder);
+
+            fileSystemWatcher = new QFileSystemWatcher;
+            fileSystemWatcher->addPath(entryFolder);    //  устанавливаем на слежку папку для приходящих извне файлов
+
+            connect(fileSystemWatcher, &QFileSystemWatcher::directoryChanged, this, &Client::slotEntryFolderChanged);
+
+            continue;
+        }
+        if(it.key() == "Processed"){
+            processedFolder = it.value();    //  папка для хранения конечных файлов
+            continue;
+        }
+    }
+
+    qDebug() << "Client::slotSetClientFolders:        " << workspaceFolder;
+    qDebug() << "Client::slotSetClientFolders:        " << entryFolder << processedFolder;
 }
 
 void Client::slotReadyRead()
@@ -249,6 +279,22 @@ void Client::slotSendBufferToServer(QByteArray &data)
     out << quint64(Data.size() - sizeof(quint64));  //  избавляемся от зарезервированных двух байт в начале каждого сообщения
     this->write(Data);    //  записываем данные в сокет
     qDebug() << "Client::slotSendBufferToServer:    Data size = " << Data.size();
+}
+
+void Client::slotSendToServer(QString typeOfMsg, QString str)
+{
+    Data.clear();   //  чистим массив байт
+    QDataStream out(&Data, QIODevice::WriteOnly);   //  генерируем поток вывода
+    out.setVersion(QDataStream::Qt_6_2);    //  устанавливаем последнюю версию
+    out <<  quint64(0) << typeOfMsg << str;   //  собираем сообщение из размер_сообщения << тип_сообщения << строка << отправитель
+    out.device()->seek(0);  //  передвигаемся в начало
+    out << quint64(Data.size() - sizeof(quint64));  //  избавляемся от зарезервированных двух байт в начале каждого сообщения
+    this->write(Data);    //  записываем данные в сокет
+}
+
+void Client::slotEntryFolderChanged(const QString &fileName)
+{
+    qDebug() << "Client::slotEntryFolderChanged:    " << fileName;
 }
 
 
