@@ -21,7 +21,7 @@ private:
     int fileSize;   //  размер файла
     QString fileName;   //  его название
     QFile *file;     //  сам файлик
-    char *bytes = {0};     //  массив байт данных
+    char *bytes = nullptr;     //  массив байт данных
     int blockData = 1000000;  //  размер данных
     QByteArray buffer;
 
