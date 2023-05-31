@@ -43,7 +43,7 @@ MainWindow::MainWindow(QWidget *parent)
     chatFrame = new ChatFrame(this);
     fileFrame = new FileFrame(this);
 
-    selectWorkspaceFrame = new SelectWorkspaceFrame();
+    selectWorkspaceFrame = new SelectWorkspaceFrame(this);
     selectProcessorFrame = new SelectProcessorFrame();
 
     connectFrame->createInterface();
@@ -64,6 +64,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->mainFrame->setLayout(mainContainer);
     ui->settingsMainFrame->setLayout(settingsContainer);
+
+    workspaceManager = new WorkspaceManager();
+    connect(workspaceManager, &WorkspaceManager::signalStatusClient, this, &MainWindow::slotStatusClient);  //  связка для отображения статуса клиента, вывод в консоль
+
 }
 
 MainWindow::~MainWindow()
@@ -119,6 +123,25 @@ void MainWindow::slotSetCBDataForm(QMap<QString, QVariant> possibleProcessingDat
 void MainWindow::slotSetFilePathLabel(QString text)
 {
     fileFrame->setValue(text);
+}
+
+void MainWindow::on_chooseWorkspaceDirPushButton_clicked(){
+    QString folderPath = QFileDialog::getExistingDirectory(0, "Выбор папки", "");  //  выбираем папку
+    if(!folderPath.isEmpty()){
+        //  для наглядности работы сохраняем путь в информационный QLabel
+        //  при вызове setValue данный виджет сам вызовет сигнал для установки директории на сервере
+        selectWorkspaceFrame->setValue(folderPath);
+        ui->consoleTextBrowser->append(selectWorkspaceFrame->getValue().firstKey());
+
+        qDebug() << "MainWindow::on_chooseWorkspaceDirPushButton_clicked:   " << folderPath;
+
+        workspaceManager->setRootFolder(folderPath);
+        if(workspaceManager->createWorkspaceFolders()){
+            ui->consoleTextBrowser->append("<hr/>Рабочая папка организована!");
+        } else {
+            ui->consoleTextBrowser->append("<hr/>Рабочая папка не организована!");
+        }
+    }
 }
 
 //void MainWindow::SendPartOfFile()

@@ -26,6 +26,7 @@
 /// =========================   Классы проекта
 #include "client.h"             //  класс клиента
 #include "components/frames/cardFrame/I_cardframe.h"    //  интерфейс виджета-карточки
+#include "helperClasses/managers/workspaceManager/workspace_manager.h"  //  менеджер рабочей папки
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -49,6 +50,7 @@ private:
     Ui::MainWindow *ui;
     Client *client;
     QTcpSocket *socket; //  сокет соединения
+
     QByteArray Data;    //  передаваемые файлы
 
     QMap<QString,QString> mapRequest;   //  определяем глоссарий запросов к сторонам
@@ -82,11 +84,16 @@ private:
     I_CardFrame *selectWorkspaceFrame;
     I_CardFrame *selectProcessorFrame;
 
+    WorkspaceManager *workspaceManager;
+
 private slots:
     void slotStatusClient(QString status);
     void slotMessageTextBrowser(QString message);
     void slotSetCBDataForm(QMap<QString,QVariant> possibleProcessingData);
     void slotSetFilePathLabel(QString text);
+
+public slots:
+    void on_chooseWorkspaceDirPushButton_clicked();
 
 //public slots:
 //    void slotReadyRead();   //  слот готовности к чтению сообщений
