@@ -21,9 +21,12 @@
 
 ///  ========================    классы проекта
 #include "supportRRManagers/I_message_manager.h"    //  для работы с ссылками обработчиков
-#include "supportRRManagers/nullManager/null_manager.h"    //  для определения менеджера "заглушки"
-#include "supportRRManagers/clientsMessageManager/clients_message_manager.h"    //  для определения менеджера "Message"
-#include "supportRRManagers/clientsFileManager/clients_file_manager.h"  //  для определения менеджера "File"
+                                                            //  для определения менеджера..
+#include "supportRRManagers/nullManager/null_manager.h"     //   .."заглушки"
+#include "supportRRManagers/clientsMessageManager/clients_message_manager.h"    //  .."Message"
+#include "supportRRManagers/clientsFileManager/clients_file_manager.h"  //  .."File"
+#include "supportRRManagers/fileDownloadedManager/file_downloaded_manager.h"    //  .."File Downloaded"
+#include "supportRRManagers/serverRequestPartFileManager/server_request_part_file_manager.h"    //  .."Request part of processing file"
 ///  ========================
 ///
 ///  ========================    классы для работы
@@ -39,6 +42,8 @@ private:
 
     ClientsMessageManager *clientsMessageManager;
     ClientsFileManager *clientsFileManager;
+    FileDownloadedManager *fileDownloadedManager;
+    ServerRequestPartFileManager *serverRequestPartFileManager;
     NullManager *nullManager;
 public:
     ReadyReadManager();
@@ -49,11 +54,13 @@ signals:
     void signalStatusRRManagerServer(QString status);
     void signalSendToAllClientsServer(QString typeOfMsg, QString str);
     void signalSendToOneRRManager(QTcpSocket* socket, QString typeOfMsg, QString str);
+    void signalSendBufferToClient(QByteArray &buffer);
 
 private slots:
     void slotStatusRRManager(QString status);
     void slotSendToAllClientsRRManager(QString typeOfMsg, QString str);
     void slotSendToOneRRManager(QTcpSocket* socket, QString typeOfMsg, QString str);
+    void slotSendBufferRRManager(QByteArray &buffer);
 };
 
 #endif // READYREADMANAGER_H

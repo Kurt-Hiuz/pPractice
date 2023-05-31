@@ -10,9 +10,18 @@ ReadyReadManager::ReadyReadManager()
     connect(clientsFileManager, &ClientsFileManager::signalStatusRRManager, this, &ReadyReadManager::slotStatusRRManager);
     connect(clientsFileManager, &ClientsFileManager::signalSendToOneRRManager, this, &ReadyReadManager::slotSendToOneRRManager);
 
+    serverRequestPartFileManager = new ServerRequestPartFileManager();
+    connect(serverRequestPartFileManager, &ServerRequestPartFileManager::signalStatusRRManager, this, &ReadyReadManager::slotStatusRRManager);
+    connect(serverRequestPartFileManager, &ServerRequestPartFileManager::signalSendBufferRRManager, this, &ReadyReadManager::slotSendBufferRRManager);
+
+    fileDownloadedManager = new FileDownloadedManager();
+    connect(fileDownloadedManager, &FileDownloadedManager::signalStatusRRManager, this, &ReadyReadManager::slotStatusRRManager);
+    connect(fileDownloadedManager, &FileDownloadedManager::signalClearFileData, serverRequestPartFileManager, &ServerRequestPartFileManager::slotClearFileData);
+
     nullManager = new NullManager();
     messageManagers[clientsMessageManager->typeOfMessage()] = clientsMessageManager;
     messageManagers[clientsFileManager->typeOfMessage()] = clientsFileManager;
+    messageManagers[fileDownloadedManager->typeOfMessage()] = fileDownloadedManager;
 }
 
 I_MessageManager *ReadyReadManager::identifyMessage(QString typeOfMess)
@@ -49,4 +58,10 @@ void ReadyReadManager::slotSendToOneRRManager(QTcpSocket *socket, QString typeOf
 {
     qDebug() << "ReadyReadManager::slotSendToOneRRManager:     " << typeOfMsg << " | " << str;
     emit signalSendToOneRRManager(socket, typeOfMsg, str);
+}
+
+void ReadyReadManager::slotSendBufferRRManager(QByteArray &buffer)
+{
+    qDebug() << "ReadyReadManager::slotSendBufferRRManager:     buffer.size(): " << buffer.size();
+    emit signalSendBufferToClient(buffer);
 }
