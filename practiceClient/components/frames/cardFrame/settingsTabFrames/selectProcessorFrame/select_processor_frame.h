@@ -5,6 +5,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QHBoxLayout>
+#include <QVariant>
 
 class SelectProcessorFrame : public I_CardFrame
 {
