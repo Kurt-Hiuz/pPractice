@@ -2,6 +2,7 @@
 #define POSSIBLEPROCESSINGMANAGER_H
 
 #include "../I_message_manager.h"
+#include <QDataStream>
 
 class PossibleProcessingManager : public I_MessageManager
 {
