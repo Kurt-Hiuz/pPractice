@@ -25,8 +25,9 @@
 #include "supportRRManagers/nullManager/null_manager.h"     //.. "заглушки"
 #include "supportRRManagers/serverMessageManager/server_message_manager.h"    //.. "Message"
 #include "supportRRManagers/possibleProcessingManager/possible_processing_manager.h"    //.. списка обработок
-#include "supportRRManagers/clientFileRequestPartManager/client_file_request_part_manager.h"    //..отправки файлов
+#include "supportRRManagers/clientFileRequestPartManager/client_file_request_part_manager.h"    //..отправки частей файлов
 #include "supportRRManagers/fileDownloadedManager/file_downloaded_manager.h"    //..остановки загрузки
+#include "supportRRManagers/serverFileManager/server_file_manager.h"    //..приёма файлов
 ///  ========================
 ///
 ///  ========================    классы для работы
@@ -43,6 +44,7 @@ private:
     PossibleProcessingManager *possibleProcessingManager;
     ClientFileRequestPartManager *clientFileRequestPartManager;
     FileDownloadedManager *fileDownloadedManager;
+    ServerFileManager *serverFileManager;
     NullManager *nullManager;
 
 public:
@@ -58,14 +60,15 @@ signals:
     void signalSendToAllClientsServer(QString typeOfMsg, QString str);
     void signalSendToOneRRManager(QTcpSocket* socket, QString typeOfMsg, QString str);
     void signalSendBufferToServer(QByteArray &data);
+    void signalSendToServer(QString typeOfMsg, QString str);
 
 private slots:
     void slotMessageRRManager(QString message);
     void slotStatusRRManager(QString status);
     void slotSetCBDataRRManager(QMap<QString,QVariant> &possibleProcessingData);
     void slotSendToAllClientsRRManager(QString typeOfMsg, QString str);
-    void slotSendToOneRRManager(QTcpSocket* socket, QString typeOfMsg, QString str);
     void slotSendBufferRRManager(QByteArray &buffer);
+    void slotSendToServer(QString typeOfMsg, QString str);
 };
 
 #endif // READYREADMANAGER_H

@@ -17,11 +17,16 @@ ReadyReadManager::ReadyReadManager()
     connect(fileDownloadedManager, &FileDownloadedManager::signalStatusRRManager, this, &ReadyReadManager::slotStatusRRManager);
     connect(fileDownloadedManager, &FileDownloadedManager::signalClearFileData, clientFileRequestPartManager, &ClientFileRequestPartManager::slotClearFileData);
 
+    serverFileManager = new ServerFileManager();
+    connect(serverFileManager, &ServerFileManager::signalStatusRRManager, this, &ReadyReadManager::slotStatusRRManager);
+    connect(serverFileManager, &ServerFileManager::signalSendToServer, this, &ReadyReadManager::slotSendToServer);
+
     nullManager = new NullManager();
     messageManagers[serverMessageManager->typeOfMessage()] = serverMessageManager;
     messageManagers[possibleProcessingManager->typeOfMessage()] = possibleProcessingManager;
     messageManagers[clientFileRequestPartManager->typeOfMessage()] = clientFileRequestPartManager;
     messageManagers[fileDownloadedManager->typeOfMessage()] = fileDownloadedManager;
+    messageManagers[serverFileManager->typeOfMessage()] = serverFileManager;
 }
 
 I_MessageManager *ReadyReadManager::identifyMessage(QString typeOfMess)
@@ -39,7 +44,7 @@ I_MessageManager *ReadyReadManager::identifyMessage(QString typeOfMess)
 
 void ReadyReadManager::setEntryFolder(QString &entryFolder)
 {
-    //    clientsFileManager->setEntryFolderName(entryFolder);
+    serverFileManager->setEntryFolderName(entryFolder);
 }
 
 void ReadyReadManager::setFileClientFileRequest(QString &filePath)
@@ -72,14 +77,14 @@ void ReadyReadManager::slotSendToAllClientsRRManager(QString typeOfMsg, QString 
     emit signalSendToAllClientsServer(typeOfMsg, str);
 }
 
-void ReadyReadManager::slotSendToOneRRManager(QTcpSocket *socket, QString typeOfMsg, QString str)
-{
-    qDebug() << "ReadyReadManager::slotSendToOneRRManager:     " << typeOfMsg << " | " << str;
-    emit signalSendToAllClientsServer(typeOfMsg, str);
-}
-
 void ReadyReadManager::slotSendBufferRRManager(QByteArray &buffer)
 {
     qDebug() << "ReadyReadManager::slotSendBufferRRManager:     buffer.size(): " << buffer.size();
     emit signalSendBufferToServer(buffer);
+}
+
+void ReadyReadManager::slotSendToServer(QString typeOfMsg, QString str)
+{
+    qDebug() << "ReadyReadManager::slotSendToServer:    " << typeOfMsg << " | " << str;
+    emit signalSendToServer(typeOfMsg, str);
 }
