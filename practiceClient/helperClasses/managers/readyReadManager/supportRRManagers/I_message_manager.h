@@ -12,6 +12,7 @@
 #include <QObject>              //  для создания объекта
 #include <QTcpSocket>           //  для работы с сокетом
 #include <QDebug>               //  для дебага
+///  ========================
 
 class I_MessageManager : public QObject
 {
