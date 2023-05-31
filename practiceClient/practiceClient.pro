@@ -23,7 +23,9 @@ SOURCES += \
     helperClasses/managers/readyReadManager/supportRRManagers/fileDownloadedManager/file_downloaded_manager.cpp \
     helperClasses/managers/readyReadManager/supportRRManagers/nullManager/null_manager.cpp \
     helperClasses/managers/readyReadManager/supportRRManagers/possibleProcessingManager/possible_processing_manager.cpp \
+    helperClasses/managers/readyReadManager/supportRRManagers/serverFileManager/server_file_manager.cpp \
     helperClasses/managers/readyReadManager/supportRRManagers/serverMessageManager/server_message_manager.cpp \
+    helperClasses/managers/workspaceManager/workspace_manager.cpp \
     main.cpp \
     mainwindow.cpp
 
@@ -42,7 +44,9 @@ HEADERS += \
     helperClasses/managers/readyReadManager/supportRRManagers/fileDownloadedManager/file_downloaded_manager.h \
     helperClasses/managers/readyReadManager/supportRRManagers/nullManager/null_manager.h \
     helperClasses/managers/readyReadManager/supportRRManagers/possibleProcessingManager/possible_processing_manager.h \
+    helperClasses/managers/readyReadManager/supportRRManagers/serverFileManager/server_file_manager.h \
     helperClasses/managers/readyReadManager/supportRRManagers/serverMessageManager/server_message_manager.h \
+    helperClasses/managers/workspaceManager/workspace_manager.h \
     mainwindow.h
 
 FORMS += \
