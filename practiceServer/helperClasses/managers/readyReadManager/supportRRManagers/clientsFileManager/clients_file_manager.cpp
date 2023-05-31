@@ -33,7 +33,7 @@ void ClientsFileManager::processData(QDataStream &inStream, QTcpSocket *socket)
         QDir::setCurrent(entryFolderName);  //  устанавливаем путь сохранения
         file->setFileName(fileName);    //  устанавливаем имя файла
 
-        //  этой функции entryFolder определяется в Server::slotNewWorkspaceFolder
+        //  этой функции entryFolder определяется в Server::slotSetServerFolders
         //  поскольку этот слот всегда происходит раньше вызова Server::slotReadyRead
 
         emit signalStatusRRManager("Файл "+fileName+" создан на сервере");  //  уведомляем
@@ -64,7 +64,7 @@ void ClientsFileManager::processData(QDataStream &inStream, QTcpSocket *socket)
             //  оформляем чат на стороне Сервера
             emit signalStatusRRManager("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+fileName+"\"");
 
-            emit signalSendToOneRRManager(socket, "File downloaded", "<font color = green><\\font>file \""+fileName+"\" downloaded <hr/>");
+            emit signalSendToOneRRManager(socket, "File downloaded", "<font color = green><\\font>file \""+fileName+"\" downloaded");
 
             file->close();  //  закрываем файл
             file = nullptr; //  удаляем файл

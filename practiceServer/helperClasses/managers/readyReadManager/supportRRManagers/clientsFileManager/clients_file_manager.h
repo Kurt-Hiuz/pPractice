@@ -1,7 +1,7 @@
 #ifndef FILEMANAGER_H
 #define FILEMANAGER_H
 
-///     Класс FileManager реализует интерфейс I_MessageManager
+///     Класс ClientsFileManager реализует интерфейс I_MessageManager
 ///     обрабатывает всё необходимое, что связанное с присылаемыми файлами
 ///     Переменные:
 ///         file - определяем файл
@@ -19,7 +19,6 @@
 ///     Сигналы:
 ///         signalStatusRRManager() - отправка статуса ReadyReadManager'у
 ///         signalSendToOneRRManager() - отправка сообщения одному клиенту через ReadyReadManager
-///
 
 ///  ========================    классы проекта
 #include "../I_message_manager.h"   //  реализуем интерфейс
