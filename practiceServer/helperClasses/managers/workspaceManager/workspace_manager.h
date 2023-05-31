@@ -18,9 +18,12 @@
 ///         saveSettings() - принимает json объект и создаёт из него файл.json, возвращая отчёт в консоль
 ///         setRootFolder() - устанавливает новые пути для папок
 ///     Слоты:
-///         workspaceFileChanged() - обработка сигнала от QFileSystemWatcher::directoryChanged
+///         workspaceDirectoryChanged() - обработка сигнала от QFileSystemWatcher::directoryChanged
+///         workspaceFileChanged() - обработка сигнала от QFileSystemWatcher::fileChanged
 ///     Сигналы:
 ///         signalUpdateUiComboBox() - сигнал для смены данных в ComboBox обработок
+///         signalStatusServer() - сигнал для отображения статуса сервера
+///         signalSetServerFolders() - сигнал для установки папок сервера
 
 ///  ========================    классы проекта
 #include "helperClasses/managers/workspaceManager/settingsManager/settings_manager.h"   //  менеджер для папки /Settings
@@ -54,6 +57,7 @@ public:
 signals:
     void signalUpdateUiComboBox(const QString &fileName);
     void signalStatusServer(QString status);
+    void signalSetServerFolders(QMap<QString, QString> &subFolders);
 
 private:
     QString rootFolder;

@@ -39,6 +39,14 @@ void WorkspaceManager::setRootFolder(QString incomingRootFolder)
 
     if(watchingFolders == folders){
         status = "Все папки отслеживаются";
+        QMap<QString, QString> subFolders;
+
+        subFolders.insert("Root", rootFolder);
+        subFolders.insert("Entry", entryFolder);
+        subFolders.insert("Expectation", expectationFolder);
+        subFolders.insert("Storage", storageFolder);
+
+        emit signalSetServerFolders(subFolders);
     } else {
         status = "Не все папки отслеживаются";
     }
@@ -53,7 +61,7 @@ void WorkspaceManager::setRootFolder(QString incomingRootFolder)
 
 void WorkspaceManager::workspaceFileChanged(const QString &fileName)
 {
-    emit updateUiComboBoxSignal(fileName);
+    emit signalUpdateUiComboBox(fileName);
 }
 
 void WorkspaceManager::workspaceDirectoryChanged(const QString &fodlerName)
