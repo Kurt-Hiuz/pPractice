@@ -19,7 +19,7 @@
 ///  ========================
 ///
 ///  ========================    классы для работы с виджетами
-#include <QLineEdit>            //  поле ввода текста
+#include <QSpinBox>             //  поле ввода натуральных чисел
 #include <QLabel>               //  метка для подсказки
 ///  ========================
 
@@ -32,11 +32,11 @@ public:
     void createInterface() override;
     QMap<QString, QVariant> getValue() override;
     void setValue(QVariant value) override;
-    void enableInteface() override;
+    void enableInteface(bool value) override;
 
 private:
     QString consoleMessage;
-    QLineEdit *changePortLineEdit;
+    QSpinBox *changePortSpinBox;
     QLabel *dataLabel;
     MainWindow *parentUi; 
 };
