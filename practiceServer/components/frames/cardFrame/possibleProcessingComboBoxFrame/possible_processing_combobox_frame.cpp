@@ -35,9 +35,9 @@ void PossibleProcessingComboBoxFrame::createInterface()
     frameLayout->addWidget(updateProcessingPushButton);
 }
 
-void PossibleProcessingComboBoxFrame::enableInteface(){
-    updateProcessingPushButton->setEnabled(true);
-    possibleProcessingComboBox->setEnabled(true);
+void PossibleProcessingComboBoxFrame::enableInteface(bool value){
+    updateProcessingPushButton->setEnabled(value);
+    possibleProcessingComboBox->setEnabled(value);
 }
 
 QMap<QString, QVariant> PossibleProcessingComboBoxFrame::getValue()

@@ -24,8 +24,8 @@ void MaxConnectionSpinBoxFrame::createInterface()
     frameLayout->addWidget(maxConnectionSpinBox);
 }
 
-void MaxConnectionSpinBoxFrame::enableInteface(){
-    maxConnectionSpinBox->setEnabled(true);
+void MaxConnectionSpinBoxFrame::enableInteface(bool value){
+    maxConnectionSpinBox->setEnabled(value);
 }
 
 QMap<QString, QVariant> MaxConnectionSpinBoxFrame::getValue()

@@ -38,7 +38,7 @@ void SelectWorkspaceFrame::setValue(QVariant value){
     dataLabel->setText(value.toString());
 }
 
-void SelectWorkspaceFrame::enableInteface()
+void SelectWorkspaceFrame::enableInteface(bool value)
 {
-    return;
+    chooseWorkspaceDirPushButton->setEnabled(value);
 }

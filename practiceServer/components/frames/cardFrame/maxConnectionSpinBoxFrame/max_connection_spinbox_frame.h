@@ -33,7 +33,7 @@ public:
     void createInterface() override;
     QMap<QString, QVariant> getValue() override;
     void setValue(QVariant value) override;
-    void enableInteface() override;
+    void enableInteface(bool value) override;
 
 private:
     QString consoleMessage;
