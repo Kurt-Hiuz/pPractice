@@ -42,7 +42,7 @@ void ServerRequestPartFileManager::processData(QDataStream &inStream, QTcpSocket
         bytes = nullptr;
     }
 
-    emit signalSendBufferRRManager(buffer);
+    emit signalSendBufferRRManager(socket, buffer);
 }
 
 QString ServerRequestPartFileManager::typeOfMessage()

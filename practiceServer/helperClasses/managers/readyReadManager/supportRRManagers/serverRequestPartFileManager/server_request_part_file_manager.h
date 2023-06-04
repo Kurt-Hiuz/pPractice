@@ -36,7 +36,7 @@ public:
 
 signals:
     void signalStatusRRManager(QString status);
-    void signalSendBufferRRManager(QByteArray &buffer);
+    void signalSendBufferRRManager(QTcpSocket *socketToSend, QByteArray &buffer);
 
 private:
     QString str;
