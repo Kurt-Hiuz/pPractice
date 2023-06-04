@@ -12,8 +12,6 @@ Client::Client(){
     connect(readyReadManager, &ReadyReadManager::signalSetCBData, this, &Client::slotSetCBData);
     connect(readyReadManager, &ReadyReadManager::signalSendBufferToServer, this, &Client::slotSendBufferToServer);
     connect(readyReadManager, &ReadyReadManager::signalSendToServer, this, &Client::slotSendToServer);
-//    connect(readyReadManager, &ReadyReadManager::signalSendToAllClientsServer, this, &Client::slotSendToAllClients);
-//    connect(readyReadManager, &ReadyReadManager::signalSendToOneRRManager, this, &Client::slotSendToOneClie
 }
 
 void Client::slotSendTextToServer(QString &message, QString &senderName)
