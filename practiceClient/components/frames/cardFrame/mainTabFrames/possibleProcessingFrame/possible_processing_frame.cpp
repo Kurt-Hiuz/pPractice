@@ -12,6 +12,8 @@ PossibleProcessingFrame::PossibleProcessingFrame(MainWindow *ui)
     chooseProcessingPushButton = new QPushButton("Выбрать");
     chooseProcessingPushButton->setObjectName("chooseProcessingPushButton");
     chooseProcessingPushButton->setEnabled(false);
+
+    connect(chooseProcessingPushButton, &QPushButton::clicked, parentUi, &MainWindow::on_chooseProcessingPushButton_clicked);
 }
 
 void PossibleProcessingFrame::createInterface()
@@ -25,7 +27,12 @@ void PossibleProcessingFrame::createInterface()
 
 QMap<QString, QVariant> PossibleProcessingFrame::getValue()
 {
+    QMap<QString, QVariant> valueMap;   //  переменная для возврата
+    //  сообщение в консоль
+    consoleMessage = "<font color = red>!!!<\\font> <br/> <font color = black><\\font>Установлены новые обработки! <br/><font color = red>!!!<\\font>";
 
+    valueMap.insert(consoleMessage, chooseProcessingComboBox->currentData());
+    return valueMap;
 }
 
 void PossibleProcessingFrame::setValue(QVariant value)
@@ -42,4 +49,9 @@ void PossibleProcessingFrame::switchEnabledInteface()
 {
     chooseProcessingComboBox->setEnabled(!chooseProcessingComboBox->isEnabled());
     chooseProcessingPushButton->setEnabled(!chooseProcessingPushButton->isEnabled());
+}
+
+QString PossibleProcessingFrame::getCurrentData()
+{
+    return chooseProcessingComboBox->currentData().toString();
 }

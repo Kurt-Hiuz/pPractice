@@ -17,11 +17,13 @@ public:
     QMap<QString, QVariant> getValue() override;
     void setValue(QVariant value) override;
     void switchEnabledInteface() override;
+    QString getCurrentData();
 
 private:
     QComboBox *chooseProcessingComboBox;
     QPushButton *chooseProcessingPushButton;
     MainWindow *parentUi;
+    QString consoleMessage;
 };
 
 #endif // POSSIBLEPROCESSINGFRAME_H
