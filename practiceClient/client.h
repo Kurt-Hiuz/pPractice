@@ -44,7 +44,7 @@ public slots:
     void slotSendTextToServer(QString &message, QString &senderName);
     void slotSendFileToServer(QString &filePath);
     void slotSetClientFolders(QMap<QString, QString> &subFolders);
-
+    void slotSendToServer(QString typeOfMsg, QString str);
 
 private slots:
     void slotReadyRead();
@@ -52,7 +52,6 @@ private slots:
     void slotStatusClient(QString status);
     void slotSetCBData(QMap<QString,QVariant> &possibleProcessingData);
     void slotSendBufferToServer(QByteArray &data);
-    void slotSendToServer(QString typeOfMsg, QString str);
     void slotEntryFolderChanged(const QString & fileName);  //  обработчик изменений в директории
 };
 
