@@ -116,7 +116,7 @@
             <bool>false</bool>
            </property>
            <property name="text">
-            <string>Сохранить настройки</string>
+            <string>Подтвердить выбор папки</string>
            </property>
           </widget>
          </item>

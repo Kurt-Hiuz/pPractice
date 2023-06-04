@@ -19,15 +19,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     server = new Server(server_started);    //  создаем сервер, передавая его состояние, которое изменится в конструкторе
 
-    if(server_started)  //  проверка состояния "true"
-        {
-            ui->infoAboutServerTextEdit->append("Сервер запущен на ["+server->serverAddress().toString()+" IP] и "+QString::number(server->generatedServerPort)+" порту");  //  уведомление
-        }
-        else
-        {
-            ui->infoAboutServerTextEdit->append("Сервер не запущен");   //  уведомление
-            return;
-        }
+    if(!server_started){  //  проверка состояния "false"
+        ui->infoAboutServerTextEdit->append("Сервер не запущен");   //  уведомление
+        return;
+    }
+    ui->infoAboutServerTextEdit->append("Сервер запущен на "+QString::number(server->generatedServerPort)+" порту");  //  уведомление
+
 
     connect(server, &Server::signalStatusServer, this, &MainWindow::slotStatusServer);  //  связка для отображения статуса сервера, вывод в консоль
     connect(server, &Server::signalAddSocketToListWidget, this, &MainWindow::slotAddSocketToListWidget);    //  связка для отображения добавления клиентов в clientsListWidget
@@ -61,6 +58,8 @@ MainWindow::MainWindow(QWidget *parent)
     settingsContainer->addWidget(m_maxConnectionSpinBoxFrame);
 
     ui->settingsFrame->setLayout(settingsContainer);
+
+    m_changePortLineEditFrame->setValue(server->generatedServerPort);
 
     // устанавливаем специальную политику отображения меню
     ui->clientsListWidget->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -164,21 +163,11 @@ void MainWindow::on_chooseWorkspaceDirPushButton_clicked()   //  по нажат
         workspaceManager->setRootFolder(folderPath);
         if(workspaceManager->createWorkspaceFolders()){
             ui->infoAboutServerTextEdit->append("<hr/>Рабочая папка организована!");
-            for(auto item : ui->settingsFrame->children()){
-
-                //  если встречаем слой выравнивания, то пропускаем
-                //  поскольку в списке настроек первым элементом всегда будет слой выравнивания
-                if(QString(item->metaObject()->className()).contains("Layout") ||
-                        item->objectName().contains("Choose workspace directory Frame")){
-                    continue;
-                }
-
-                //  включаем интерфейс
-                dynamic_cast<I_CardFrame*>(item)->enableInteface();
-            }
-        } else {
-            ui->infoAboutServerTextEdit->append("<hr/>Рабочая папка не организована!");
+            return;
         }
+
+        ui->infoAboutServerTextEdit->append("<hr/>Рабочая папка не организована!");
+
     }
 }
 
@@ -244,6 +233,15 @@ void MainWindow::on_openJSONSettingsFilePushButton_clicked()
 
 void MainWindow::on_saveSettingsPushButton_clicked()
 {
+    //  сначало мы подтверждаем выбор папки
+    //  До этого на кнопке было написано "Подтвердить выбор папки"
+    //  сейчас мы меняем название для дальнейшей работы именно с сохранением настроек
+    if(ui->saveSettingsPushButton->text() != "Сохранить настройки"){
+        ui->saveSettingsPushButton->setText("Сохранить настройки");
+    }
+    //  создаем наблюдатель за папкой Entry
+    ui->infoAboutServerTextEdit->append(workspaceManager->setEntryWatcher());
+
     //  проходимся по сгенерированному списку настроек
     for(auto item : ui->settingsFrame->children()){
 
@@ -255,12 +253,20 @@ void MainWindow::on_saveSettingsPushButton_clicked()
 
         //  получаем json вариант данных с элемента, приведённого от QObject* к I_CardFrame*
         m_currentJsonValue = m_jsonPacker.getJsonVersionValue(dynamic_cast<I_CardFrame*>(item));
+        qDebug() << "MainWindow::on_saveSettingsPushButton_clicked:     m_currentJsonValue: " << m_currentJsonValue;
 
         //  выводим в консоль сообщение, получая первый ключ
         ui->infoAboutServerTextEdit->append(dynamic_cast<I_CardFrame*>(item)->getValue().firstKey());
 
         //  дополняем в m_currentJsonObject ключ(название класса) : значение(json вариант)
         m_currentJsonObject[item->metaObject()->className()] = m_currentJsonValue;
+        //  включаем интерфейс
+        if(dynamic_cast<I_CardFrame*>(item)->objectName() == "Choose workspace directory Frame"){
+            dynamic_cast<I_CardFrame*>(item)->enableInteface(false);
+            continue;
+        }
+
+        dynamic_cast<I_CardFrame*>(item)->enableInteface(true);
     }
 
     //  добавляем в консоль отчет по сохранению настроек
@@ -295,6 +301,7 @@ void MainWindow::updateUiComboBoxSlot(const QString &fileName)
 
         //  получаем значение по ключу
         valueObject = documentObject.value(keyObject);
+        qDebug() << "MainWindow::updateUiComboBoxSlot:  valueObject:    " << valueObject;
 
         ui->settingsFrame->findChild<PossibleProcessingComboBoxFrame*>("Possible processing Frame")->setValue(valueObject);
     }
