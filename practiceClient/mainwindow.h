@@ -45,6 +45,7 @@ public:
 signals:
     void signalSendTextToServer(QString &message, QString &senderName);
     void signalSendFileToServer(QString &filePath);
+    void signalSendToServer(QString typeOfMsg, QString str);
 
 private:
     Ui::MainWindow *ui;
@@ -94,6 +95,7 @@ private slots:
 
 public slots:
     void on_chooseWorkspaceDirPushButton_clicked();
+    void on_chooseProcessingPushButton_clicked();
 
 //public slots:
 //    void slotReadyRead();   //  слот готовности к чтению сообщений

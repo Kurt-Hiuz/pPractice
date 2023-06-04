@@ -97,6 +97,7 @@ void MainWindow::setEnableInteface()
 
     connect(this, &MainWindow::signalSendTextToServer, client, &Client::slotSendTextToServer);
     connect(this, &MainWindow::signalSendFileToServer, client, &Client::slotSendFileToServer);
+    connect(this, &MainWindow::signalSendToServer, client, &Client::slotSendToServer);
     connect(client, &Client::signalStatusClient, this, &MainWindow::slotStatusClient);
     connect(client, &Client::signalMessageTextBrowser, this, &MainWindow::slotMessageTextBrowser);
     connect(client, &Client::signalSetCBDataForm, this, &MainWindow::slotSetCBDataForm);
@@ -142,6 +143,12 @@ void MainWindow::on_chooseWorkspaceDirPushButton_clicked(){
             ui->consoleTextBrowser->append("<hr/>Рабочая папка не организована!");
         }
     }
+}
+
+void MainWindow::on_chooseProcessingPushButton_clicked()
+{
+    emit signalSendToServer("Set processing on client", dynamic_cast<PossibleProcessingFrame*>(possibleProcessingFrame)->getCurrentData());   //  отправляем серверу текущий текст в комбобоксе
+    ui->consoleTextBrowser->append("Выбрано: "+dynamic_cast<PossibleProcessingFrame*>(possibleProcessingFrame)->getCurrentData()+delimiter);   //  пишем клиенту, что он выбрал
 }
 
 //void MainWindow::SendPartOfFile()
