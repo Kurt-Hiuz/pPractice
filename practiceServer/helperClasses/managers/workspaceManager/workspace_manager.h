@@ -26,7 +26,8 @@
 ///         signalSetServerFolders() - сигнал для установки папок сервера
 
 ///  ========================    классы проекта
-#include "helperClasses/managers/workspaceManager/settingsManager/settings_manager.h"   //  менеджер для папки /Settings
+#include "settingsManager/settings_manager.h"   //  менеджер для папки /Settings
+#include "entryManager/entry_manager.h"         //  менеджер для папки /Entry
 ///  ========================
 ///
 ///  ========================    классы для работы с директориями
@@ -52,7 +53,9 @@ public:
 
     bool createWorkspaceFolders();
     QString saveSettings(QJsonObject m_currentJsonObject);
+    QString createSettingFiles();
     void setRootFolder(QString incomingRootFolder);
+    QString setEntryWatcher();
 
 signals:
     void signalUpdateUiComboBox(const QString &fileName);
@@ -70,10 +73,11 @@ private:
     QFileSystemWatcher *workspaceWatcher;
 
     SettingsManager *m_settingsManager;
+    EntryManager *m_entryManager;
 
 private slots:
     void workspaceFileChanged(const QString &fileName);
-    void workspaceDirectoryChanged(const QString &fodlerName);
+    void workspaceDirectoryChanged(const QString &folderName);
 };
 
 #endif // WORKSPACEMANAGER_H

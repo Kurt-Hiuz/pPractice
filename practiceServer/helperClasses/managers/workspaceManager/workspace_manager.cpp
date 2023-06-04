@@ -20,6 +20,15 @@ QString WorkspaceManager::saveSettings(QJsonObject m_currentJsonObject)
     return m_settingsManager->setSettings(m_currentJsonObject);
 }
 
+QString WorkspaceManager::createSettingFiles()
+{
+    if(m_settingsManager->createSettingsFiles()){
+        return QString("Файлы настроек созданы в /Settings");
+    }
+
+    return QString("Файлы настроек НЕ созданы");
+}
+
 void WorkspaceManager::setRootFolder(QString incomingRootFolder)
 {
     this->rootFolder = incomingRootFolder;
@@ -30,33 +39,42 @@ void WorkspaceManager::setRootFolder(QString incomingRootFolder)
     this->expectationFolder = dataFolder+"/Expectation";
     this->storageFolder = dataFolder+"/Storage";
 
-    QStringList folders = {settingsFolder, dataFolder, entryFolder, expectationFolder, storageFolder};
+//    QStringList folders = {settingsFolder, dataFolder, entryFolder, expectationFolder, storageFolder};
 
-    this->workspaceWatcher = new QFileSystemWatcher();
+//    this->workspaceWatcher = new QFileSystemWatcher();
+//    workspaceWatcher->addPaths(folders);
 
-    QStringList watchingFolders = workspaceWatcher->addPaths(folders);
-    QString status;
+//    if(workspaceWatcher->addPath(incomingRootFolder)){
+//        emit signalStatusServer("Корневая папка не отслеживается!");
+////        qDebug() << "WorkspaceManager::setRootFolder:   folders:   " << folders;
+////        qDebug() << "WorkspaceManager::setRootFolder:   workspaceWatcher->directories():   " << workspaceWatcher->directories();
+//    } else {
+//        connect(workspaceWatcher, &QFileSystemWatcher::directoryChanged, this, &WorkspaceManager::workspaceDirectoryChanged);
+//    }
 
-    if(watchingFolders == folders){
-        status = "Все папки отслеживаются";
-        QMap<QString, QString> subFolders;
+    //  создаем map для всех папок
+    QMap<QString, QString> subFolders;
 
-        subFolders.insert("Root", rootFolder);
-        subFolders.insert("Entry", entryFolder);
-        subFolders.insert("Expectation", expectationFolder);
-        subFolders.insert("Storage", storageFolder);
+    subFolders.insert("Root", rootFolder);
+    subFolders.insert("Entry", entryFolder);
+    subFolders.insert("Expectation", expectationFolder);
+    subFolders.insert("Storage", storageFolder);
 
-        emit signalSetServerFolders(subFolders);
-    } else {
-        status = "Не все папки отслеживаются";
-    }
-    emit signalStatusServer(status);
-
-    connect(workspaceWatcher, &QFileSystemWatcher::directoryChanged, this, &WorkspaceManager::workspaceDirectoryChanged);
+    //  слот обработает контейнер папок
+    emit signalSetServerFolders(subFolders);
 
     m_settingsManager = new SettingsManager(settingsFolder);
-
     connect(m_settingsManager, &SettingsManager::processingFileChangedSignal, this, &WorkspaceManager::workspaceFileChanged);
+
+    m_entryManager = new EntryManager(entryFolder);
+}
+
+QString WorkspaceManager::setEntryWatcher()
+{
+    if(m_entryManager->setWatcher()){
+        return QString("Папка для входящих файлов отслеживается!");
+    }
+    return QString("Папка для входящих файлов НЕ отслеживается!");
 }
 
 void WorkspaceManager::workspaceFileChanged(const QString &fileName)
@@ -64,7 +82,7 @@ void WorkspaceManager::workspaceFileChanged(const QString &fileName)
     emit signalUpdateUiComboBox(fileName);
 }
 
-void WorkspaceManager::workspaceDirectoryChanged(const QString &fodlerName)
+void WorkspaceManager::workspaceDirectoryChanged(const QString &folderName)
 {
-    return;
+    qDebug() << "WorkspaceManager::workspaceDirectoryChanged:   " << folderName;
 }
