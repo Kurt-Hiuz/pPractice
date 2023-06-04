@@ -29,35 +29,61 @@ Server::Server(bool &server_started){
     connect(readyReadManager, &ReadyReadManager::signalStatusRRManagerServer, this, &Server::slotStatusServer);
     connect(readyReadManager, &ReadyReadManager::signalSendToAllClientsServer, this, &Server::slotSendToAllClients);
     connect(readyReadManager, &ReadyReadManager::signalSendToOneRRManager, this, &Server::slotSendToOneClient);
+    connect(readyReadManager, &ReadyReadManager::signalSendBufferToClient, this, &Server::slotSendBufferToClient);
+    connect(readyReadManager, &ReadyReadManager::signalSetClientProcessing, this, &Server::slotSetClientProcessing);
 }
 
-void Server::SendPossibleProcessing(QTcpSocket* socketForSend, QMap<QString,QVariant> possibleProcessingData)
+void Server::SendPossibleProcessing(QTcpSocket* socketToSend, QMap<QString,QVariant> possibleProcessingData)
 {
     Data.clear();   //  может быть мусор
-
     QDataStream out(&Data, QIODevice::WriteOnly);   //  объект out, режим работы только для записи, иначе ничего работать не будет
     out.setVersion(QDataStream::Qt_6_2);
     out << quint64(0) << mapRequest["004"] << possibleProcessingData;  //  отправляем в поток размер_сообщения, тип-сообщения и строку при необходимости
     out.device()->seek(0);  //  в начало потока
     out << quint64(Data.size() - sizeof(quint64));  //  высчитываем размер сообщения
-    socketForSend->write(Data);    //  отправляем по сокету данные
+    socketToSend->write(Data);    //  отправляем по сокету данные
 }
 
 void Server::slotEntryFolderChanged(const QString &folderName)
 {
-    qDebug() << "Server::slotEntryFolderChanged:        ";
-    processingManager = new ProcessingManager();
-    QFileInfoList list = processingManager->entryFiles(folderName);     //  получаем список файлов директории
+//    qDebug() << "Server::slotEntryFolderChanged:        ";
+//    processingManager = new ProcessingManager();
+//    QFileInfoList list = processingManager->entryFiles(folderName);     //  получаем список файлов директории
 
-    for (int i = 0; i < list.size(); i++) {
-        QFileInfo fileInfo = list.at(i);
-        qDebug() << "Server::slotEntryFolderChanged:        " << qPrintable(QString("%1 %2 %3").arg(fileInfo.size(), 10).arg(fileInfo.fileName(), 5).arg(fileInfo.lastModified().toString()));   //  выводим в формате "размер имя"
-//        SendFileToClient(fileInfo.filePath());  //  отправляем файл клиенту
+//    for (int i = 0; i < list.size(); i++) {
+//        QFileInfo fileInfo = list.at(i);
+//        qDebug() << "Server::slotEntryFolderChanged:        " << qPrintable(QString("%1 %2 %3").arg(fileInfo.size(), 10).arg(fileInfo.fileName(), 5).arg(fileInfo.lastModified().toString()));   //  выводим в формате "размер имя"
+////        SendFileToClient(fileInfo.filePath());  //  отправляем файл клиенту
+//    }
+//    qDebug() << "Server::slotEntryFolderChanged:        " << folderName;
+//    qDebug() << "Server::slotEntryFolderChanged:        " << "================";     // переводим строку
+
+//    processingManager = nullptr;    //  освобождаем память
+}
+
+void Server::slotSendBufferToClient(QTcpSocket *socketToSend, QByteArray &buffer)
+{
+    socketToSend->waitForBytesWritten();  //  мы ждем того, чтобы все байты записались
+    Data.clear();   //  чистим массив байт
+    QDataStream out(&Data, QIODevice::WriteOnly);   //  генерируем поток вывода
+    out.setVersion(QDataStream::Qt_6_2);    //  устанавливаем последнюю версию
+    out << quint64(0) << QString("File") << buffer;   //  собираем сообщение из размер_сообщения << тип_сообщения << строка << отправитель
+    out.device()->seek(0);  //  передвигаемся в начало
+    qDebug() << "Server::slotSendBufferToClient:    sending blockSize = " << quint64(Data.size() - sizeof(quint64));
+    out << quint64(Data.size() - sizeof(quint64));  //  избавляемся от зарезервированных двух байт в начале каждого сообщения
+    socketToSend->write(Data);    //  записываем данные в сокет
+    qDebug() << "Server::slotSendBufferToClient:    Data size = " << Data.size();
+}
+
+void Server::slotSetClientProcessing(QTcpSocket *socket, QString currentProcessing)
+{
+    mapSockets[socket] = currentProcessing;
+    qDebug() << "Server::setClientProcessing:     mapSockets = " << mapSockets;
+    if(currentProcessing != ""){
+        emit signalStatusServer("<font color = blue><\\font>Клиент "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+" выбрал \""+currentProcessing+"\" обработку</hr>");
+    } else {
+        emit signalStatusServer("<font color = red><\\font>Client on "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+" убрал обработку</hr>");
     }
-    qDebug() << "Server::slotEntryFolderChanged:        " << folderName;
-    qDebug() << "Server::slotEntryFolderChanged:        " << "================";     // переводим строку
-
-    processingManager = nullptr;    //  освобождаем память
 }
 
 void Server::slotSocketDisplayed(QTcpSocket* displayedSocket)
@@ -109,10 +135,10 @@ void Server::slotSetServerFolders(QMap<QString, QString> &subFolders)
             entryFolder = it.value();    //  папка для файлов извне
             readyReadManager->setEntryFolder(entryFolder);
 
-            fileSystemWatcher = new QFileSystemWatcher;
-            fileSystemWatcher->addPath(entryFolder);    //  устанавливаем на слежку папку для приходящих извне файлов
+//            fileSystemWatcher = new QFileSystemWatcher;
+//            fileSystemWatcher->addPath(entryFolder);    //  устанавливаем на слежку папку для приходящих извне файлов
 
-            connect(fileSystemWatcher, &QFileSystemWatcher::directoryChanged, this, &Server::slotEntryFolderChanged);
+//            connect(fileSystemWatcher, &QFileSystemWatcher::directoryChanged, this, &Server::slotEntryFolderChanged);
             continue;
         }
 
@@ -127,8 +153,7 @@ void Server::slotSetServerFolders(QMap<QString, QString> &subFolders)
         }
     }
 
-    qDebug() << "Server::slotSetServerFolders:      " << this->entryFolder;
-    qDebug() << "Server::slotSetServerFolders:      " << entryFolder << storageFolder << expectationFolder;
+    qDebug() << "Server::slotSetServerFolders:      all Data folders:   " << entryFolder << storageFolder << expectationFolder;
 }
 
 void Server::incomingConnection(qintptr socketDescriptor){  //  обработчик нового подключения
@@ -138,9 +163,10 @@ void Server::incomingConnection(qintptr socketDescriptor){  //  обработч
     connect(socket, &QTcpSocket::disconnected, this, &Server::slotDisconnect); //  связка удаления клиента
 
     mapSockets[socket] = "";    //  клиент пока не показал, что он умеет делать
-    Server::signalStatusServer("new client on " + QString::number(socketDescriptor));   //  уведомление о подключении
-    Server::signalAddSocketToListWidget(socket);    //  отображаем на форме в clientsListWidget этот сокет
+    emit signalStatusServer("new client on " + QString::number(socketDescriptor));   //  уведомление о подключении
+    emit signalAddSocketToListWidget(socket);    //  отображаем на форме в clientsListWidget этот сокет
     SendToAllClients(mapRequest["001"], "new client on " + QString::number(socketDescriptor));
+    SendPossibleProcessing(socket, possibleProcessing);
     qDebug() << "Server::incomingConnection:        new client on " << socketDescriptor;
     qDebug() << "Server::incomingConnection:        push quantity of clients: "+QString::number(mapSockets.size());
 }

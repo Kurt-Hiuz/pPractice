@@ -98,6 +98,8 @@ private slots:
     void slotSendToAllClients(QString typeOfMsg, QString str);
     void slotSendToOneClient(QTcpSocket* sendSocket, QString typeOfMsg, QString str);
     void slotEntryFolderChanged(const QString &fileName);  //  обработчик изменений в директории
+    void slotSendBufferToClient(QTcpSocket *socketToSend, QByteArray &buffer);
+    void slotSetClientProcessing(QTcpSocket* socket, QString currentProcessing);
 
 public slots:
     void incomingConnection(qintptr socketDescriptor);  //  обработчик новых подключений
