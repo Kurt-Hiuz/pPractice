@@ -27,6 +27,7 @@
 #include "supportRRManagers/clientsFileManager/clients_file_manager.h"  //  .."File"
 #include "supportRRManagers/fileDownloadedManager/file_downloaded_manager.h"    //  .."File Downloaded"
 #include "supportRRManagers/serverRequestPartFileManager/server_request_part_file_manager.h"    //  .."Request part of processing file"
+#include "supportRRManagers/clientsProcessingManager/clients_processing_manager.h"  //  .."Set processing on client"
 ///  ========================
 ///
 ///  ========================    классы для работы
@@ -44,6 +45,7 @@ private:
     ClientsFileManager *clientsFileManager;
     FileDownloadedManager *fileDownloadedManager;
     ServerRequestPartFileManager *serverRequestPartFileManager;
+    ClientsProcessingManager *clientsProcessingManager;
     NullManager *nullManager;
 public:
     ReadyReadManager();
@@ -54,13 +56,15 @@ signals:
     void signalStatusRRManagerServer(QString status);
     void signalSendToAllClientsServer(QString typeOfMsg, QString str);
     void signalSendToOneRRManager(QTcpSocket* socket, QString typeOfMsg, QString str);
-    void signalSendBufferToClient(QByteArray &buffer);
+    void signalSendBufferToClient(QTcpSocket *socketToSend, QByteArray &buffer);
+    void signalSetClientProcessing(QTcpSocket *socket, QString currentProcessing);
 
 private slots:
     void slotStatusRRManager(QString status);
     void slotSendToAllClientsRRManager(QString typeOfMsg, QString str);
     void slotSendToOneRRManager(QTcpSocket* socket, QString typeOfMsg, QString str);
-    void slotSendBufferRRManager(QByteArray &buffer);
+    void slotSendBufferRRManager(QTcpSocket *socketToSend, QByteArray &buffer);
+//    void slotSetClientProcessing(QTcpSocket *socket, QString currentProcessing);
 };
 
 #endif // READYREADMANAGER_H
