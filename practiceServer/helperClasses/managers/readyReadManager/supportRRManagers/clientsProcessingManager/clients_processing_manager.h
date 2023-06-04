@@ -27,6 +27,7 @@ public:
 signals:
     void signalStatusRRManager(QString status);
     void signalSendToAllClientsRRManager(QString typeOfMsg, QString str);
+    void signalSetClientProcessing(QTcpSocket *socket, QString currentProcessing);
 };
 
 #endif // CLIENTSPROCESSINGMANAGER_H

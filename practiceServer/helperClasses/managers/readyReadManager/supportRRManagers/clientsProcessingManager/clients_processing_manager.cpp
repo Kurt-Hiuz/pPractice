@@ -17,7 +17,10 @@ void ClientsProcessingManager::writeDataToStream(QDataStream &outStream)
 
 void ClientsProcessingManager::processData(QDataStream &inStream, QTcpSocket *socket)
 {
+    QString currentProcessing;
+    inStream >> currentProcessing;
 
+    emit signalSetClientProcessing(socket, currentProcessing);
 }
 
 QString ClientsProcessingManager::typeOfMessage()
