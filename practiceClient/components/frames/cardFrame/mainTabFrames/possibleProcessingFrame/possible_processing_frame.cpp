@@ -40,6 +40,8 @@ void PossibleProcessingFrame::setValue(QVariant value)
     QMap<QString,QVariant> possibleProcessingData = value.toMap();
 
     chooseProcessingComboBox->clear();
+    //  самая первая обработка - это отсутствие обработки
+    chooseProcessingComboBox->addItem("Нет обработки", "");
     for(auto it = possibleProcessingData.begin(); it != possibleProcessingData.end(); it++){
         chooseProcessingComboBox->addItem(it.key(), it.value());
     }
