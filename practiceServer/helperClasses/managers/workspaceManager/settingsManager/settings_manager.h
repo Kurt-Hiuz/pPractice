@@ -38,13 +38,14 @@ public:
     SettingsManager(QString rootFolder);
 
     QString setSettings(QJsonObject currentJsonObject);
+    bool createSettingsFiles();
 
 private:
     QString rootFolder;
     QString serverSettingsFileName;
     QString possibleProcessingFileName;
 
-    QFileSystemWatcher *settingsfilesWatcher;
+    QFileSystemWatcher *settingsFilesWatcher;
 
 signals:
     void processingFileChangedSignal(const QString &fileName);
