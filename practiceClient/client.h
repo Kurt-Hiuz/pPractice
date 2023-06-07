@@ -10,12 +10,15 @@
 
 #include "helperClasses/managers/readyReadManager/ready_read_manager.h" //  класс для распределения файлов на обработчиков
 #include "helperClasses/managers/readyReadManager/supportRRManagers/I_message_manager.h"    //  класс для работы с обработчиками сообщений
+#include "helperClasses/managers/workspaceManager/workspace_manager.h"
 
 class Client : public QTcpSocket
 {
     Q_OBJECT
 public:
     Client();
+    WorkspaceManager *workspaceManager = nullptr;
+    void setWorkspaceManager(WorkspaceManager *newWorkspaceManager);
 
 signals:
     void signalStatusClient(QString status);
@@ -45,6 +48,7 @@ public slots:
     void slotSendFileToServer(QString &filePath);
     void slotSetClientFolders(QMap<QString, QString> &subFolders);
     void slotSendToServer(QString typeOfMsg, QString str);
+    void slotDeleteSendedFile(QString &fileName);
 
 private slots:
     void slotReadyRead();
@@ -53,6 +57,7 @@ private slots:
     void slotSetCBData(QMap<QString,QVariant> &possibleProcessingData);
     void slotSendBufferToServer(QByteArray &data);
     void slotEntryFolderChanged(const QString & fileName);  //  обработчик изменений в директории
+    void slotSendProcessedFile(QString filePath);
 };
 
 #endif // CLIENT_H
