@@ -64,7 +64,7 @@ void ServerFileManager::processData(QDataStream &inStream)
             //  оформляем чат на стороне Сервера
             emit signalStatusRRManager("Server: send file by name \""+fileName+"\"");
 
-            emit signalSendToServer("File downloaded", "<font color = green><\\font>file \""+fileName+"\" downloaded");
+            emit signalSendToServer("File downloaded", fileName);
 
             file->close();  //  закрываем файл
             file = nullptr; //  удаляем файл
