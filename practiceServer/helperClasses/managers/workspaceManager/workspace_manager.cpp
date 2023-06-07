@@ -12,7 +12,8 @@ bool WorkspaceManager::createWorkspaceFolders()
             QDir().mkdir(dataFolder) &&
             QDir().mkdir(entryFolder) &&
             QDir().mkdir(expectationFolder) &&
-            QDir().mkdir(storageFolder);
+            QDir().mkdir(storageFolder) &&
+            QDir().mkdir(sendedFilesFolder);
 }
 
 QString WorkspaceManager::saveSettings(QJsonObject m_currentJsonObject)
@@ -38,6 +39,7 @@ void WorkspaceManager::setRootFolder(QString incomingRootFolder)
     this->entryFolder = dataFolder+"/Entry";
     this->expectationFolder = dataFolder+"/Expectation";
     this->storageFolder = dataFolder+"/Storage";
+    this->sendedFilesFolder = dataFolder+"/SendedFiles";
 
 //    QStringList folders = {settingsFolder, dataFolder, entryFolder, expectationFolder, storageFolder};
 
@@ -59,6 +61,7 @@ void WorkspaceManager::setRootFolder(QString incomingRootFolder)
     subFolders.insert("Entry", entryFolder);
     subFolders.insert("Expectation", expectationFolder);
     subFolders.insert("Storage", storageFolder);
+    subFolders.insert("SendedFiles", sendedFilesFolder);
 
     //  слот обработает контейнер папок
     emit signalSetServerFolders(subFolders);
@@ -67,6 +70,12 @@ void WorkspaceManager::setRootFolder(QString incomingRootFolder)
     connect(m_settingsManager, &SettingsManager::processingFileChangedSignal, this, &WorkspaceManager::workspaceFileChanged);
 
     m_entryManager = new EntryManager(entryFolder);
+    connect(m_entryManager, &EntryManager::signalEntryFiles, this, &WorkspaceManager::slotEntryFiles);
+    connect(m_entryManager, &EntryManager::signalClearEntryFolder, this, &WorkspaceManager::slotClearEntryFolder);
+
+    m_expectationManager = new ExpectationManager(expectationFolder);
+
+    m_sendedFileManager = new SendedFileManager(sendedFilesFolder);
 }
 
 QString WorkspaceManager::setEntryWatcher()
@@ -77,6 +86,36 @@ QString WorkspaceManager::setEntryWatcher()
     return QString("Папка для входящих файлов НЕ отслеживается!");
 }
 
+void WorkspaceManager::deleteFile(QString fileName)
+{
+    if(m_entryManager->removeFile(fileName)){
+        qDebug() << "WorkspaceManager::copyToExpectation:   файл " << fileName << " удален в папке";
+        return;
+    }
+
+    qDebug() << "WorkspaceManager::copyToExpectation:   файл " << fileName << " не удален в папке";
+}
+
+void WorkspaceManager::copyToExpectation(QString filePath)
+{
+    if(m_expectationManager->createFile(filePath)){
+        qDebug() << "WorkspaceManager::copyToExpectation:   файл " << filePath << " создан в папке";
+        return;
+    }
+
+    qDebug() << "WorkspaceManager::copyToExpectation:   файл не создан в папке";
+}
+
+void WorkspaceManager::copyToSended(QString filePath)
+{
+    if(m_sendedFileManager->createFile(filePath)){
+        qDebug() << "WorkspaceManager::copyToSended:   файл " << filePath << " создан в папке";
+        return;
+    }
+
+    qDebug() << "WorkspaceManager::copyToSended:   файл не создан в папке";
+}
+
 void WorkspaceManager::workspaceFileChanged(const QString &fileName)
 {
     emit signalUpdateUiComboBox(fileName);
@@ -85,4 +124,21 @@ void WorkspaceManager::workspaceFileChanged(const QString &fileName)
 void WorkspaceManager::workspaceDirectoryChanged(const QString &folderName)
 {
     qDebug() << "WorkspaceManager::workspaceDirectoryChanged:   " << folderName;
+}
+
+void WorkspaceManager::slotEntryFiles(QStringList &fileInfoList)
+{
+    qDebug() << "WorkspaceManager::slotEntryFiles   fileList:" << fileInfoList;
+    emit signalSiftFiles(fileInfoList);
+}
+
+void WorkspaceManager::slotClearEntryFolder(QString message, QFileInfoList &fileInfoList)
+{
+    emit signalClearEntryFolder(message);
+
+    //  пробегаемся по всем файлам /Entry для переноса в /Expectation
+    for(auto file : fileInfoList){
+        copyToExpectation(file.absoluteFilePath());
+        deleteFile(file.fileName());
+    }
 }

@@ -28,6 +28,8 @@
 ///  ========================    классы проекта
 #include "settingsManager/settings_manager.h"   //  менеджер для папки /Settings
 #include "entryManager/entry_manager.h"         //  менеджер для папки /Entry
+#include "expectationManager/expectation_manager.h" //  менеджер для папки /ExpectationManager
+#include "sendedFileManager/sended_file_manager.h"  //  менеджер для папки /SendedFileManager
 ///  ========================
 ///
 ///  ========================    классы для работы с директориями
@@ -56,11 +58,16 @@ public:
     QString createSettingFiles();
     void setRootFolder(QString incomingRootFolder);
     QString setEntryWatcher();
+    void copyToExpectation(QString filePath);
+    void copyToSended(QString filePath);
+    void deleteFile(QString fileName);
 
 signals:
     void signalUpdateUiComboBox(const QString &fileName);
     void signalStatusServer(QString status);
     void signalSetServerFolders(QMap<QString, QString> &subFolders);
+    void signalSiftFiles(QStringList &fileInfoList);
+    void signalClearEntryFolder(QString message);
 
 private:
     QString rootFolder;
@@ -69,15 +76,20 @@ private:
     QString entryFolder;
     QString expectationFolder;
     QString storageFolder;
+    QString sendedFilesFolder;
 
     QFileSystemWatcher *workspaceWatcher;
 
     SettingsManager *m_settingsManager;
     EntryManager *m_entryManager;
+    ExpectationManager *m_expectationManager;
+    SendedFileManager *m_sendedFileManager;
 
 private slots:
     void workspaceFileChanged(const QString &fileName);
     void workspaceDirectoryChanged(const QString &folderName);
+    void slotEntryFiles(QStringList &fileInfoList);
+    void slotClearEntryFolder(QString message, QFileInfoList &fileInfoList);
 };
 
 #endif // WORKSPACEMANAGER_H
