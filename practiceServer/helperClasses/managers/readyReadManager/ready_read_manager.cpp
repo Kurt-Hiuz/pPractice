@@ -17,6 +17,7 @@ ReadyReadManager::ReadyReadManager()
     fileDownloadedManager = new FileDownloadedManager();
     connect(fileDownloadedManager, &FileDownloadedManager::signalStatusRRManager, this, &ReadyReadManager::slotStatusRRManager);
     connect(fileDownloadedManager, &FileDownloadedManager::signalClearFileData, serverRequestPartFileManager, &ServerRequestPartFileManager::slotClearFileData);
+    connect(fileDownloadedManager, &FileDownloadedManager::signalDeleteSendedFile, this, &ReadyReadManager::slotDeleteSendedFile);
 
     clientsProcessingManager = new ClientsProcessingManager();
     connect(clientsProcessingManager, &ClientsProcessingManager::signalSetClientProcessing, this, &ReadyReadManager::signalSetClientProcessing);
@@ -69,4 +70,16 @@ void ReadyReadManager::slotSendBufferRRManager(QTcpSocket *socketToSend, QByteAr
 {
     qDebug() << "ReadyReadManager::slotSendBufferRRManager:     buffer.size(): " << buffer.size();
     emit signalSendBufferToClient(socketToSend, buffer);
+}
+
+void ReadyReadManager::slotDeleteSendedFile(QString &fileName)
+{
+    qDebug() << "ReadyReadManager::slotDeleteSendedFile deleting file name: " << fileName;
+    emit signalDeleteSendedFile(fileName);
+}
+
+void ReadyReadManager::setFileClientFileRequest(QString &filePath)
+{
+    qDebug() << "ReadyReadManager::setFileClientFileRequest:    " << filePath;
+    serverRequestPartFileManager->setFilePath(filePath);
 }

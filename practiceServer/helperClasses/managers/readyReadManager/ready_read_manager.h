@@ -51,6 +51,7 @@ public:
     ReadyReadManager();
     I_MessageManager* identifyMessage(QString typeOfMess);
     void setEntryFolder(QString &entryFolder);
+    void setFileClientFileRequest(QString &filePath);
 
 signals:
     void signalStatusRRManagerServer(QString status);
@@ -58,12 +59,14 @@ signals:
     void signalSendToOneRRManager(QTcpSocket* socket, QString typeOfMsg, QString str);
     void signalSendBufferToClient(QTcpSocket *socketToSend, QByteArray &buffer);
     void signalSetClientProcessing(QTcpSocket *socket, QString currentProcessing);
+    void signalDeleteSendedFile(QString &fileName);
 
 private slots:
     void slotStatusRRManager(QString status);
     void slotSendToAllClientsRRManager(QString typeOfMsg, QString str);
     void slotSendToOneRRManager(QTcpSocket* socket, QString typeOfMsg, QString str);
     void slotSendBufferRRManager(QTcpSocket *socketToSend, QByteArray &buffer);
+    void slotDeleteSendedFile(QString &fileName);
 //    void slotSetClientProcessing(QTcpSocket *socket, QString currentProcessing);
 };
 
