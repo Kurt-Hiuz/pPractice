@@ -47,6 +47,7 @@
 ///  ========================
 ///
 ///  ========================   классы проекта
+#include "helperClasses/managers/workspaceManager/workspace_manager.h"
 #include "helperClasses/managers/processingManager/processing_manager.h"    //  класс для распределения файлов на обработчиков
 #include "helperClasses/managers/readyReadManager/ready_read_manager.h"     //  класс для работы слота ReadyRead
 #include "helperClasses/managers/readyReadManager/supportRRManagers/I_message_manager.h"    //  класс для работы с обработчиками сообщений
@@ -58,6 +59,8 @@ public:
     Server(bool &server_started);
     QTcpSocket *socket;
     int generatedServerPort = QRandomGenerator::global()->bounded(1024, 65535);
+    WorkspaceManager *workspaceManager = nullptr;
+    void setWorkspaceManager(WorkspaceManager *newWorkspaceManager);
 
 private:
     QMap<QTcpSocket*, QString> mapSockets;
@@ -78,6 +81,7 @@ private:
     QString entryFolder = ""; //  путь до папки для файлов извне
     QString storageFolder = "";  //  путь до папки с приходящей обработанной информацией от клиентов
     QString expectationFolder = "";
+    QString sendedFilesFolder = "";
     QString delimiter = "<font color = black><\\font><br>=======================";
 
     QFileSystemWatcher *fileSystemWatcher;
@@ -90,7 +94,7 @@ private:
     void SendToAllClients(QString typeOfMsg, QString str);      //  функция для передачи данных всем клиентам
     void SendToOneClient(QTcpSocket* socket, QString typeOfMsg, QString str);       //  функция для передачи данных одному клиенту
 
-    void SendFileToClient(QString filePath);    //  функция отправки файл (начало)
+    void SendFileToClient(QTcpSocket *socket, QString filePath);    //  функция отправки файл (начало)
     void SendPartOfFile();      //  функция отправки части файла (продолжение)
 
 private slots:
@@ -100,6 +104,8 @@ private slots:
     void slotEntryFolderChanged(const QString &fileName);  //  обработчик изменений в директории
     void slotSendBufferToClient(QTcpSocket *socketToSend, QByteArray &buffer);
     void slotSetClientProcessing(QTcpSocket* socket, QString currentProcessing);
+    void slotSiftFiles(QStringList &fileInfoList);
+    void slotDeleteSendedFile(QString &fileName);
 
 public slots:
     void incomingConnection(qintptr socketDescriptor);  //  обработчик новых подключений
