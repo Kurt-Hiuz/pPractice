@@ -121,6 +121,7 @@ private slots:
     void on_openJSONSettingsFilePushButton_clicked();
     void on_saveSettingsPushButton_clicked();
     void updateUiComboBoxSlot(const QString &fileName);
+    void slotClearEntryFolder(QString message);
 
 signals:
     void signalSocketDisplayed(QTcpSocket* displayedSocket);

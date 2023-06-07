@@ -40,6 +40,8 @@ MainWindow::MainWindow(QWidget *parent)
     workspaceManager = new WorkspaceManager();
     connect(workspaceManager, &WorkspaceManager::signalUpdateUiComboBox, this, &MainWindow::updateUiComboBoxSlot);
     connect(workspaceManager, &WorkspaceManager::signalStatusServer, this, &MainWindow::slotStatusServer);  //  связка для отображения статуса сервера, вывод в консоль
+    connect(workspaceManager, &WorkspaceManager::signalClearEntryFolder, this, &MainWindow::slotClearEntryFolder);
+
     connect(workspaceManager, &WorkspaceManager::signalSetServerFolders, server, &Server::slotSetServerFolders);
 
     m_selectWorkspaceFrame = new SelectWorkspaceFrame(this);
@@ -161,6 +163,7 @@ void MainWindow::on_chooseWorkspaceDirPushButton_clicked()   //  по нажат
         ui->saveSettingsPushButton->setEnabled(true);
 
         workspaceManager->setRootFolder(folderPath);
+        server->setWorkspaceManager(workspaceManager);
         if(workspaceManager->createWorkspaceFolders()){
             ui->infoAboutServerTextEdit->append("<hr/>Рабочая папка организована!");
             return;
@@ -225,10 +228,7 @@ void MainWindow::on_openJSONSettingsFilePushButton_clicked()
 
     }
 
-    ui->infoAboutServerTextEdit->append("<hr/>Настройки загружены");
-
-    qDebug() << "======";
-    qDebug() << "Настройки установлены";
+    ui->infoAboutServerTextEdit->append("Настройки установлены<hr/>");
 }
 
 void MainWindow::on_saveSettingsPushButton_clicked()
@@ -309,8 +309,9 @@ void MainWindow::updateUiComboBoxSlot(const QString &fileName)
     ui->infoAboutServerTextEdit->append("<hr/>Список обновлен");
 
     emit signalUpdatePossibleProcessing(valueObject);
-
-    qDebug() << "MainWindow::updateUiComboBoxSlot:  ======";
-    qDebug() << "MainWindow::updateUiComboBoxSlot:  Настройки установлены";
 }
 
+void MainWindow::slotClearEntryFolder(QString message)
+{
+    ui->infoAboutServerTextEdit->append(message);
+}
