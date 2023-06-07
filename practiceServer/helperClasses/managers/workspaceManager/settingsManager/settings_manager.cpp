@@ -78,5 +78,9 @@ bool SettingsManager::createSettingsFiles()
 
 void SettingsManager::processingFileChanged(const QString &fileName)
 {
-    emit processingFileChangedSignal(fileName);
+    qDebug() << "SettingsManager::processingFileChanged:    " << fileName;
+    if(fileName == possibleProcessingFileName){
+        emit processingFileChangedSignal(fileName);
+        return;
+    }
 }
