@@ -7,12 +7,12 @@ ClientFileRequestPartManager::ClientFileRequestPartManager()
 
 void ClientFileRequestPartManager::readDataFromStream(QDataStream &inStream)
 {
-
+    inStream >> this->str;
 }
 
 void ClientFileRequestPartManager::writeDataToStream(QDataStream &outStream)
 {
-
+    outStream << this->str;
 }
 
 void ClientFileRequestPartManager::processData(QDataStream &inStream)
