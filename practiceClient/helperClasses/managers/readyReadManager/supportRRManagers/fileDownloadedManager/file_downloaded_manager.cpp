@@ -21,7 +21,8 @@ void FileDownloadedManager::processData(QDataStream &inStream)
     inStream >> str;  //  выводим в переменную сообщение
 
     emit signalClearFileData();
-    emit signalStatusRRManager(str);  //  и то же самое клиенту
+    emit signalDeleteSendedFile(str);
+    emit signalStatusRRManager("<font color = green><\\font>file \""+str+"\" downloaded");  //  и то же самое клиенту
 }
 
 QString FileDownloadedManager::typeOfMessage()

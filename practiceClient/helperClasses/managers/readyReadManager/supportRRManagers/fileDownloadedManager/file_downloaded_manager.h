@@ -16,6 +16,7 @@ public:
 signals:
     void signalClearFileData();
     void signalStatusRRManager(QString status);
+    void signalDeleteSendedFile(QString &fileName);
 };
 
 #endif // FILEDOWNLOADEDMANAGER_H
