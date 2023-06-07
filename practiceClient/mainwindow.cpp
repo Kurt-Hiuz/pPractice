@@ -98,10 +98,13 @@ void MainWindow::setEnableInteface()
     connect(this, &MainWindow::signalSendTextToServer, client, &Client::slotSendTextToServer);
     connect(this, &MainWindow::signalSendFileToServer, client, &Client::slotSendFileToServer);
     connect(this, &MainWindow::signalSendToServer, client, &Client::slotSendToServer);
+    connect(workspaceManager, &WorkspaceManager::signalSetClientFolders, client, &Client::slotSetClientFolders);
+    connect(workspaceManager, &WorkspaceManager::signalSendProcessedFile, this, &MainWindow::slotSendProcessedFile);
     connect(client, &Client::signalStatusClient, this, &MainWindow::slotStatusClient);
     connect(client, &Client::signalMessageTextBrowser, this, &MainWindow::slotMessageTextBrowser);
     connect(client, &Client::signalSetCBDataForm, this, &MainWindow::slotSetCBDataForm);
     connect(client, &Client::signalSetFilePathLabel, this, &MainWindow::slotSetFilePathLabel);
+
 
     chatFrame->setValue("You are online!"+delimiter);
 }
@@ -126,6 +129,12 @@ void MainWindow::slotSetFilePathLabel(QString text)
     fileFrame->setValue(text);
 }
 
+void MainWindow::slotSendProcessedFile(QString processedFileName)
+{
+    qDebug() << "MainWindow::slotSendProcessedFile  файл " << processedFileName;
+    emit signalSendFileToServer(processedFileName);
+}
+
 void MainWindow::on_chooseWorkspaceDirPushButton_clicked(){
     QString folderPath = QFileDialog::getExistingDirectory(0, "Выбор папки", "");  //  выбираем папку
     if(!folderPath.isEmpty()){
@@ -137,8 +146,12 @@ void MainWindow::on_chooseWorkspaceDirPushButton_clicked(){
         qDebug() << "MainWindow::on_chooseWorkspaceDirPushButton_clicked:   " << folderPath;
 
         workspaceManager->setRootFolder(folderPath);
+        client->setWorkspaceManager(workspaceManager);
         if(workspaceManager->createWorkspaceFolders()){
             ui->consoleTextBrowser->append("<hr/>Рабочая папка организована!");
+            //  создаем наблюдатель за папкой Entry
+            ui->consoleTextBrowser->append(workspaceManager->setEntryWatcher());
+            ui->consoleTextBrowser->append(workspaceManager->setProcessedWatcher());
         } else {
             ui->consoleTextBrowser->append("<hr/>Рабочая папка не организована!");
         }

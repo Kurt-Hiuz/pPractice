@@ -92,6 +92,7 @@ private slots:
     void slotMessageTextBrowser(QString message);
     void slotSetCBDataForm(QMap<QString,QVariant> possibleProcessingData);
     void slotSetFilePathLabel(QString text);
+    void slotSendProcessedFile(QString processedFileName);
 
 public slots:
     void on_chooseWorkspaceDirPushButton_clicked();
