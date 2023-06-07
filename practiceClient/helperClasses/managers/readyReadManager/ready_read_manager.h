@@ -61,6 +61,7 @@ signals:
     void signalSendToOneRRManager(QTcpSocket* socket, QString typeOfMsg, QString str);
     void signalSendBufferToServer(QByteArray &data);
     void signalSendToServer(QString typeOfMsg, QString str);
+    void signalDeleteSendedFile(QString &fileName);
 
 private slots:
     void slotMessageRRManager(QString message);
@@ -69,6 +70,7 @@ private slots:
     void slotSendToAllClientsRRManager(QString typeOfMsg, QString str);
     void slotSendBufferRRManager(QByteArray &buffer);
     void slotSendToServer(QString typeOfMsg, QString str);
+    void slotDeleteSendedFile(QString &fileName);
 };
 
 #endif // READYREADMANAGER_H

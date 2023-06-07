@@ -16,6 +16,7 @@ ReadyReadManager::ReadyReadManager()
     fileDownloadedManager = new FileDownloadedManager();
     connect(fileDownloadedManager, &FileDownloadedManager::signalStatusRRManager, this, &ReadyReadManager::slotStatusRRManager);
     connect(fileDownloadedManager, &FileDownloadedManager::signalClearFileData, clientFileRequestPartManager, &ClientFileRequestPartManager::slotClearFileData);
+    connect(fileDownloadedManager, &FileDownloadedManager::signalDeleteSendedFile, this, &ReadyReadManager::slotDeleteSendedFile);
 
     serverFileManager = new ServerFileManager();
     connect(serverFileManager, &ServerFileManager::signalStatusRRManager, this, &ReadyReadManager::slotStatusRRManager);
@@ -44,6 +45,7 @@ I_MessageManager *ReadyReadManager::identifyMessage(QString typeOfMess)
 
 void ReadyReadManager::setEntryFolder(QString &entryFolder)
 {
+    qDebug() << "ReadyReadManager::setEntryFolder   entryFolder:" << entryFolder;
     serverFileManager->setEntryFolderName(entryFolder);
 }
 
@@ -87,4 +89,10 @@ void ReadyReadManager::slotSendToServer(QString typeOfMsg, QString str)
 {
     qDebug() << "ReadyReadManager::slotSendToServer:    " << typeOfMsg << " | " << str;
     emit signalSendToServer(typeOfMsg, str);
+}
+
+void ReadyReadManager::slotDeleteSendedFile(QString &fileName)
+{
+    qDebug() << "ReadyReadManager::slotDeleteSendedFile deleting file name: " << fileName;
+    emit signalDeleteSendedFile(fileName);
 }
