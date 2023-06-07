@@ -17,6 +17,7 @@ SOURCES += \
     components/frames/cardFrame/mainTabFrames/possibleProcessingFrame/possible_processing_frame.cpp \
     components/frames/cardFrame/settingsTabFrames/selectProcessorFrame/select_processor_frame.cpp \
     components/frames/cardFrame/settingsTabFrames/selectWorkspaceFrame/select_workspace_frame.cpp \
+    helperClasses/managers/processingManager/processing_manager.cpp \
     helperClasses/managers/readyReadManager/ready_read_manager.cpp \
     helperClasses/managers/readyReadManager/supportRRManagers/I_message_manager.cpp \
     helperClasses/managers/readyReadManager/supportRRManagers/clientFileRequestPartManager/client_file_request_part_manager.cpp \
@@ -25,6 +26,8 @@ SOURCES += \
     helperClasses/managers/readyReadManager/supportRRManagers/possibleProcessingManager/possible_processing_manager.cpp \
     helperClasses/managers/readyReadManager/supportRRManagers/serverFileManager/server_file_manager.cpp \
     helperClasses/managers/readyReadManager/supportRRManagers/serverMessageManager/server_message_manager.cpp \
+    helperClasses/managers/workspaceManager/entryManager/entry_manager.cpp \
+    helperClasses/managers/workspaceManager/processedManager/processed_manager.cpp \
     helperClasses/managers/workspaceManager/workspace_manager.cpp \
     main.cpp \
     mainwindow.cpp
@@ -38,6 +41,7 @@ HEADERS += \
     components/frames/cardFrame/mainTabFrames/possibleProcessingFrame/possible_processing_frame.h \
     components/frames/cardFrame/settingsTabFrames/selectProcessorFrame/select_processor_frame.h \
     components/frames/cardFrame/settingsTabFrames/selectWorkspaceFrame/select_workspace_frame.h \
+    helperClasses/managers/processingManager/processing_manager.h \
     helperClasses/managers/readyReadManager/ready_read_manager.h \
     helperClasses/managers/readyReadManager/supportRRManagers/I_message_manager.h \
     helperClasses/managers/readyReadManager/supportRRManagers/clientFileRequestPartManager/client_file_request_part_manager.h \
@@ -46,6 +50,8 @@ HEADERS += \
     helperClasses/managers/readyReadManager/supportRRManagers/possibleProcessingManager/possible_processing_manager.h \
     helperClasses/managers/readyReadManager/supportRRManagers/serverFileManager/server_file_manager.h \
     helperClasses/managers/readyReadManager/supportRRManagers/serverMessageManager/server_message_manager.h \
+    helperClasses/managers/workspaceManager/entryManager/entry_manager.h \
+    helperClasses/managers/workspaceManager/processedManager/processed_manager.h \
     helperClasses/managers/workspaceManager/workspace_manager.h \
     mainwindow.h
 
