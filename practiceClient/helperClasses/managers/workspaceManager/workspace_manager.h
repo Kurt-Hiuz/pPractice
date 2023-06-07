@@ -18,6 +18,12 @@
 ///         signalStatusClient() - сигнал для отображения состояния клиента
 ///         signalSetClientFolders() - сигнал для установки папок на клиенте
 
+
+///  ========================    классы проекта
+#include "entryManager/entry_manager.h"         //  менеджер для папки /Entry
+#include "processedManager/processed_manager.h" //  менеджер для папки /Processed
+///  ========================
+///
 ///  ========================    классы для работы с директориями
 #include <QDir>                 //  для работы с директориями
 #include <QFile>                //  для работы с файлами
@@ -42,10 +48,14 @@ public:
 
     bool createWorkspaceFolders();
     void setRootFolder(QString incomingRootFolder);
+    QString setEntryWatcher();
+    QString setProcessedWatcher();
+    void deleteFile(QString fileName);
 
 signals:
     void signalStatusClient(QString status);
     void signalSetClientFolders(QMap<QString, QString> &subFolders);
+    void signalSendProcessedFile(QString processedFilePath);
 
 private:
     QString rootFolder;
@@ -53,9 +63,13 @@ private:
     QString processedFolder;
 
     QFileSystemWatcher *workspaceWatcher;
+    EntryManager *m_entryManager;
+    ProcessedManager *m_processedManager;
 
 private slots:
     void workspaceDirectoryChanged(const QString &fodlerName);
+    void slotNewEntryFile(QFileInfo &fileInfo);
+    void slotSendProcessedFile(QString processedFilePath);
 };
 
 #endif // WORKSPACEMANAGER_H
