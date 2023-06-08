@@ -16,7 +16,8 @@ public:
     bool removeFile(QString fileName);
 
 signals:
-    void signalSendProcessedFile(QString processedFilePath);
+    void signalProcessedFiles(QStringList &fileInfoList);
+    void signalFolderStatus(QString status);
 
 private:
     QString rootFolder;

@@ -42,7 +42,8 @@ void WorkspaceManager::setRootFolder(QString incomingRootFolder)
     connect(m_entryManager, &EntryManager::signalNewEntryFile, this, &WorkspaceManager::slotNewEntryFile);
 
     m_processedManager = new ProcessedManager(processedFolder);
-    connect(m_processedManager, &ProcessedManager::signalSendProcessedFile, this, &WorkspaceManager::slotSendProcessedFile);
+    connect(m_processedManager, &ProcessedManager::signalProcessedFiles, this, &WorkspaceManager::slotProcessedFiles);
+    connect(m_processedManager, &ProcessedManager::signalFolderStatus, this, &WorkspaceManager::signalStatusClient);
 
     connect(workspaceWatcher, &QFileSystemWatcher::directoryChanged, this, &WorkspaceManager::workspaceDirectoryChanged);
 }
@@ -72,10 +73,10 @@ void WorkspaceManager::slotNewEntryFile(QFileInfo &fileInfo)
     emit signalStatusClient("Поступил новый файл:   "+fileInfo.fileName());
 }
 
-void WorkspaceManager::slotSendProcessedFile(QString processedFilePath)
+void WorkspaceManager::slotProcessedFiles(QStringList &fileInfoList)
 {
-    qDebug() << "WorkspaceManager::slotSendProcessedFile:   processedFilePath:" << processedFilePath;
-    emit signalSendProcessedFile(processedFilePath);
+    qDebug() << "WorkspaceManager::slotEntryFiles   fileList:" << fileInfoList;
+    emit signalSiftFiles(fileInfoList);
 }
 
 void WorkspaceManager::deleteFile(QString fileName)

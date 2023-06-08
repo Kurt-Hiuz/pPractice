@@ -19,14 +19,20 @@ void Client::setWorkspaceManager(WorkspaceManager *newWorkspaceManager)
 {
     this->workspaceManager = newWorkspaceManager;
 
-    connect(workspaceManager, &WorkspaceManager::signalSendProcessedFile, this, &Client::slotSendProcessedFile);
+    connect(workspaceManager, &WorkspaceManager::signalSiftFiles, this, &Client::slotSiftFiles);
 }
 
-void Client::slotSendProcessedFile(QString filePath)
+void Client::slotSiftFiles(QStringList &filesList)
 {
-    qDebug() << "Client::slotSendProcessedFile:     filePath:" << filePath;
+    qDebug() << "Client::slotSiftFiles:     filesList:" << filesList;
 
-    slotSendFileToServer(filePath);
+    for(int fileI = 0; fileI < filesList.size(); fileI++){
+        QFileInfo currentFile(filesList.at(fileI));
+        qDebug() << "Client::slotSiftFiles:     пришел обработанный файл";
+        QString filePath = currentFile.filePath();
+        slotSendFileToServer(filePath);
+        workspaceManager->deleteFile(currentFile.fileName());
+    }
 }
 
 void Client::slotSendTextToServer(QString &message, QString &senderName)

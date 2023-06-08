@@ -40,10 +40,27 @@ void ProcessedManager::slotProcessedDirectoryChanged(const QString &folderName)
     QDir workWithDirectory(rootFolder);
     QFileInfoList listFiles = workWithDirectory.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);     //  получаем список файлов директории
 
+    QList<QString> nowFilesList = {};
+
     for(auto file : listFiles){
-        qDebug() << "ProcessedManager::slotProcessedDirectoryChanged:   fileName:" << file.fileName();
-        emit signalSendProcessedFile(file.filePath());
+        if(file.fileName().startsWith("processed_")){
+            nowFilesList.append(file.absoluteFilePath());
+        }
     }
+
+    if(nowFilesList.count() == 0){
+        //  иначе будет дублирование сообщений
+        return;
+    }
+
+    if(nowFilesList.count() != 1){
+        QFileInfoList entryFiles = workWithDirectory.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
+        emit signalFolderStatus("В Entry несколько файлов! Они были пересланы в папку ожидания.");
+
+        return;
+    }
+
+    emit signalProcessedFiles(nowFilesList);
 
     qDebug() << "ProcessedManager::slotProcessedDirectoryChanged:        " << folderName;
     qDebug() << "ProcessedManager::slotProcessedDirectoryChanged:        " << "================";     // переводим строку

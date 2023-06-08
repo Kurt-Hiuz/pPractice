@@ -57,7 +57,7 @@ private slots:
     void slotSetCBData(QMap<QString,QVariant> &possibleProcessingData);
     void slotSendBufferToServer(QByteArray &data);
     void slotEntryFolderChanged(const QString & fileName);  //  обработчик изменений в директории
-    void slotSendProcessedFile(QString filePath);
+    void slotSiftFiles(QStringList &fileInfoList);
 };
 
 #endif // CLIENT_H

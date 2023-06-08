@@ -99,7 +99,6 @@ void MainWindow::setEnableInteface()
     connect(this, &MainWindow::signalSendFileToServer, client, &Client::slotSendFileToServer);
     connect(this, &MainWindow::signalSendToServer, client, &Client::slotSendToServer);
     connect(workspaceManager, &WorkspaceManager::signalSetClientFolders, client, &Client::slotSetClientFolders);
-    connect(workspaceManager, &WorkspaceManager::signalSendProcessedFile, this, &MainWindow::slotSendProcessedFile);
     connect(client, &Client::signalStatusClient, this, &MainWindow::slotStatusClient);
     connect(client, &Client::signalMessageTextBrowser, this, &MainWindow::slotMessageTextBrowser);
     connect(client, &Client::signalSetCBDataForm, this, &MainWindow::slotSetCBDataForm);
@@ -127,12 +126,6 @@ void MainWindow::slotSetCBDataForm(QMap<QString, QVariant> possibleProcessingDat
 void MainWindow::slotSetFilePathLabel(QString text)
 {
     fileFrame->setValue(text);
-}
-
-void MainWindow::slotSendProcessedFile(QString processedFileName)
-{
-    qDebug() << "MainWindow::slotSendProcessedFile  файл " << processedFileName;
-    emit signalSendFileToServer(processedFileName);
 }
 
 void MainWindow::on_chooseWorkspaceDirPushButton_clicked(){

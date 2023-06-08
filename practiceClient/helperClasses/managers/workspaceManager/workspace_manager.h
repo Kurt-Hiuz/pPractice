@@ -55,7 +55,7 @@ public:
 signals:
     void signalStatusClient(QString status);
     void signalSetClientFolders(QMap<QString, QString> &subFolders);
-    void signalSendProcessedFile(QString processedFilePath);
+    void signalSiftFiles(QStringList &fileInfoList);
 
 private:
     QString rootFolder;
@@ -69,7 +69,7 @@ private:
 private slots:
     void workspaceDirectoryChanged(const QString &fodlerName);
     void slotNewEntryFile(QFileInfo &fileInfo);
-    void slotSendProcessedFile(QString processedFilePath);
+    void slotProcessedFiles(QStringList &fileInfoList);
 };
 
 #endif // WORKSPACEMANAGER_H
