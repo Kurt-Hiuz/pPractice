@@ -7,6 +7,8 @@ MaxConnectionSpinBoxFrame::MaxConnectionSpinBoxFrame(MainWindow *parentUi)
     maxConnectionSpinBox = new QSpinBox();
     maxConnectionSpinBox->setMaximumWidth(40);
     maxConnectionSpinBox->setEnabled(false);
+    maxConnectionSpinBox->setMinimum(1);
+    maxConnectionSpinBox->setMaximum(100);
 
     dataLabel = new QLabel();
 
