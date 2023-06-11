@@ -17,17 +17,6 @@ bool EntryManager::setWatcher()
 
     if(entryFilesWatcher->addPath(rootFolder)){
         connect(entryFilesWatcher, &QFileSystemWatcher::directoryChanged, this, &EntryManager::slotEntryDirectoryChanged);
-
-//        //  определяем папку Entry
-//        QDir entryDirectory(rootFolder);
-//        //  сохраняем текущие файлы
-//        currentEntryInfo = entryDirectory.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
-
-//        for(auto file : currentEntryInfo){
-//            currentEntryFiles.append(file.absoluteFilePath());
-//        }
-
-//        qDebug() << "EntryManager::setWatcher   currentEntryFiles:  " << currentEntryFiles;
         return true;
     }
 
@@ -39,23 +28,32 @@ bool EntryManager::removeFile(QString fileName)
     QFileInfo fileInfo(rootFolder+"/"+fileName);
     // установим текущую рабочую директорию, где будет файл, без QFileInfo может не заработать
     QDir::setCurrent(fileInfo.path());
-    // Создаём объект файла и открываем его на запись
+    // Создаём объект файла
     QFile fileToDelete(rootFolder+"/"+fileName);
+    qDebug() << "EntryManager::removeFile:      " << rootFolder+"/"+fileName;
+
+    if(fileToDelete.exists()){
+        qDebug() << "EntryManager::removeFile:      файл " << fileToDelete.fileName() << " существует";
+    } else {
+        qDebug() << "EntryManager::removeFile:      файл " << fileToDelete.fileName() << " НЕ существует";
+    }
 
     return fileToDelete.remove();
 }
 
+QString EntryManager::getFile(QString fileName)
+{
+    QFileInfo fileInfo(rootFolder+"/"+fileName);
+    qDebug() << "EntryManager::getFile rootFolder"<<"/"<<"fileName: " << rootFolder+"/"+fileName;
+
+    if(fileInfo.exists()){
+        return rootFolder+"/"+fileName;
+    }
+    return QString("");
+}
+
 void EntryManager::slotEntryDirectoryChanged(const QString &folderName)
 {
-//    qDebug() << "EntryManager::slotEntryDirectoryChanged:        ";
-//    processingManager = new ProcessingManager();
-//    QFileInfoList list = processingManager->entryFiles(folderName);     //  получаем список файлов директории
-
-//    for (int i = 0; i < list.size(); i++) {
-//        QFileInfo fileInfo = list.at(i);
-//        qDebug() << "EntryManager::slotEntryDirectoryChanged:        " << qPrintable(QString("%1 %2").arg(fileInfo.size(), 10).arg(fileInfo.fileName(), 5));   //  выводим в формате "размер имя"
-
-//    }
     //  определяем папку Entry
     QDir entryDirectory(rootFolder);
     //  получаем текущие файлы
@@ -65,21 +63,14 @@ void EntryManager::slotEntryDirectoryChanged(const QString &folderName)
     QList<QString> nowFilesList = {};
 
     for(auto file : nowEntryFiles){
+        if(file.fileName().startsWith("processed_")){
+            qDebug() << "Server::slotSiftFiles:     пришел обработанный файл";
+
+            continue;
+        }
+
         nowFilesList.append(file.absoluteFilePath());
     }
-
-//    //  приводим предыдущие текущие файлы и те, что сейчас
-//    QSet<QString> currentDirSet(currentEntryFiles.begin(), currentEntryFiles.end());
-//    QSet<QString> nowDirSet(nowFilesList.begin(), nowFilesList.end());
-
-//    //  получаем новые файлы
-//    QSet<QString> newFiles = nowDirSet - currentDirSet;
-//    //  приводим это к списку строк файлов
-//    QList<QString> newFilesList(newFiles.begin(), newFiles.end());
-//    qDebug() << "EntryManager::slotEntryDirectoryChanged:   newFilesList:" << newFilesList;
-
-//    qDebug() << "EntryManager::slotEntryDirectoryChanged:        " << folderName;
-//    qDebug() << "EntryManager::slotEntryDirectoryChanged:        " << "================";     // переводим строку
 
     if(nowEntryFiles.count() == 0){
         //  иначе будет дублирование сообщений
@@ -94,12 +85,4 @@ void EntryManager::slotEntryDirectoryChanged(const QString &folderName)
     }
 
     emit signalEntryFiles(nowFilesList);
-
-    //  пересохраняем текущие файлы
-//    currentEntryFiles = entryDirectory.entryList(QDir::NoDotAndDotDot | QDir::Files);
-
-//    if(processingManager != nullptr){
-//        delete processingManager;
-//        processingManager = nullptr;
-//    }
 }
