@@ -60,14 +60,9 @@ signals:
     void signalSendBufferToClient(QTcpSocket *socketToSend, QByteArray &buffer);
     void signalSetClientProcessing(QTcpSocket *socket, QString currentProcessing);
     void signalDeleteSendedFile(QString &fileName);
-
-private slots:
-    void slotStatusRRManager(QString status);
-    void slotSendToAllClientsRRManager(QString typeOfMsg, QString str);
-    void slotSendToOneRRManager(QTcpSocket* socket, QString typeOfMsg, QString str);
-    void slotSendBufferRRManager(QTcpSocket *socketToSend, QByteArray &buffer);
-    void slotDeleteSendedFile(QString &fileName);
-//    void slotSetClientProcessing(QTcpSocket *socket, QString currentProcessing);
+    void signalDeleteExpectationFile(QString &fileName);
+    void signalSaveData(QString fileName);
+    void signalCheckExpectationFolder(QTcpSocket *socket);
 };
 
 #endif // READYREADMANAGER_H
