@@ -48,10 +48,11 @@ private:
     QFileSystemWatcher *settingsFilesWatcher;
 
 signals:
-    void processingFileChangedSignal(const QString &fileName);
+    void signalProcessingFileChanged(const QString &filePath);
+    void signalSettingsFileChanged(const QString &filePath);
 
 private slots:
-    void processingFileChanged(const QString &fileName);
+    void slotProcessingFileChanged(const QString &filePath);
 };
 
 #endif // SETTINGSMANAGER_H

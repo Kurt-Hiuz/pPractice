@@ -4,8 +4,8 @@ SettingsManager::SettingsManager(QString rootFolder)
 {
     this->rootFolder = rootFolder;  //  путь/Settings
 
-    serverSettingsFileName = rootFolder+"/"+"serverSettings.json";
-    possibleProcessingFileName = rootFolder+"/"+"possibleProcessing.json";
+    serverSettingsFileName = rootFolder+"/"+"Настройки.json";
+    possibleProcessingFileName = rootFolder+"/"+"Обработки.json";
 }
 
 QString SettingsManager::setSettings(QJsonObject currentJsonObject)
@@ -48,9 +48,10 @@ QString SettingsManager::setSettings(QJsonObject currentJsonObject)
 
     settingsFilesWatcher = new QFileSystemWatcher();
 
-    if(settingsFilesWatcher->addPath(possibleProcessingFileName)){
+    if(settingsFilesWatcher->addPath(possibleProcessingFileName) &&
+       settingsFilesWatcher->addPath(serverSettingsFileName)){
         qDebug() << "SettingsManager::setSettings   flag true";
-        connect(settingsFilesWatcher, &QFileSystemWatcher::fileChanged, this, &SettingsManager::processingFileChanged);
+        connect(settingsFilesWatcher, &QFileSystemWatcher::fileChanged, this, &SettingsManager::slotProcessingFileChanged);
     } else {
         qDebug() << "SettingsManager::setSettings   flag false";
     }
@@ -76,11 +77,16 @@ bool SettingsManager::createSettingsFiles()
     return possibleProcessingFile.exists() && jsonFile.exists();
 }
 
-void SettingsManager::processingFileChanged(const QString &fileName)
+void SettingsManager::slotProcessingFileChanged(const QString &filePath)
 {
-    qDebug() << "SettingsManager::processingFileChanged:    " << fileName;
-    if(fileName == possibleProcessingFileName){
-        emit processingFileChangedSignal(fileName);
+    qDebug() << "SettingsManager::processingFileChanged:    " << filePath;
+    if(filePath == possibleProcessingFileName){
+        emit signalProcessingFileChanged(filePath);
+        return;
+    }
+
+    if(filePath == serverSettingsFileName){
+        emit signalSettingsFileChanged(filePath);
         return;
     }
 }
