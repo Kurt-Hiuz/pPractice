@@ -29,7 +29,7 @@ private:
     MainWindow *parentUi;
 
 private slots:
-    void slotConnectToServerPuchButtonClicked();
+    void slotConnectToServerPushButtonClicked();
 };
 
 #endif // CONNECTFRAME_H

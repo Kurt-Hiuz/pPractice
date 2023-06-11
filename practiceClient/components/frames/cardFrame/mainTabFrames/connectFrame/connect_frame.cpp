@@ -15,7 +15,7 @@ ConnectFrame::ConnectFrame(MainWindow *ui)
     portLineEdit->setPlaceholderText("Введите порт");
 
     connectToServerPuchButton = new QPushButton("Подключиться");
-    connect(connectToServerPuchButton, &QPushButton::clicked, this, &ConnectFrame::slotConnectToServerPuchButtonClicked);
+    connect(connectToServerPuchButton, &QPushButton::clicked, this, &ConnectFrame::slotConnectToServerPushButtonClicked);
 }
 
 void ConnectFrame::createInterface()
@@ -51,16 +51,16 @@ void ConnectFrame::switchEnabledInteface()
     connectToServerPuchButton->setEnabled(!connectToServerPuchButton->isEnabled());
 }
 
-void ConnectFrame::slotConnectToServerPuchButtonClicked()
+void ConnectFrame::slotConnectToServerPushButtonClicked()
 {
     if(IPLineEdit->text().isEmpty()){
         IPLineEdit->setStyleSheet("background-color: red");
-        IPLineEdit->setPlaceholderText("IP is empty!");
+        IPLineEdit->setPlaceholderText("IP пустой!");
         return;
     }
     if(portLineEdit->text().isEmpty()){
         portLineEdit->setStyleSheet("background-color: red");
-        portLineEdit->setPlaceholderText("Port is empty!");
+        portLineEdit->setPlaceholderText("Порт пустой!");
         return;
     }
 
