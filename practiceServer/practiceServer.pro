@@ -13,10 +13,10 @@ SOURCES += \
     components/dialogs/I_dialogwindow.cpp \
     components/dialogs/updateProcessingDialog/update_processing_dialog.cpp \
     components/frames/cardFrame/I_cardframe.cpp \
+    components/frames/cardFrame/changePortSpinBoxFrame/change_port_spinbox_frame.cpp \
     components/frames/cardFrame/maxConnectionSpinBoxFrame/max_connection_spinbox_frame.cpp \
     components/frames/cardFrame/selectWorkspaceFrame/select_workspace_frame.cpp \
     components/frames/cardFrame/possibleProcessingComboBoxFrame/possible_processing_combobox_frame.cpp \
-    components/frames/cardFrame/changePortLineEditFrame/change_port_line_edit_frame.cpp \
     helperClasses/jsonPacker/json_packer.cpp \
     helperClasses/jsonParser/json_parser.cpp \
     helperClasses/managers/processingManager/processing_manager.cpp \
@@ -28,6 +28,7 @@ SOURCES += \
     helperClasses/managers/readyReadManager/supportRRManagers/clientsFileManager/clients_file_manager.cpp \
     helperClasses/managers/readyReadManager/supportRRManagers/fileDownloadedManager/file_downloaded_manager.cpp \
     helperClasses/managers/readyReadManager/supportRRManagers/nullManager/null_manager.cpp \
+    helperClasses/managers/workspaceManager/storageManager/storage_manager.cpp \
     helperClasses/managers/workspaceManager/entryManager/entry_manager.cpp \
     helperClasses/managers/workspaceManager/expectationManager/expectation_manager.cpp \
     helperClasses/managers/workspaceManager/sendedFileManager/sended_file_manager.cpp \
@@ -41,10 +42,10 @@ HEADERS += \
     components/dialogs/I_dialogwindow.h \
     components/dialogs/updateProcessingDialog/update_processing_dialog.h \
     components/frames/cardFrame/I_cardframe.h \
+    components/frames/cardFrame/changePortSpinBoxFrame/change_port_spinbox_frame.h \
     components/frames/cardFrame/maxConnectionSpinBoxFrame/max_connection_spinbox_frame.h \
     components/frames/cardFrame/selectWorkspaceFrame/select_workspace_frame.h \
     components/frames/cardFrame/possibleProcessingComboBoxFrame/possible_processing_combobox_frame.h \
-    components/frames/cardFrame/changePortLineEditFrame/change_port_line_edit_frame.h \
     helperClasses/jsonPacker/json_packer.h \
     helperClasses/jsonParser/json_parser.h \
     helperClasses/managers/processingManager/processing_manager.h \
@@ -56,6 +57,7 @@ HEADERS += \
     helperClasses/managers/readyReadManager/supportRRManagers/clientsFileManager/clients_file_manager.h \
     helperClasses/managers/readyReadManager/supportRRManagers/fileDownloadedManager/file_downloaded_manager.h \
     helperClasses/managers/readyReadManager/supportRRManagers/nullManager/null_manager.h \
+    helperClasses/managers/workspaceManager/storageManager/storage_manager.h \
     helperClasses/managers/workspaceManager/entryManager/entry_manager.h \
     helperClasses/managers/workspaceManager/expectationManager/expectation_manager.h \
     helperClasses/managers/workspaceManager/sendedFileManager/sended_file_manager.h \
