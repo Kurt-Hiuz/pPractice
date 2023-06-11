@@ -66,7 +66,6 @@ private:
     I_CardFrame *chatFrame;
     I_CardFrame *fileFrame;
     I_CardFrame *selectWorkspaceFrame;
-    I_CardFrame *selectProcessorFrame;
 
     WorkspaceManager *workspaceManager;
 

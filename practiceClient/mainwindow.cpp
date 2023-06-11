@@ -6,13 +6,16 @@
 #include "components/frames/cardFrame/mainTabFrames/chatFrame/chat_frame.h"   //  карточка чата
 #include "components/frames/cardFrame/mainTabFrames/fileFrame/file_frame.h"   //  карточка файла
 #include "components/frames/cardFrame/settingsTabFrames/selectWorkspaceFrame/select_workspace_frame.h"  //  карточка выбора рабочей папки
-#include "components/frames/cardFrame/settingsTabFrames/selectProcessorFrame/select_processor_frame.h"  //  карточка выбора обработчика
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    this->setWindowTitle("D.I.P. Client++");
+
+    client = new Client();
 
     connectFrame = new ConnectFrame(this);
 
@@ -21,7 +24,6 @@ MainWindow::MainWindow(QWidget *parent)
     fileFrame = new FileFrame(this);
 
     selectWorkspaceFrame = new SelectWorkspaceFrame(this);
-    selectProcessorFrame = new SelectProcessorFrame();
 
     connectFrame->createInterface();
     possibleProcessingFrame->createInterface();
@@ -29,7 +31,6 @@ MainWindow::MainWindow(QWidget *parent)
     fileFrame->createInterface();
 
     selectWorkspaceFrame->createInterface();
-    selectProcessorFrame->createInterface();
 
     mainContainer->addWidget(connectFrame);
     mainContainer->addWidget(possibleProcessingFrame);
@@ -37,7 +38,6 @@ MainWindow::MainWindow(QWidget *parent)
     mainContainer->addWidget(fileFrame);
 
     settingsContainer->addWidget(selectWorkspaceFrame);
-    settingsContainer->addWidget(selectProcessorFrame);
 
     ui->mainFrame->setLayout(mainContainer);
     ui->settingsMainFrame->setLayout(settingsContainer);
@@ -54,16 +54,18 @@ MainWindow::~MainWindow()
 
 void MainWindow::setEnableInteface()
 {
-    client = new Client();
-
     QMap<QString, QVariant> mapValue = connectFrame->getValue();
 
-    client->connectToHost(mapValue["IPLineEdit"].toString(), mapValue["portLineEdit"].toUInt());   //  подключение к серверу (локальный адрес + порт такой же, как у сервера)
-    if(!(client->isOpen())){
+    qDebug() << mapValue["IPLineEdit"].toString() << " | " << mapValue["portLineEdit"].toInt();
+
+    int port = mapValue["portLineEdit"].toInt();
+    QString IP = mapValue["IPLineEdit"].toString();
+
+    if(port < 1024){
         fileFrame->setValue("Проверьте IP и порт сервера! Вы не подключились");
-        client = nullptr;
         return;
     }
+    client->connectToHost(IP, port);   //  подключение к серверу (локальный адрес + порт такой же, как у сервера)
 
     for(auto mainTabChild : ui->mainFrame->children()){
         if(QString(mainTabChild->metaObject()->className()).contains("Layout")){
@@ -82,9 +84,11 @@ void MainWindow::setEnableInteface()
     connect(client, &Client::signalSetFilePathLabel, this, &MainWindow::slotSetFilePathLabel);
     connect(client, &Client::signalEnableInterface, this, &MainWindow::slotEnableInterface);
 
-
     chatFrame->setValue("Вы подключились!"+delimiter);
+
+    connectFrame->switchEnabledInteface();
     possibleProcessingFrame->switchEnabledInteface();
+    fileFrame->switchEnabledInteface();
 }
 
 void MainWindow::slotStatusClient(QString status)
@@ -139,6 +143,9 @@ void MainWindow::on_chooseWorkspaceDirPushButton_clicked(){
 
             //  включаем выбор обработок
             possibleProcessingFrame->switchEnabledInteface();
+
+            //  и включаем выбор файла для отправки
+            fileFrame->switchEnabledInteface();
         } else {
             ui->consoleTextBrowser->append("<hr/>Рабочая папка не организована!");
         }
