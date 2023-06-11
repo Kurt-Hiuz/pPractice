@@ -21,6 +21,7 @@ SOURCES += \
     helperClasses/managers/readyReadManager/ready_read_manager.cpp \
     helperClasses/managers/readyReadManager/supportRRManagers/I_message_manager.cpp \
     helperClasses/managers/readyReadManager/supportRRManagers/clientFileRequestPartManager/client_file_request_part_manager.cpp \
+    helperClasses/managers/readyReadManager/supportRRManagers/disconnectManager/disconnect_manager.cpp \
     helperClasses/managers/readyReadManager/supportRRManagers/fileDownloadedManager/file_downloaded_manager.cpp \
     helperClasses/managers/readyReadManager/supportRRManagers/nullManager/null_manager.cpp \
     helperClasses/managers/readyReadManager/supportRRManagers/possibleProcessingManager/possible_processing_manager.cpp \
@@ -45,6 +46,7 @@ HEADERS += \
     helperClasses/managers/readyReadManager/ready_read_manager.h \
     helperClasses/managers/readyReadManager/supportRRManagers/I_message_manager.h \
     helperClasses/managers/readyReadManager/supportRRManagers/clientFileRequestPartManager/client_file_request_part_manager.h \
+    helperClasses/managers/readyReadManager/supportRRManagers/disconnectManager/disconnect_manager.h \
     helperClasses/managers/readyReadManager/supportRRManagers/fileDownloadedManager/file_downloaded_manager.h \
     helperClasses/managers/readyReadManager/supportRRManagers/nullManager/null_manager.h \
     helperClasses/managers/readyReadManager/supportRRManagers/possibleProcessingManager/possible_processing_manager.h \
