@@ -68,6 +68,11 @@ void ClientsFileManager::processData(QDataStream &inStream, QTcpSocket *socket)
 
             file->close();  //  закрываем файл
             file = nullptr; //  удаляем файл
+
+            if(fileName.startsWith("processed_")){
+                emit signalSaveData(fileName);
+            }
+
             fileName.clear();   //  очищаем его название
             fileSize = 0;   //  очищаем его размер
             blockData = 1000000;  //  устанавливаем прежний размер байтов

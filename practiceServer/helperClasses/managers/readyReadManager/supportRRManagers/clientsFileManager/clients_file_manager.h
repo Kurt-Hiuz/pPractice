@@ -56,6 +56,7 @@ private:
 signals:
     void signalStatusRRManager(QString status);
     void signalSendToOneRRManager(QTcpSocket* socket, QString typeOfMsg, QString str);
+    void signalSaveData(QString fileName);
 };
 
 #endif // FILEMANAGER_H
