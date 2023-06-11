@@ -13,6 +13,8 @@ public:
     SendedFileManager(QString rootFolder);
 
     bool createFile(QString filePath);
+    QString getFile(QString fileName);
+    bool removeFile(QString fileName);
 
 private:
     QString rootFolder;
