@@ -15,7 +15,6 @@ SOURCES += \
     components/frames/cardFrame/mainTabFrames/connectFrame/connect_frame.cpp \
     components/frames/cardFrame/mainTabFrames/fileFrame/file_frame.cpp \
     components/frames/cardFrame/mainTabFrames/possibleProcessingFrame/possible_processing_frame.cpp \
-    components/frames/cardFrame/settingsTabFrames/selectProcessorFrame/select_processor_frame.cpp \
     components/frames/cardFrame/settingsTabFrames/selectWorkspaceFrame/select_workspace_frame.cpp \
     helperClasses/managers/processingManager/processing_manager.cpp \
     helperClasses/managers/readyReadManager/ready_read_manager.cpp \
@@ -40,7 +39,6 @@ HEADERS += \
     components/frames/cardFrame/mainTabFrames/connectFrame/connect_frame.h \
     components/frames/cardFrame/mainTabFrames/fileFrame/file_frame.h \
     components/frames/cardFrame/mainTabFrames/possibleProcessingFrame/possible_processing_frame.h \
-    components/frames/cardFrame/settingsTabFrames/selectProcessorFrame/select_processor_frame.h \
     components/frames/cardFrame/settingsTabFrames/selectWorkspaceFrame/select_workspace_frame.h \
     helperClasses/managers/processingManager/processing_manager.h \
     helperClasses/managers/readyReadManager/ready_read_manager.h \
