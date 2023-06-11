@@ -61,9 +61,11 @@ public:
     int generatedServerPort = QRandomGenerator::global()->bounded(1024, 65535);
     WorkspaceManager *workspaceManager = nullptr;
     void setWorkspaceManager(WorkspaceManager *newWorkspaceManager);
+    void setMaxConnections(int count);
 
 private:
     QMap<QTcpSocket*, QString> mapSockets;
+    int maxConnections = 30;
     QByteArray Data;
 
     QMap<QString,QString> mapRequest;
@@ -101,11 +103,13 @@ private slots:
     void slotStatusServer(QString status);
     void slotSendToAllClients(QString typeOfMsg, QString str);
     void slotSendToOneClient(QTcpSocket* sendSocket, QString typeOfMsg, QString str);
-    void slotEntryFolderChanged(const QString &fileName);  //  обработчик изменений в директории
     void slotSendBufferToClient(QTcpSocket *socketToSend, QByteArray &buffer);
     void slotSetClientProcessing(QTcpSocket* socket, QString currentProcessing);
     void slotSiftFiles(QStringList &fileInfoList);
     void slotDeleteSendedFile(QString &fileName);
+    void slotDeleteExpectationFile(QString &fileName);
+    void slotSaveData(QString fileName);
+    void slotCheckExpectationFolder(QTcpSocket* checkingSocket);
 
 public slots:
     void incomingConnection(qintptr socketDescriptor);  //  обработчик новых подключений

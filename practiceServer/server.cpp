@@ -14,16 +14,7 @@ Server::Server(bool &server_started){
     /// второе число определяет конец какого-то действия, если оно в несколько этапов, например, передача файла
     /// третье и последующие числа определяют тип передаваемых данных
 
-    mapRequest[""] = "";  //  ничего не нужно
-    mapRequest["000"] = "Disconnect";   //  сигнал на отключение
-    mapRequest["001"] = "Message";   //  отправляется простое сообщение
-    mapRequest["0011"] = "Message from someone";    //  отправляется сообщение от кого-то конкретного
-    mapRequest["002"] = "File";  //  отправляется файл (определяем начало процесса передачи файла)
-    mapRequest["102"] = "Request part of file";  //  запрос на еще одну часть файла
-    mapRequest["103"] = "Request part of processing file";  //  запрос на еще одну часть обрабатываемого файла
-    mapRequest["012"] = "File downloaded";  //  файл загружен полностью (определяем конец процесса передачи файла)
-    mapRequest["004"] = "Possible processing ComboBox data";    //  отправка данных по доступным обработкам
-    mapRequest["0041"] = "Set treatment on client";     //  закрепление возможной обработки за сокетом
+//    mapRequest["000"] = "Disconnect";   //  сигнал на отключение
 
     readyReadManager = new ReadyReadManager();
     connect(readyReadManager, &ReadyReadManager::signalStatusRRManagerServer, this, &Server::slotStatusServer);
@@ -32,6 +23,9 @@ Server::Server(bool &server_started){
     connect(readyReadManager, &ReadyReadManager::signalSendBufferToClient, this, &Server::slotSendBufferToClient);
     connect(readyReadManager, &ReadyReadManager::signalSetClientProcessing, this, &Server::slotSetClientProcessing);
     connect(readyReadManager, &ReadyReadManager::signalDeleteSendedFile, this, &Server::slotDeleteSendedFile);
+    connect(readyReadManager, &ReadyReadManager::signalDeleteExpectationFile, this, &Server::slotDeleteExpectationFile);
+    connect(readyReadManager, &ReadyReadManager::signalSaveData, this, &Server::slotSaveData);
+    connect(readyReadManager, &ReadyReadManager::signalCheckExpectationFolder, this, &Server::slotCheckExpectationFolder);
 }
 
 void Server::setWorkspaceManager(WorkspaceManager *newWorkspaceManager)
@@ -39,6 +33,12 @@ void Server::setWorkspaceManager(WorkspaceManager *newWorkspaceManager)
     this->workspaceManager = newWorkspaceManager;
 
     connect(workspaceManager, &WorkspaceManager::signalSiftFiles, this, &Server::slotSiftFiles);
+}
+
+void Server::setMaxConnections(int count)
+{
+    this->setMaxPendingConnections(count);
+    this->maxConnections = count;
 }
 
 void Server::SendPossibleProcessing(QTcpSocket* socketToSend, QMap<QString,QVariant> possibleProcessingData)
@@ -50,23 +50,6 @@ void Server::SendPossibleProcessing(QTcpSocket* socketToSend, QMap<QString,QVari
     out.device()->seek(0);  //  в начало потока
     out << quint64(Data.size() - sizeof(quint64));  //  высчитываем размер сообщения
     socketToSend->write(Data);    //  отправляем по сокету данные
-}
-
-void Server::slotEntryFolderChanged(const QString &folderName)
-{
-//    qDebug() << "Server::slotEntryFolderChanged:        ";
-//    processingManager = new ProcessingManager();
-//    QFileInfoList list = processingManager->entryFiles(folderName);     //  получаем список файлов директории
-
-//    for (int i = 0; i < list.size(); i++) {
-//        QFileInfo fileInfo = list.at(i);
-//        qDebug() << "Server::slotEntryFolderChanged:        " << qPrintable(QString("%1 %2 %3").arg(fileInfo.size(), 10).arg(fileInfo.fileName(), 5).arg(fileInfo.lastModified().toString()));   //  выводим в формате "размер имя"
-////        SendFileToClient(fileInfo.filePath());  //  отправляем файл клиенту
-//    }
-//    qDebug() << "Server::slotEntryFolderChanged:        " << folderName;
-//    qDebug() << "Server::slotEntryFolderChanged:        " << "================";     // переводим строку
-
-//    processingManager = nullptr;    //  освобождаем память
 }
 
 void Server::slotSendBufferToClient(QTcpSocket *socketToSend, QByteArray &buffer)
@@ -90,7 +73,7 @@ void Server::slotSetClientProcessing(QTcpSocket *socket, QString currentProcessi
     if(currentProcessing != ""){
         emit signalStatusServer("<font color = blue><\\font>Клиент "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+" выбрал \""+currentProcessing+"\" обработку</hr>");
     } else {
-        emit signalStatusServer("<font color = red><\\font>Client on "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+" убрал обработку</hr>");
+        emit signalStatusServer("<font color = red><\\font>Клиент "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+" убрал обработку</hr>");
     }
 }
 
@@ -98,11 +81,6 @@ void Server::slotSiftFiles(QStringList &filesList)
 {
     for(int fileI = 0; fileI < filesList.size(); fileI++){
         QFileInfo currentFile(filesList.at(fileI));
-        if(currentFile.fileName().startsWith("processed_")){
-            qDebug() << "Server::slotSiftFiles:     пришел обработанный файл";
-
-            continue;
-        }
 
         for(auto it = mapSockets.begin(); it != mapSockets.end(); it++){
 
@@ -110,11 +88,11 @@ void Server::slotSiftFiles(QStringList &filesList)
             qDebug() << "Server::slotSiftFiles currentFile.fileName(): " << currentFile.fileName();
             if(currentFile.fileName().endsWith(it.value()) && it.value() != ""){
                 qDebug() << "Server::slotSiftFiles:     " << currentFile.filePath();
-                workspaceManager->copyToSended(currentFile.filePath());
+                emit signalStatusServer(workspaceManager->copyToSended(currentFile.filePath()));
                 SendFileToClient(it.key(), currentFile.filePath());
             } else {
-                workspaceManager->copyToExpectation(currentFile.filePath());
-                workspaceManager->deleteFile(currentFile.fileName());
+                emit signalStatusServer(workspaceManager->copyToExpectation(currentFile.filePath()));
+                emit signalStatusServer(workspaceManager->deleteEntryFile(currentFile.fileName()));
             }
         }
     }
@@ -122,7 +100,34 @@ void Server::slotSiftFiles(QStringList &filesList)
 
 void Server::slotDeleteSendedFile(QString &fileName)
 {
-    workspaceManager->deleteFile(fileName);
+    emit signalStatusServer(workspaceManager->deleteEntryFile(fileName));
+}
+
+void Server::slotDeleteExpectationFile(QString &fileName)
+{
+    emit signalStatusServer(workspaceManager->deleteExpectationFile(fileName));
+}
+
+void Server::slotSaveData(QString fileName)
+{
+    emit signalStatusServer(workspaceManager->saveProcessingFile(fileName));
+}
+
+void Server::slotCheckExpectationFolder(QTcpSocket *checkingSocket)
+{
+    QStringList filesList = workspaceManager->getExpectationFolderFiles();
+
+    for(int fileI = 0; fileI < filesList.size(); fileI++){
+        QFileInfo currentFile(filesList.at(fileI));
+        QString processing = mapSockets[checkingSocket];
+        qDebug() << "Server::slotCheckExpectationFolder  обработка: " << processing;
+        qDebug() << "Server::slotCheckExpectationFolder currentFile.fileName(): " << currentFile.fileName();
+        if(currentFile.fileName().endsWith(processing) && processing != ""){
+            qDebug() << "Server::slotCheckExpectationFolder:     " << currentFile.filePath();
+            emit signalStatusServer(workspaceManager->copyToSended(currentFile.filePath()));
+            SendFileToClient(checkingSocket, currentFile.filePath());
+        }
+    }
 }
 
 void Server::slotSocketDisplayed(QTcpSocket* displayedSocket)
@@ -134,7 +139,7 @@ void Server::slotDisconnectSocket(int socketDiscriptorToDelete) //  обрабо
 {
     for(auto item = mapSockets.begin(); item != mapSockets.end(); item++){  //  пробегаемся по сокетам
         if(item.key()->socketDescriptor() == socketDiscriptorToDelete){     //  ищем совпадение по сокету
-            SendToOneClient(item.key(), mapRequest["000"], "Disconnect from host"); //  отправляем клиенту сигнал на отключение
+            SendToOneClient(item.key(), QString("Disconnect"), "Отключен с хоста"); //  отправляем клиенту сигнал на отключение
 
             qDebug() << "Server::slotDisconnectSocket       " << "pop quantity of clients: "+QString::number(mapSockets.size());
             break;
@@ -173,11 +178,6 @@ void Server::slotSetServerFolders(QMap<QString, QString> &subFolders)
         if(it.key() == "Entry"){
             entryFolder = it.value();    //  папка для файлов извне
             readyReadManager->setEntryFolder(entryFolder);
-
-//            fileSystemWatcher = new QFileSystemWatcher;
-//            fileSystemWatcher->addPath(entryFolder);    //  устанавливаем на слежку папку для приходящих извне файлов
-
-//            connect(fileSystemWatcher, &QFileSystemWatcher::directoryChanged, this, &Server::slotEntryFolderChanged);
             continue;
         }
 
@@ -203,13 +203,19 @@ void Server::slotSetServerFolders(QMap<QString, QString> &subFolders)
 void Server::incomingConnection(qintptr socketDescriptor){  //  обработчик нового подключения
     socket = new QTcpSocket;    //  создание нового сокета под нового клиента
     socket->setSocketDescriptor(socketDescriptor);  //  устанавливаем в него дескриптор (- неотрицательное число, идентифицирующее  поток ввода-вывода)
+    if(this->mapSockets.size() == this->maxConnections){
+        SendToOneClient(socket, QString("Disconnect"), "Отключен с хоста");
+        socket->disconnectFromHost();
+        return;
+    }
+
     connect(socket, &QTcpSocket::readyRead, this, &Server::slotReadyRead);  //  связка готовности чтения
     connect(socket, &QTcpSocket::disconnected, this, &Server::slotDisconnect); //  связка удаления клиента
 
     mapSockets[socket] = "";    //  клиент пока не показал, что он умеет делать
-    emit signalStatusServer("new client on " + QString::number(socketDescriptor));   //  уведомление о подключении
+    emit signalStatusServer("Новый клиент " + QString::number(socketDescriptor));   //  уведомление о подключении
     emit signalAddSocketToListWidget(socket);    //  отображаем на форме в clientsListWidget этот сокет
-    SendToAllClients(mapRequest["001"], "new client on " + QString::number(socketDescriptor));
+    SendToAllClients(QString("Message"), "Новый клиент " + QString::number(socketDescriptor));
     SendPossibleProcessing(socket, possibleProcessing);
     qDebug() << "Server::incomingConnection:        new client on " << socketDescriptor;
     qDebug() << "Server::incomingConnection:        push quantity of clients: "+QString::number(mapSockets.size());
@@ -257,140 +263,8 @@ void Server::slotReadyRead(){
 
         messageManager->processData(in, socket);
 
-//        if(typeOfMess == "Message"){     //  если тип данных "Message"
-//            QString str;    //  создаем переменную строки
-//            in >> str;  //  записываем в нее строку из объекта in, чтобы проверить содержимое
-//            qDebug() << "Server::slotReadyRead:     остаток после чтения str: " << socket->bytesAvailable();
-//            Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str);     //  оформляем чат на стороне Сервера
-
-//            SendToAllClients(mapRequest["001"],"<font color = black><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str.remove(0,5)+delimiter);      //  мы просто избавляемся от префикса "MESS:" и пересылаем клиенту сообщение
-//        }
-
-//        if(typeOfMess == "Message from someone"){   //  если сообщение с конкретным отправителем
-//            QString str, someone;    //  создаем переменную строки и отправителя
-//            in >> str >> someone;   //  считываем
-//            Server::signalStatusServer(someone+" "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str);     //  оформляем чат на стороне Сервера
-//            SendToAllClients(mapRequest["001"],"<font color = black><\\font>"+someone+" "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+str.remove(0,5)+delimiter);      //  мы просто избавляемся от префикса "MESS:" и пересылаем клиенту сообщение
-//        }
-
-//        if(typeOfMess == "File"){    //  отправляется файл
-
-//            // mapRequest["002"] << fileName << fileSize
-
-//            if(fileName.isEmpty()){    //  если файла не существует
-//                in >> fileName;  //  записываем из потока название файла
-//                in >> fileSize; //  считываем его размер
-
-//                if(fileSize < blockData){   //  если размер файла меньше выделенного блока
-//                    blockData = fileSize;   //  устанавливаем размер блока ровно по файлу (передача произойдет в один этап)
-//                } else {
-//                    blockData = 1000000;  //  устанавливаем по умолчанию (на случай последующей передачи, если размер файла будет куда больше)
-//                }
-
-//                file = new QFile;     //  определяем файл
-//                file->setFileName(fileName);    //  устанавливаем имя файла
-
-//                //  этой функции entryFolder определяется в Server::slotNewWorkspaceFolder
-//                //  поскольку этот слот всегда происходит раньше вызова Server::slotReadyRead
-//                QDir::setCurrent(entryFolder);  //  устанавливаем путь сохранения
-//                Server::signalStatusServer("Файл "+fileName+" создан на сервере");  //  уведомляем
-
-//                SendToOneClient(socket, mapRequest["102"],"Downloading new part of file...");    //  запрашиваем первую часть файла
-//            }
-//        }
-
-//        if(typeOfMess == "Request part of processing file"){    //  от нас запрашивается новая часть файла
-//            QString str;    //  определяем переменную, в которую сохраним уведомление от запроса
-//            in >> str;  //  выводим в переменную сообщение
-
-//            qDebug() << "Server::slotReadyRead:     str = " << str;  //  выводим в консоль
-//            Server::signalStatusServer(str); //  выводим клиенту
-
-//            SendPartOfFile();   //  вызываем соответствующий метод отправки
-//            nextBlockSize = 0;  //  заранее обнуляем размер сообщения
-//        }
-
-//        if(typeOfMess == "Request part of file"){   //  отправляется часть файла
-//            if((fileSize - file->size()) < blockData){  //  если разница между плановым и текущим размером файла меньше блока байтов
-//                blockData = fileSize - file->size();    //  мы устанавливаем такой размер для блока (разницу)
-//            }
-
-//            bytes = new char[blockData];   //  выделяем байты под файл, то есть передача пройдет в несколько этапов
-
-//            in >> bytes;    //  считываем байты
-
-//            if(file->open(QIODevice::Append)){  //  записываем в конец файла
-//                file->write(bytes, blockData);    //  записываем в файл
-//            } else {
-//                Server::signalStatusServer("Не удается открыть файл "+fileName);
-//            }
-
-//            if(file->size() < fileSize){    //  если размер до сих пор не полон
-//                Server::signalStatusServer("Текущий размер файла "+fileName+" от "+QString::number(socket->socketDescriptor())+" = "+QString::number(file->size())+"\n"+"Ожидаемый размер = "+QString::number(fileSize));
-
-//                //  SendToAllClients(mapRequest["102"],"<font color = black><\\font>Downloading new part of file...<font color = black><\\font>");    //  запрашиваем новую часть файл
-//                SendToOneClient(socket, mapRequest["102"],"<font color = black><\\font>Downloading new part of file...<font color = black><\\font>");    //  запрашиваем первую часть файла
-//            } else {
-//                //  оформляем чат на стороне Сервера
-//                //  уведомление о "кто: какой файл" при сигнале "012" - File downloaded
-//                Server::signalStatusServer("User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+fileName+"\"");
-//                //  SendToAllClients(mapRequest["012"],"<font color = green><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+fileName+"\" \n"+delimiter);
-
-//                SendToOneClient(socket, mapRequest["012"], "<font color = green><\\font>file \""+fileName+"\" downloaded \n"+delimiter);
-
-//                //  TODO: при отправке всем происходит баг в задержке сообщений. решить
-//                //  SendToAllClients(mapRequest["001"], "<font color = green><\\font>User "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": send file by name \""+fileName+"\" \n"+delimiter);
-
-//                file->close();  //  закрываем файл
-//                file = nullptr; //  удаляем файл
-//                fileName.clear();   //  очищаем его название
-//                fileSize = 0;   //  очищаем его размер
-//                blockData = 1000000;  //  устанавливаем прежний размер байтов
-//                delete[] bytes; //  удаляем байты из кучи
-//                nextBlockSize = 0;  //  обнуляем для новых сообщений
-
-//                return; //  выходим
-//            }
-
-//            file->close();   //закрываем файл
-//            if(bytes != nullptr){   //  удаляем байты из кучи, делая проверку на случай двойного удаления
-//                delete[] bytes;
-//                bytes = nullptr;
-//            }
-
-//        }   //  конец, если отправляется файл
-
-//        if(typeOfMess == "File downloaded"){ //  если файл полностью скачался
-//            QString str;    //  определяем переменную, в которую сохраним данные
-//            in >> str;  //  выводим в переменную сообщение
-//            qDebug() << "Server::slotReadyRead:     File "+fileName+" downloaded";   //  выводим консоль, какой файл был загружен
-//            Server::signalStatusServer(str);  //  и то же самое клиенту
-//            file->close();
-//            delete file; //  удаляем файл
-//            file = nullptr;
-//            fileName.clear();   //  очищаем его название
-//            delete[] bytes; //  удаляем байты из кучи
-//            nextBlockSize = 0;  //  обнуляем для новых сообщений
-//        }
-
-//        if(typeOfMess == "Set treatment on client"){
-//            QString currentTreatment;
-//            in >> currentTreatment;
-//            mapSockets[socket] = currentTreatment;
-//            qDebug() << "Server::slotReadyRead:     mapSockets = " << mapSockets;
-//            if(currentTreatment != ""){
-//                Server::signalStatusServer("<font color = blue><\\font>Client on "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+" choose "+currentTreatment+" for processing"+delimiter);
-//            } else {
-//                Server::signalStatusServer("<font color = red><\\font>Client on "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+" removed the processing "+delimiter);
-//            }
-//        }
-
         nextBlockSize = 0;  //  обнуляем для новых сообщений
-//        if(socket->bytesAvailable() == 0){
-            break;  //  выходим, делать больше нечего
-//        }
-
-//        delete messageManager;
+        break;  //  выходим, делать больше нечего
     }   //  конец while
 }
 
@@ -399,10 +273,10 @@ void Server::slotDisconnect()
     QTcpSocket* disconnectedSocket = static_cast<QTcpSocket*>(QObject::sender());
     mapSockets.remove(disconnectedSocket);
     qDebug() << "Server::slotDisconnect:        pop quantity of clients: "+QString::number(mapSockets.size());
-    SendToAllClients(mapRequest["001"], "<font color = red><\\font>User  "+disconnectedSocket->localAddress().toString()+": has disconnected <hr/>");
-    Server::signalStatusServer("<font color = red><\\font>User  "+disconnectedSocket->localAddress().toString()+": has disconnected <hr/>");
-    Server::signalDeleteSocketFromListWidget(mapSockets);
-    disconnectedSocket->deleteLater();  //  оставляем удаление сокета программе
+    SendToAllClients(QString("Message"), "<font color = red><\\font>Пользователь  "+disconnectedSocket->localAddress().toString()+": отключился <hr/>");
+    emit signalStatusServer("<font color = red><\\font>Пользователь  "+disconnectedSocket->localAddress().toString()+": отключился <hr/>");
+    emit signalDeleteSocketFromListWidget(mapSockets);
+    disconnectedSocket->disconnectFromHost();  //  оставляем удаление сокета программе
 }
 
 void Server::SendToAllClients(QString typeOfMsg, QString str){ //  отправка клиенту сообщений
@@ -482,7 +356,7 @@ void Server::SendPartOfFile()
 
     QDataStream out(&Data, QIODevice::WriteOnly);   //  определяем поток отправки
     out.setVersion(QDataStream::Qt_6_2);
-    out << quint64(0) << mapRequest["103"] << buffer;   //  отправляем байты
+    out << quint64(0) << QString("Request part of processing file") << buffer;   //  отправляем байты
     out.device()->seek(0);
     //  избавляемся от зарезервированных двух байт в начале каждого сообщения
     qDebug() << "Server::SendPartOfFile:        sending blockSize = " << quint64(Data.size() - sizeof(quint64));
