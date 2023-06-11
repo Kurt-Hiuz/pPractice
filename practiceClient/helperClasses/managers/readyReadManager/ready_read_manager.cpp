@@ -22,12 +22,17 @@ ReadyReadManager::ReadyReadManager()
     connect(serverFileManager, &ServerFileManager::signalStatusRRManager, this, &ReadyReadManager::slotStatusRRManager);
     connect(serverFileManager, &ServerFileManager::signalSendToServer, this, &ReadyReadManager::slotSendToServer);
 
+    disconnectManager = new DisconnectManager();
+    connect(disconnectManager, &DisconnectManager::signalStatusRRManager, this, &ReadyReadManager::slotStatusRRManager);
+    connect(disconnectManager, &DisconnectManager::signalEnableInterface, this, &ReadyReadManager::signalEnableInterface);
+
     nullManager = new NullManager();
     messageManagers[serverMessageManager->typeOfMessage()] = serverMessageManager;
     messageManagers[possibleProcessingManager->typeOfMessage()] = possibleProcessingManager;
     messageManagers[clientFileRequestPartManager->typeOfMessage()] = clientFileRequestPartManager;
     messageManagers[fileDownloadedManager->typeOfMessage()] = fileDownloadedManager;
     messageManagers[serverFileManager->typeOfMessage()] = serverFileManager;
+    messageManagers[disconnectManager->typeOfMessage()] = disconnectManager;
 }
 
 I_MessageManager *ReadyReadManager::identifyMessage(QString typeOfMess)

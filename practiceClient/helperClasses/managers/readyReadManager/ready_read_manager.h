@@ -28,6 +28,7 @@
 #include "supportRRManagers/clientFileRequestPartManager/client_file_request_part_manager.h"    //..отправки частей файлов
 #include "supportRRManagers/fileDownloadedManager/file_downloaded_manager.h"    //..остановки загрузки
 #include "supportRRManagers/serverFileManager/server_file_manager.h"    //..приёма файлов
+#include "supportRRManagers/disconnectManager/disconnect_manager.h"     //..обработки отключения
 ///  ========================
 ///
 ///  ========================    классы для работы
@@ -45,6 +46,7 @@ private:
     ClientFileRequestPartManager *clientFileRequestPartManager;
     FileDownloadedManager *fileDownloadedManager;
     ServerFileManager *serverFileManager;
+    DisconnectManager *disconnectManager;
     NullManager *nullManager;
 
 public:
@@ -62,6 +64,7 @@ signals:
     void signalSendBufferToServer(QByteArray &data);
     void signalSendToServer(QString typeOfMsg, QString str);
     void signalDeleteSendedFile(QString &fileName);
+    void signalEnableInterface(QString message);
 
 private slots:
     void slotMessageRRManager(QString message);
