@@ -56,14 +56,14 @@
 class Server : public QTcpServer{
     Q_OBJECT
 public:
-    Server(bool &server_started);
+    Server(bool &server_started, int serverPort);
     QTcpSocket *socket;
-    int generatedServerPort = QRandomGenerator::global()->bounded(1024, 65535);
     WorkspaceManager *workspaceManager = nullptr;
     void setWorkspaceManager(WorkspaceManager *newWorkspaceManager);
     void setMaxConnections(int count);
 
 private:
+    int generatedServerPort = 0;
     QMap<QTcpSocket*, QString> mapSockets;
     int maxConnections = 30;
     QByteArray Data;
@@ -117,6 +117,7 @@ public slots:
     void slotDisconnect();  //  обработчик отключившихся клиентов
     void slotSocketDisplayed(QTcpSocket* displayedSocket);  //  обработчик для размещенного сокета
     void slotDisconnectSocket(int socketDiscriptorToDelete);    //  обработчик для принудительного удаления сокета
+    void slotDisconnectAll(QString reason);    //  обработчик для принудительного удаления сокета
     void slotUpdatePossibleProcessing(QVariant newPossibleProcessingData);
     void slotSetServerFolders(QMap<QString, QString> &subFolders);
 

@@ -1,20 +1,25 @@
 #include "server.h"
 
-Server::Server(bool &server_started){
+Server::Server(bool &server_started, int serverPort){
+    if(serverPort < 1024){
+        generatedServerPort = QRandomGenerator::global()->bounded(1024, 65535);
+    } else {
+        generatedServerPort = serverPort;
+    }
+
     if(this->listen(QHostAddress::Any, generatedServerPort)){  //  статус будет передаваться, когда сервер будет прослушивать любой из адресов
         server_started = true;  //  меняем состояние сервера
         qDebug() << "Server::Server:        start on "+QString::number(generatedServerPort)+" port";    //  уведомляем в консоли
     } else {
         server_started = false; //  иначе что-то пошло не так
     }
+
     nextBlockSize = 0;  //  обнуляем размер сообщения в самом начале работы
 
     /// Глоссарий, описывающий тип отправляемого сообщения
     /// первое число определяет тип (0 - простой сигнал о чем-то \ 1 - запрос чего-то)
     /// второе число определяет конец какого-то действия, если оно в несколько этапов, например, передача файла
     /// третье и последующие числа определяют тип передаваемых данных
-
-//    mapRequest["000"] = "Disconnect";   //  сигнал на отключение
 
     readyReadManager = new ReadyReadManager();
     connect(readyReadManager, &ReadyReadManager::signalStatusRRManagerServer, this, &Server::slotStatusServer);
@@ -147,6 +152,16 @@ void Server::slotDisconnectSocket(int socketDiscriptorToDelete) //  обрабо
     }
 }
 
+void Server::slotDisconnectAll(QString reason)
+{
+    SendToAllClients("Message", "Принудительное отключение всех клиентов: "+reason);
+    for(auto item = mapSockets.begin(); item != mapSockets.end(); item++){  //  пробегаемся по сокетам
+        SendToOneClient(item.key(), QString("Disconnect"), "Отключен с хоста"); //  отправляем клиенту сигнал на отключение
+    }
+    mapSockets.clear();
+    emit signalDeleteSocketFromListWidget(mapSockets);
+}
+
 void Server::slotUpdatePossibleProcessing(QVariant newPossibleProcessingData)
 {
     this->possibleProcessing.clear();
@@ -273,8 +288,8 @@ void Server::slotDisconnect()
     QTcpSocket* disconnectedSocket = static_cast<QTcpSocket*>(QObject::sender());
     mapSockets.remove(disconnectedSocket);
     qDebug() << "Server::slotDisconnect:        pop quantity of clients: "+QString::number(mapSockets.size());
-    SendToAllClients(QString("Message"), "<font color = red><\\font>Пользователь  "+disconnectedSocket->localAddress().toString()+": отключился <hr/>");
-    emit signalStatusServer("<font color = red><\\font>Пользователь  "+disconnectedSocket->localAddress().toString()+": отключился <hr/>");
+    SendToAllClients(QString("Message"), "<font color = red><\\font>Пользователь  "+disconnectedSocket->localAddress().toString()+": отключился <br/>");
+    emit signalStatusServer("<font color = red><\\font>Пользователь  "+disconnectedSocket->localAddress().toString()+": отключился <br/>");
     emit signalDeleteSocketFromListWidget(mapSockets);
     disconnectedSocket->disconnectFromHost();  //  оставляем удаление сокета программе
 }
