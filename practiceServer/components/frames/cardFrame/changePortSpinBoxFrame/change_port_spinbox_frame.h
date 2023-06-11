@@ -1,10 +1,10 @@
-#ifndef LINEEDITFRAME_H
-#define LINEEDITFRAME_H
+#ifndef SPINBOXFRAME_H
+#define SPINBOXFRAME_H
 
-///     Класс ChangeIPLineEditFrame реализует интерфейс I_CardFrame
+///     Класс ChangePortSpinBoxFrame реализует интерфейс I_CardFrame
 ///     Переменные:
 ///         consoleMessage - сообщение в консоль сервера
-///         changeIPLineEdit - поле ввода IP сервера
+///         changePortSpinBox - поле ввода порта сервера
 ///         dataLabel - метка с подсказкой/данными для наглядности
 ///         parentUi - ссылка на родительский элемент ui
 ///     Методы:
@@ -23,11 +23,11 @@
 #include <QLabel>               //  метка для подсказки
 ///  ========================
 
-class ChangePortLineEditFrame : public I_CardFrame
+class ChangePortSpinBoxFrame : public I_CardFrame
 {
     Q_OBJECT
 public:
-    ChangePortLineEditFrame(MainWindow *parentUi);
+    ChangePortSpinBoxFrame(MainWindow *parentUi);
 
     void createInterface() override;
     QMap<QString, QVariant> getValue() override;
@@ -41,4 +41,4 @@ private:
     MainWindow *parentUi; 
 };
 
-#endif // LINEEDITFRAME_H
+#endif // SPINBOXFRAME_H

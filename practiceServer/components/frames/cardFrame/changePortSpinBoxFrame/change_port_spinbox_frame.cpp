@@ -1,9 +1,9 @@
-#include "change_port_line_edit_frame.h"
+#include "change_port_spinbox_frame.h"
 
 #include <QHBoxLayout>
 #include <QMap>
 
-ChangePortLineEditFrame::ChangePortLineEditFrame(MainWindow *parentUi)
+ChangePortSpinBoxFrame::ChangePortSpinBoxFrame(MainWindow *parentUi)
 {
     //  конструктор карточки
     this->setObjectName("Change port spinbox Frame");
@@ -17,11 +17,10 @@ ChangePortLineEditFrame::ChangePortLineEditFrame(MainWindow *parentUi)
 
     this->parentUi = parentUi;
 
-    changePortSpinBox->setValue(00000);
     dataLabel->setText("Сменить порт: (1024-65535)");
 }
 
-void ChangePortLineEditFrame::createInterface()
+void ChangePortSpinBoxFrame::createInterface()
 {
     //  создание интерфейса
     QHBoxLayout *frameLayout = new QHBoxLayout();   //  слой выравнивания
@@ -31,11 +30,11 @@ void ChangePortLineEditFrame::createInterface()
     frameLayout->addWidget(changePortSpinBox);
 }
 
-void ChangePortLineEditFrame::enableInteface(bool value){
+void ChangePortSpinBoxFrame::enableInteface(bool value){
     changePortSpinBox->setEnabled(value);
 }
 
-QMap<QString, QVariant> ChangePortLineEditFrame::getValue()
+QMap<QString, QVariant> ChangePortSpinBoxFrame::getValue()
 {
     QMap<QString, QVariant> valueMap;   //  переменная для возврата
     //  сообщение в консоль
@@ -45,7 +44,7 @@ QMap<QString, QVariant> ChangePortLineEditFrame::getValue()
     return valueMap;
 }
 
-void ChangePortLineEditFrame::setValue(QVariant value)
+void ChangePortSpinBoxFrame::setValue(QVariant value)
 {
     changePortSpinBox->setValue(value.toInt());
 }
