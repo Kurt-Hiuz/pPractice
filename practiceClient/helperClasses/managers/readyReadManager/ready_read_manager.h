@@ -65,15 +65,6 @@ signals:
     void signalSendToServer(QString typeOfMsg, QString str);
     void signalDeleteSendedFile(QString &fileName);
     void signalEnableInterface(QString message);
-
-private slots:
-    void slotMessageRRManager(QString message);
-    void slotStatusRRManager(QString status);
-    void slotSetCBDataRRManager(QMap<QString,QVariant> &possibleProcessingData);
-    void slotSendToAllClientsRRManager(QString typeOfMsg, QString str);
-    void slotSendBufferRRManager(QByteArray &buffer);
-    void slotSendToServer(QString typeOfMsg, QString str);
-    void slotDeleteSendedFile(QString &fileName);
 };
 
 #endif // READYREADMANAGER_H

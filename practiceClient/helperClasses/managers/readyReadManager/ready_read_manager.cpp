@@ -3,27 +3,27 @@
 ReadyReadManager::ReadyReadManager()
 {
     serverMessageManager = new ServerMessageManager();
-    connect(serverMessageManager, &ServerMessageManager::signalMessageRRManager, this, &ReadyReadManager::slotMessageRRManager);
+    connect(serverMessageManager, &ServerMessageManager::signalMessageRRManager, this, &ReadyReadManager::signalMessageRRManagerClient);
 
     possibleProcessingManager = new PossibleProcessingManager();
-    connect(possibleProcessingManager, &PossibleProcessingManager::signalStatusRRManager, this, &ReadyReadManager::slotStatusRRManager);
-    connect(possibleProcessingManager, &PossibleProcessingManager::signalSetCBDataRRManager, this, &ReadyReadManager::slotSetCBDataRRManager);
+    connect(possibleProcessingManager, &PossibleProcessingManager::signalStatusRRManager, this, &ReadyReadManager::signalStatusRRManagerClient);
+    connect(possibleProcessingManager, &PossibleProcessingManager::signalSetCBDataRRManager, this, &ReadyReadManager::signalSetCBData);
 
     clientFileRequestPartManager = new ClientFileRequestPartManager();
-    connect(clientFileRequestPartManager, &ClientFileRequestPartManager::signalStatusRRManager, this, &ReadyReadManager::slotStatusRRManager);
-    connect(clientFileRequestPartManager, &ClientFileRequestPartManager::signalSendBufferRRManager, this, &ReadyReadManager::slotSendBufferRRManager);
+    connect(clientFileRequestPartManager, &ClientFileRequestPartManager::signalStatusRRManager, this, &ReadyReadManager::signalStatusRRManagerClient);
+    connect(clientFileRequestPartManager, &ClientFileRequestPartManager::signalSendBufferRRManager, this, &ReadyReadManager::signalSendBufferToServer);
 
     fileDownloadedManager = new FileDownloadedManager();
-    connect(fileDownloadedManager, &FileDownloadedManager::signalStatusRRManager, this, &ReadyReadManager::slotStatusRRManager);
+    connect(fileDownloadedManager, &FileDownloadedManager::signalStatusRRManager, this, &ReadyReadManager::signalStatusRRManagerClient);
     connect(fileDownloadedManager, &FileDownloadedManager::signalClearFileData, clientFileRequestPartManager, &ClientFileRequestPartManager::slotClearFileData);
-    connect(fileDownloadedManager, &FileDownloadedManager::signalDeleteSendedFile, this, &ReadyReadManager::slotDeleteSendedFile);
+    connect(fileDownloadedManager, &FileDownloadedManager::signalDeleteSendedFile, this, &ReadyReadManager::signalDeleteSendedFile);
 
     serverFileManager = new ServerFileManager();
-    connect(serverFileManager, &ServerFileManager::signalStatusRRManager, this, &ReadyReadManager::slotStatusRRManager);
-    connect(serverFileManager, &ServerFileManager::signalSendToServer, this, &ReadyReadManager::slotSendToServer);
+    connect(serverFileManager, &ServerFileManager::signalStatusRRManager, this, &ReadyReadManager::signalStatusRRManagerClient);
+    connect(serverFileManager, &ServerFileManager::signalSendToServer, this, &ReadyReadManager::signalSendToServer);
 
     disconnectManager = new DisconnectManager();
-    connect(disconnectManager, &DisconnectManager::signalStatusRRManager, this, &ReadyReadManager::slotStatusRRManager);
+    connect(disconnectManager, &DisconnectManager::signalStatusRRManager, this, &ReadyReadManager::signalStatusRRManagerClient);
     connect(disconnectManager, &DisconnectManager::signalEnableInterface, this, &ReadyReadManager::signalEnableInterface);
 
     nullManager = new NullManager();
@@ -60,44 +60,3 @@ void ReadyReadManager::setFileClientFileRequest(QString &filePath)
     clientFileRequestPartManager->setFilePath(filePath);
 }
 
-void ReadyReadManager::slotMessageRRManager(QString message)
-{
-    qDebug() << "ReadyReadManager::slotMessageRRManager:     " << message;
-    emit signalMessageRRManagerClient(message);
-}
-
-void ReadyReadManager::slotStatusRRManager(QString status)
-{
-    qDebug() << "ReadyReadManager::slotStatusRRManager:     " << status;
-    emit signalStatusRRManagerClient(status);
-}
-
-void ReadyReadManager::slotSetCBDataRRManager(QMap<QString, QVariant> &possibleProcessingData)
-{
-    qDebug() << "ReadyReadManager::slotSetCBDataRRManager:     possibleProcessingData.size():" << possibleProcessingData.size();
-    emit signalSetCBData(possibleProcessingData);
-}
-
-void ReadyReadManager::slotSendToAllClientsRRManager(QString typeOfMsg, QString str)
-{
-    qDebug() << "ReadyReadManager::slotSendToAllClientsRRManager:     " << typeOfMsg << " | " << str;
-    emit signalSendToAllClientsServer(typeOfMsg, str);
-}
-
-void ReadyReadManager::slotSendBufferRRManager(QByteArray &buffer)
-{
-    qDebug() << "ReadyReadManager::slotSendBufferRRManager:     buffer.size(): " << buffer.size();
-    emit signalSendBufferToServer(buffer);
-}
-
-void ReadyReadManager::slotSendToServer(QString typeOfMsg, QString str)
-{
-    qDebug() << "ReadyReadManager::slotSendToServer:    " << typeOfMsg << " | " << str;
-    emit signalSendToServer(typeOfMsg, str);
-}
-
-void ReadyReadManager::slotDeleteSendedFile(QString &fileName)
-{
-    qDebug() << "ReadyReadManager::slotDeleteSendedFile deleting file name: " << fileName;
-    emit signalDeleteSendedFile(fileName);
-}
