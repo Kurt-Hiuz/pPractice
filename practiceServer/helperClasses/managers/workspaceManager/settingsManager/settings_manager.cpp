@@ -21,7 +21,7 @@ QString SettingsManager::setSettings(QJsonObject currentJsonObject)
     //  в случае отсутствия данных или нарушения данных соберется новая структура
     if(possibleProcessingFile.size() < 24){
         if(!possibleProcessingFile.open(QIODevice::WriteOnly)){
-            return QString("<hr/>Не удалось сохранить список обработок");
+            return QString("<br>Не удалось сохранить список обработок");
         }
         //  создание пустой json структуры внутри файла
 
