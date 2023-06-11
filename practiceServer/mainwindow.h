@@ -108,6 +108,8 @@ private:
 
     quint16 nextBlockSize;
 
+    void setServerSettingsFromFile(const QString &filePath);
+
 public slots:
     void slotStatusServer(QString status);
     void slotAddSocketToListWidget(QTcpSocket* socketToAdd);
@@ -120,7 +122,8 @@ private slots:
     void on_clientsListWidget_customContextMenuRequested(const QPoint &pos);
     void on_openJSONSettingsFilePushButton_clicked();
     void on_saveSettingsPushButton_clicked();
-    void updateUiComboBoxSlot(const QString &fileName);
+    void slotUpdateUiComboBox(const QString &fileName);
+    void slotSettingsFileChanged(const QString &filePath);
     void slotClearEntryFolder(QString message);
 
 signals:

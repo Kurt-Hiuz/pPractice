@@ -6,7 +6,7 @@
 
 #include "components/frames/cardFrame/selectWorkspaceFrame/select_workspace_frame.h"
 #include "components/frames/cardFrame/possibleProcessingComboBoxFrame/possible_processing_combobox_frame.h"
-#include "components/frames/cardFrame/changePortLineEditFrame/change_port_line_edit_frame.h"
+#include "components/frames/cardFrame/changePortSpinBoxFrame/change_port_spinbox_frame.h"
 #include "components/frames/cardFrame/maxConnectionSpinBoxFrame/max_connection_spinbox_frame.h"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -38,7 +38,8 @@ MainWindow::MainWindow(QWidget *parent)
     QVBoxLayout *settingsContainer = new QVBoxLayout();
 
     workspaceManager = new WorkspaceManager();
-    connect(workspaceManager, &WorkspaceManager::signalUpdateUiComboBox, this, &MainWindow::updateUiComboBoxSlot);
+    connect(workspaceManager, &WorkspaceManager::signalUpdateUiComboBox, this, &MainWindow::slotUpdateUiComboBox);
+    connect(workspaceManager, &WorkspaceManager::signalSettingsFileChanged, this, &MainWindow::slotSettingsFileChanged);
     connect(workspaceManager, &WorkspaceManager::signalStatusServer, this, &MainWindow::slotStatusServer);  //  связка для отображения статуса сервера, вывод в консоль
     connect(workspaceManager, &WorkspaceManager::signalClearEntryFolder, this, &MainWindow::slotClearEntryFolder);
 
@@ -46,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_selectWorkspaceFrame = new SelectWorkspaceFrame(this);
     m_possibleProcessingFrame = new PossibleProcessingComboBoxFrame(this);
-    m_changePortLineEditFrame = new ChangePortLineEditFrame(this);
+    m_changePortLineEditFrame = new ChangePortSpinBoxFrame(this);
     m_maxConnectionSpinBoxFrame = new MaxConnectionSpinBoxFrame(this);
 
     m_selectWorkspaceFrame->createInterface();
@@ -62,6 +63,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->settingsFrame->setLayout(settingsContainer);
 
     m_changePortLineEditFrame->setValue(server->generatedServerPort);
+    m_maxConnectionSpinBoxFrame->setValue(server->maxPendingConnections());
 
     // устанавливаем специальную политику отображения меню
     ui->clientsListWidget->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -72,6 +74,49 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::setServerSettingsFromFile(const QString &filePath)
+{
+    QFile fileJSONSetting;
+    fileJSONSetting.setFileName(filePath);
+    fileJSONSetting.open(QIODevice::ReadOnly | QIODevice::Text);
+    QString val = fileJSONSetting.readAll();
+    fileJSONSetting.close();
+
+    QJsonParseError error;
+    QJsonDocument document = QJsonDocument::fromJson(val.toUtf8(), &error);
+    qDebug() << "MainWindow::readServerSettingsFile:     Error: " << error.errorString() << error.offset << error.error;
+
+    QJsonObject documentObject = document.object();
+    QString keyObject = ""; //  ключ всегда строка
+    QVariant valueObject;  //  а вот значение может быть разным
+
+    for (int i = 0; i < documentObject.size(); i++) { //  проходимся по всему файлу
+
+        keyObject = documentObject.keys().at(i);  //  берем i-тый ключ-название_виджета
+
+        for(auto settingsTabChild : ui->settingsFrame->children()){
+            if(settingsTabChild->metaObject()->className() != keyObject) continue;
+
+            //  получаем значение по ключу
+            valueObject = documentObject.value(keyObject);
+
+            dynamic_cast<I_CardFrame*>(settingsTabChild)->setValue(valueObject);
+
+            //  получаем строку для консоли и добавляем её в infoAboutServerTextEdit
+            ui->infoAboutServerTextEdit->append(dynamic_cast<I_CardFrame*>(settingsTabChild)->getValue().firstKey());
+
+            break;
+        }
+
+    }
+
+    ui->infoAboutServerTextEdit->append("Настройки установлены<hr/>");
+
+    //  устанавливаем количество макс. подключений
+    server->setMaxConnections(m_maxConnectionSpinBoxFrame->getValue().first().toInt());
+    ui->infoAboutServerTextEdit->append("Установлен новый лимит кол-ва пользователей: "+QString::number(server->maxPendingConnections()));
 }
 
 void MainWindow::slotStatusServer(QString status)   //  обработчик состояния
@@ -194,41 +239,7 @@ void MainWindow::on_openJSONSettingsFilePushButton_clicked()
 {
     QString filePath;
     filePath = QFileDialog::getOpenFileName(this, "Выбор файла", "C:\\");   //  открываем диалоговое окно с заголовком "Выбор файла" и по умолчанию ставим путь C:/
-    QFile fileJSONSetting;
-    fileJSONSetting.setFileName(filePath);
-    fileJSONSetting.open(QIODevice::ReadOnly | QIODevice::Text);
-    QString val = fileJSONSetting.readAll();
-    fileJSONSetting.close();
-
-    QJsonParseError error;
-    QJsonDocument document = QJsonDocument::fromJson(val.toUtf8(), &error);
-    qDebug() << "MainWindow::on_openJSONSettingsFilePushButton_clicked:     Error: " << error.errorString() << error.offset << error.error;
-
-    QJsonObject documentObject = document.object();
-    QString keyObject = ""; //  ключ всегда строка
-    QVariant valueObject;  //  а вот значение может быть разным
-
-    for (int i = 0; i < documentObject.size(); i++) { //  проходимся по всему файлу
-
-        keyObject = documentObject.keys().at(i);  //  берем i-тый ключ-название_виджета
-
-        for(auto settingsTabChild : ui->settingsFrame->children()){
-            if(settingsTabChild->metaObject()->className() != keyObject) continue;
-
-            //  получаем значение по ключу
-            valueObject = documentObject.value(keyObject);
-
-            dynamic_cast<I_CardFrame*>(settingsTabChild)->setValue(valueObject);
-
-            //  получаем строку для консоли и добавляем её в infoAboutServerTextEdit
-            ui->infoAboutServerTextEdit->append(dynamic_cast<I_CardFrame*>(settingsTabChild)->getValue().firstKey());
-
-            break;
-        }
-
-    }
-
-    ui->infoAboutServerTextEdit->append("Настройки установлены<hr/>");
+    setServerSettingsFromFile(filePath);
 }
 
 void MainWindow::on_saveSettingsPushButton_clicked()
@@ -273,9 +284,9 @@ void MainWindow::on_saveSettingsPushButton_clicked()
     ui->infoAboutServerTextEdit->append(workspaceManager->saveSettings(m_currentJsonObject));
 }
 
-void MainWindow::updateUiComboBoxSlot(const QString &fileName)
+void MainWindow::slotUpdateUiComboBox(const QString &fileName)
 {
-    qDebug() << "MainWindow::updateUiComboBoxSlot !!!   " << fileName;
+    qDebug() << "MainWindow::slotUpdateUiComboBox !!!   " << fileName;
 
     QFile fileJSONSetting;
     fileJSONSetting.setFileName(fileName);
@@ -289,7 +300,7 @@ void MainWindow::updateUiComboBoxSlot(const QString &fileName)
 
     QJsonParseError error;
     QJsonDocument document = QJsonDocument::fromJson(val.toUtf8(), &error);
-    qDebug() << "MainWindow::updateUiComboBoxSlot:     Error: " << error.errorString() << error.offset << error.error;
+    qDebug() << "MainWindow::slotUpdateUiComboBox:     Error: " << error.errorString() << error.offset << error.error;
 
     QJsonObject documentObject = document.object();
     QString keyObject = ""; //  ключ всегда строка
@@ -301,7 +312,7 @@ void MainWindow::updateUiComboBoxSlot(const QString &fileName)
 
         //  получаем значение по ключу
         valueObject = documentObject.value(keyObject);
-        qDebug() << "MainWindow::updateUiComboBoxSlot:  valueObject:    " << valueObject;
+        qDebug() << "MainWindow::slotUpdateUiComboBox:  valueObject:    " << valueObject;
 
         ui->settingsFrame->findChild<PossibleProcessingComboBoxFrame*>("Possible processing Frame")->setValue(valueObject);
     }
@@ -309,6 +320,11 @@ void MainWindow::updateUiComboBoxSlot(const QString &fileName)
     ui->infoAboutServerTextEdit->append("<hr/>Список обновлен");
 
     emit signalUpdatePossibleProcessing(valueObject);
+}
+
+void MainWindow::slotSettingsFileChanged(const QString &filePath)
+{
+    setServerSettingsFromFile(filePath);
 }
 
 void MainWindow::slotClearEntryFolder(QString message)
