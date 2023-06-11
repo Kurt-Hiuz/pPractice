@@ -26,6 +26,7 @@ signals:
     void signalSetCBDataForm(QMap<QString,QVariant> &possibleProcessingData);
     void signalSetFilePathLabel(QString text);
     void signalSetFileClientFileRequest(QString &filePath);
+    void signalEnableInterface(QString message);
 
 private:
     QByteArray Data;    //  передаваемые файлы

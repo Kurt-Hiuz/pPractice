@@ -13,6 +13,7 @@ Client::Client(){
     connect(readyReadManager, &ReadyReadManager::signalSendBufferToServer, this, &Client::slotSendBufferToServer);
     connect(readyReadManager, &ReadyReadManager::signalSendToServer, this, &Client::slotSendToServer);
     connect(readyReadManager, &ReadyReadManager::signalDeleteSendedFile, this, &Client::slotDeleteSendedFile);
+    connect(readyReadManager, &ReadyReadManager::signalEnableInterface, this, &Client::signalEnableInterface);
 }
 
 void Client::setWorkspaceManager(WorkspaceManager *newWorkspaceManager)
@@ -144,20 +145,10 @@ void Client::slotReadyRead()
 
             messageManager->processData(in);
 
-    //            if(typeOfMessage == "Disconnect"){
-    //                QString str;
-    //                in >> str;
-
-    //                qDebug() << "Disconnect";
-    //                ui->textBrowser->append(str);
-    //                setEnabledInterface(true);
-    //                socket->disconnectFromHost();
-    //            }
-
-                nextBlockSize = 0;  //  обнуляем для новых сообщений
-                if(this->bytesAvailable() == 0){
-                    break;  //  выходим, делать больше нечего
-                }
+            nextBlockSize = 0;  //  обнуляем для новых сообщений
+            if(this->bytesAvailable() == 0){
+                break;  //  выходим, делать больше нечего
+            }
         }
     }
 }
