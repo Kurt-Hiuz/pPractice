@@ -14,16 +14,17 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->setWindowTitle("D.I.P Server++");
 
     bool server_started = false;    //  изначально наш сервер выключен
 
-    server = new Server(server_started);    //  создаем сервер, передавая его состояние, которое изменится в конструкторе
+    server = new Server(server_started, 0);    //  создаем сервер, передавая его состояние, которое изменится в конструкторе
 
     if(!server_started){  //  проверка состояния "false"
         ui->infoAboutServerTextEdit->append("Сервер не запущен");   //  уведомление
         return;
     }
-    ui->infoAboutServerTextEdit->append("Сервер запущен на "+QString::number(server->generatedServerPort)+" порту");  //  уведомление
+    ui->infoAboutServerTextEdit->append("Сервер запущен на "+QString::number(server->serverPort())+" порту");  //  уведомление
 
 
     connect(server, &Server::signalStatusServer, this, &MainWindow::slotStatusServer);  //  связка для отображения статуса сервера, вывод в консоль
@@ -31,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(server, &Server::signalDeleteSocketFromListWidget, this, &MainWindow::slotDeleteSocketFromListWidget);  //  связка для удаления сокета из clientsListWidget
     connect(this, &MainWindow::signalSocketDisplayed, server, &Server::slotSocketDisplayed);    //  связка для отправки подключившемуся сокету список доступных обработок
     connect(this, &MainWindow::signalDisconnectSocket, server, &Server::slotDisconnectSocket);  //  связка для принудительного удаления сокета
+    connect(this, &MainWindow::signalDisconnectAll, server, &Server::slotDisconnectAll);  //  связка для принудительного удаления всех сокетов
     connect(this, &MainWindow::signalUpdatePossibleProcessing, server, &Server::slotUpdatePossibleProcessing);  //  связка для обновления списка обработок у клиентоав
 
     nextBlockSize = 0;  //  обнуляем размер сообщения в самом начале работы
@@ -62,7 +64,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->settingsFrame->setLayout(settingsContainer);
 
-    m_changePortLineEditFrame->setValue(server->generatedServerPort);
+    m_changePortLineEditFrame->setValue(server->serverPort());
     m_maxConnectionSpinBoxFrame->setValue(server->maxPendingConnections());
 
     // устанавливаем специальную политику отображения меню
@@ -117,6 +119,28 @@ void MainWindow::setServerSettingsFromFile(const QString &filePath)
     //  устанавливаем количество макс. подключений
     server->setMaxConnections(m_maxConnectionSpinBoxFrame->getValue().first().toInt());
     ui->infoAboutServerTextEdit->append("Установлен новый лимит кол-ва пользователей: "+QString::number(server->maxPendingConnections()));
+
+    int currentPort = m_changePortLineEditFrame->getValue().first().toInt();
+    if(server->serverPort() != currentPort){
+        emit signalDisconnectAll("Смена порта");
+        delete server;
+        bool server_started = false;
+        server = new Server(server_started, currentPort);
+
+        if(!server_started){  //  проверка состояния "false"
+            ui->infoAboutServerTextEdit->append("Сервер не запущен на новом порту");   //  уведомление
+            return;
+        }
+        connect(server, &Server::signalStatusServer, this, &MainWindow::slotStatusServer);  //  связка для отображения статуса сервера, вывод в консоль
+        connect(server, &Server::signalAddSocketToListWidget, this, &MainWindow::slotAddSocketToListWidget);    //  связка для отображения добавления клиентов в clientsListWidget
+        connect(server, &Server::signalDeleteSocketFromListWidget, this, &MainWindow::slotDeleteSocketFromListWidget);  //  связка для удаления сокета из clientsListWidget
+        connect(this, &MainWindow::signalSocketDisplayed, server, &Server::slotSocketDisplayed);    //  связка для отправки подключившемуся сокету список доступных обработок
+        connect(this, &MainWindow::signalDisconnectSocket, server, &Server::slotDisconnectSocket);  //  связка для принудительного удаления сокета
+        connect(this, &MainWindow::signalDisconnectAll, server, &Server::slotDisconnectAll);  //  связка для принудительного удаления всех сокетов
+        connect(this, &MainWindow::signalUpdatePossibleProcessing, server, &Server::slotUpdatePossibleProcessing);  //  связка для обновления списка обработок у клиентоав
+
+        ui->infoAboutServerTextEdit->append("Сервер запущен на новом, "+QString::number(server->serverPort())+", порту");  //  уведомление
+    }
 }
 
 void MainWindow::slotStatusServer(QString status)   //  обработчик состояния
@@ -128,7 +152,7 @@ void MainWindow::slotStatusServer(QString status)   //  обработчик с�
 void MainWindow::slotAddSocketToListWidget(QTcpSocket *socketToAdd)
 {
     //  TODO:   сделать обращение к clientsListWidget и добавление данных с сокета
-    ui->clientsListWidget->addItem("User desc:"+QString::number(socketToAdd->socketDescriptor())+" | IP: "+socketToAdd->localAddress().toString());
+    ui->clientsListWidget->addItem("Клиент дескриптор:"+QString::number(socketToAdd->socketDescriptor())+" | IP: "+socketToAdd->localAddress().toString());
 //    qDebug() << QString::number(socketToAdd->socketDescriptor()) << socketToAdd->localAddress().toString();
     MainWindow::signalSocketDisplayed(socketToAdd);
 }
@@ -146,7 +170,7 @@ void MainWindow::slotDeleteSocketFromListWidget(QMap<QTcpSocket *, QString> mapS
 //    }
     ui->clientsListWidget->clear();
     for(auto itemSocket = mapSockets.begin(); itemSocket != mapSockets.end(); itemSocket++){
-        ui->clientsListWidget->addItem("User desc:"+QString::number(itemSocket.key()->socketDescriptor())+" | IP: "+itemSocket.key()->localAddress().toString());
+        ui->clientsListWidget->addItem("Клиент дескриптор:"+QString::number(itemSocket.key()->socketDescriptor())+" | IP: "+itemSocket.key()->localAddress().toString());
     }
 
 }
@@ -331,3 +355,28 @@ void MainWindow::slotClearEntryFolder(QString message)
 {
     ui->infoAboutServerTextEdit->append(message);
 }
+
+void MainWindow::on_restartServerPushButton_clicked()
+{
+    emit signalDisconnectAll("Перезапуск сервера");
+
+    delete server;
+    bool server_started = false;
+    int currentPort = m_changePortLineEditFrame->getValue().first().toInt();
+    server = new Server(server_started, currentPort);
+
+    if(!server_started){  //  проверка состояния "false"
+        ui->infoAboutServerTextEdit->append("Сервер не перезапущен");   //  уведомление
+        return;
+    }
+    connect(server, &Server::signalStatusServer, this, &MainWindow::slotStatusServer);  //  связка для отображения статуса сервера, вывод в консоль
+    connect(server, &Server::signalAddSocketToListWidget, this, &MainWindow::slotAddSocketToListWidget);    //  связка для отображения добавления клиентов в clientsListWidget
+    connect(server, &Server::signalDeleteSocketFromListWidget, this, &MainWindow::slotDeleteSocketFromListWidget);  //  связка для удаления сокета из clientsListWidget
+    connect(this, &MainWindow::signalSocketDisplayed, server, &Server::slotSocketDisplayed);    //  связка для отправки подключившемуся сокету список доступных обработок
+    connect(this, &MainWindow::signalDisconnectSocket, server, &Server::slotDisconnectSocket);  //  связка для принудительного удаления сокета
+    connect(this, &MainWindow::signalDisconnectAll, server, &Server::slotDisconnectAll);  //  связка для принудительного удаления всех сокетов
+    connect(this, &MainWindow::signalUpdatePossibleProcessing, server, &Server::slotUpdatePossibleProcessing);  //  связка для обновления списка обработок у клиентоав
+
+    ui->infoAboutServerTextEdit->append("Сервер перезапущен на "+QString::number(server->serverPort())+" порту");  //  уведомление
+}
+

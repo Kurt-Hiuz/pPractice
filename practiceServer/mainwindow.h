@@ -125,11 +125,13 @@ private slots:
     void slotUpdateUiComboBox(const QString &fileName);
     void slotSettingsFileChanged(const QString &filePath);
     void slotClearEntryFolder(QString message);
+    void on_restartServerPushButton_clicked();
 
 signals:
     void signalSocketDisplayed(QTcpSocket* displayedSocket);
     void signalDisconnectSocket(int socketDiscriptor);
     void signalUpdatePossibleProcessing(QVariant newPossibleProcessingData);
+    void signalDisconnectAll(QString reason);
 };
 
 #endif // MAINWINDOW_H
