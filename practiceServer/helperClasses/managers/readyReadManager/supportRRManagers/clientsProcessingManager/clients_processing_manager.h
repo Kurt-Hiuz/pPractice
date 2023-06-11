@@ -28,6 +28,7 @@ signals:
     void signalStatusRRManager(QString status);
     void signalSendToAllClientsRRManager(QString typeOfMsg, QString str);
     void signalSetClientProcessing(QTcpSocket *socket, QString currentProcessing);
+    void signalCheckExpectationFolder(QTcpSocket *socket);
 };
 
 #endif // CLIENTSPROCESSINGMANAGER_H

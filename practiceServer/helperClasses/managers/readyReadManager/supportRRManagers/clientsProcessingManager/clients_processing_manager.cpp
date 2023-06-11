@@ -21,6 +21,7 @@ void ClientsProcessingManager::processData(QDataStream &inStream, QTcpSocket *so
     inStream >> currentProcessing;
 
     emit signalSetClientProcessing(socket, currentProcessing);
+    emit signalCheckExpectationFolder(socket);
 }
 
 QString ClientsProcessingManager::typeOfMessage()
