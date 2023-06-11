@@ -50,31 +50,14 @@ signals:
 private:
     Ui::MainWindow *ui;
     Client *client;
-    QTcpSocket *socket; //  сокет соединения
 
-    QByteArray Data;    //  передаваемые файлы
-
-    QMap<QString,QString> mapRequest;   //  определяем глоссарий запросов к сторонам
-    QMap<QString,QString> possibleTreatments;   //  определяем возможные обработки с приставкой и её человеческим описанием
-
-    int fileSize;   //  размер файла
-    QString fileName;   //  его название
-    QFile *file;     //  сам файлик
-    char *bytes = {0};     //  массив байт данных
-    int blockData = 1000000;  //  размер данных
-    QString rawInformationDirectory = "C:\\Users\\dvetr\\OneDrive\\Рабочий стол\\folderForIncomingFromServerRawInformation";    //  папка для приходящих от сервера сырых данных на обработку
     QString delimiter = "<font color = black><\\font><br>=======================";  //  создаем разделитель для сообщений
 
     void SendTextToServer(QString str); //  метод отправки на сервер сообщения
     void SendFileToServer(QString filePath);    //  метод отправки на сервер файла по его пути
-    void SendPartOfFile();  //  метод отправки части файла
     void SendToServer(QString typeOfMsg, QString str);  //  отправка служебных сообщений серверу
 
     void setEnabledInterface(bool flag);   //  функция блокировки интерфейса, пока снова не подключимся к хосту
-
-    qint64 nextBlockSize;  //  переменная для хранения размера блока текста
-
-    QFileSystemWatcher *fileSystemWatcher;
 
     QVBoxLayout *mainContainer = new QVBoxLayout();
     QVBoxLayout *settingsContainer = new QVBoxLayout();
@@ -92,13 +75,11 @@ private slots:
     void slotMessageTextBrowser(QString message);
     void slotSetCBDataForm(QMap<QString,QVariant> possibleProcessingData);
     void slotSetFilePathLabel(QString text);
+    void slotEnableInterface(QString message);
 
 public slots:
     void on_chooseWorkspaceDirPushButton_clicked();
     void on_chooseProcessingPushButton_clicked();
 
-//public slots:
-//    void slotReadyRead();   //  слот готовности к чтению сообщений
-//    void slotFolderForRawInformationChanged(const QString & fileName);  //  обработчик изменений в директории
 };
 #endif // MAINWINDOW_H
