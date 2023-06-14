@@ -68,34 +68,39 @@ void WorkspaceManager::setRootFolder(QString incomingRootFolder)
     m_sendedFileManager = new SendedFileManager(sendedFilesFolder);
 }
 
-QString WorkspaceManager::setEntryWatcher()
+QString WorkspaceManager::setFolderWatcher()
 {
-    if(m_entryManager->setWatcher()){
-        return QString("Папка для входящих файлов отслеживается!");
+    if(!m_entryManager->setWatcher()){
+        return QString("Папка для входящих файлов НЕ отслеживается!");
     }
-    return QString("Папка для входящих файлов НЕ отслеживается!");
+    if(!m_expectationManager->setWatcher()){
+        return QString("Папка для ожидающих файлов НЕ отслеживается!");
+    }
+    if(!m_storageManager->setWatcher()){
+        return QString("Папка для хранящихся файлов НЕ отслеживается!");
+    }
+    if(!m_sendedFileManager->setWatcher()){
+        return QString("Папка для входящих файлов НЕ отслеживается!");
+    }
+    return QString("Все папки отслеживаются!");
 }
 
 QString WorkspaceManager::deleteEntryFile(QString fileName)
 {
     if(m_entryManager->removeFile(fileName)){
         qDebug() << "WorkspaceManager::deleteEntryFile:   файл " << fileName << " удален в папке";
-        return QString("Файл "+fileName+" удален в папке");
+        return QString("Файл "+fileName+" удален в папке "+entryFolder);
     }
-
-    qDebug() << "WorkspaceManager::deleteEntryFile:   файл " << fileName << " не удален в папке";
-    return QString("Файл "+fileName+" НЕ удален в папке");
+    return QString("Файл "+fileName+" не удален в папке "+entryFolder);
 }
 
 QString WorkspaceManager::deleteExpectationFile(QString fileName)
 {
     if(m_expectationManager->removeFile(fileName)){
         qDebug() << "WorkspaceManager::deleteExpectationFile:   файл " << fileName << " удален в папке";
-        return QString("Файл "+fileName+" удален в папке");
+        return QString("Файл "+fileName+" удален в папке "+expectationFolder);
     }
-
-    qDebug() << "WorkspaceManager::deleteExpectationFile:   файл " << fileName << " не удален в папке";
-    return QString("Файл "+fileName+" НЕ удален в папке");
+    return QString("Файл "+fileName+" не удален в папке "+expectationFolder);
 }
 
 QString WorkspaceManager::saveProcessingFile(QString fileName)

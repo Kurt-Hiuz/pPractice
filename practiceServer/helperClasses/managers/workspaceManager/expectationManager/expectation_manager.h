@@ -5,6 +5,7 @@
 #include <QFile>
 #include <QDir>
 #include <QFileInfo>
+#include <QFileSystemWatcher>
 
 class ExpectationManager : public QObject
 {
@@ -15,9 +16,14 @@ public:
     bool createFile(QString filePath);
     QStringList getFiles();
     bool removeFile(QString fileName);
+    bool setWatcher();
 
 private:
     QString rootFolder;
+    QFileSystemWatcher *expectationFilesWatcher = nullptr;
+
+private slots:
+    void slotExpectationDirectoryChanged(const QString &folderName);
 };
 
 #endif // EXPECTATIONMANAGER_H

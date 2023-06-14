@@ -41,3 +41,26 @@ QString StorageManager::saveFiles(QString beforeFilePath, QString afterFilePath)
     }
     return "Не удалось создать папку: "+rootFolder+"/"+beforeFileInfo.fileName();
 }
+
+bool StorageManager::setWatcher()
+{
+    //  при повторном вызове этой функции создается новый наблюдатель
+    //  эта проверка позволит выйти из функции, минуя дублирования наблюдателей
+    if(storageFilesWatcher != nullptr){
+        return true;
+    }
+
+    storageFilesWatcher = new QFileSystemWatcher();
+
+    if(storageFilesWatcher->addPath(rootFolder)){
+        connect(storageFilesWatcher, &QFileSystemWatcher::directoryChanged, this, &StorageManager::slotStorageDirectoryChanged);
+        return true;
+    }
+
+    return false;
+}
+
+void StorageManager::slotStorageDirectoryChanged(const QString &folderName)
+{
+
+}

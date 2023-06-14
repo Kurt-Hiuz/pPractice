@@ -53,6 +53,7 @@ signals:
 
 private slots:
     void slotProcessingFileChanged(const QString &filePath);
+    void slotSettingsDirectoryChanged(const QString &folderPath);
 };
 
 #endif // SETTINGSMANAGER_H

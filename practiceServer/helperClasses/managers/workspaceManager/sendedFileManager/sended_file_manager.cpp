@@ -37,3 +37,26 @@ bool SendedFileManager::removeFile(QString fileName)
 
     return fileToDelete.remove();
 }
+
+bool SendedFileManager::setWatcher()
+{
+    //  при повторном вызове этой функции создается новый наблюдатель
+    //  эта проверка позволит выйти из функции, минуя дублирования наблюдателей
+    if(sendedFilesWatcher != nullptr){
+        return true;
+    }
+
+    sendedFilesWatcher = new QFileSystemWatcher();
+
+    if(sendedFilesWatcher->addPath(rootFolder)){
+        connect(sendedFilesWatcher, &QFileSystemWatcher::directoryChanged, this, &SendedFileManager::slotSendedDirectoryChanged);
+        return true;
+    }
+
+    return false;
+}
+
+void SendedFileManager::slotSendedDirectoryChanged(const QString &folderName)
+{
+
+}

@@ -49,9 +49,11 @@ QString SettingsManager::setSettings(QJsonObject currentJsonObject)
     settingsFilesWatcher = new QFileSystemWatcher();
 
     if(settingsFilesWatcher->addPath(possibleProcessingFileName) &&
-       settingsFilesWatcher->addPath(serverSettingsFileName)){
+       settingsFilesWatcher->addPath(serverSettingsFileName) &&
+       settingsFilesWatcher->addPath(rootFolder)){
         qDebug() << "SettingsManager::setSettings   flag true";
         connect(settingsFilesWatcher, &QFileSystemWatcher::fileChanged, this, &SettingsManager::slotProcessingFileChanged);
+        connect(settingsFilesWatcher, &QFileSystemWatcher::directoryChanged, this, &SettingsManager::slotSettingsDirectoryChanged);
     } else {
         qDebug() << "SettingsManager::setSettings   flag false";
     }
@@ -89,4 +91,9 @@ void SettingsManager::slotProcessingFileChanged(const QString &filePath)
         emit signalSettingsFileChanged(filePath);
         return;
     }
+}
+
+void SettingsManager::slotSettingsDirectoryChanged(const QString &folderPath)
+{
+
 }

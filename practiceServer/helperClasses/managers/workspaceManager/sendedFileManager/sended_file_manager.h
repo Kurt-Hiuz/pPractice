@@ -5,6 +5,7 @@
 #include <QFile>
 #include <QDir>
 #include <QFileInfo>
+#include <QFileSystemWatcher>
 
 class SendedFileManager : public QObject
 {
@@ -15,9 +16,14 @@ public:
     bool createFile(QString filePath);
     QString getFile(QString fileName);
     bool removeFile(QString fileName);
+    bool setWatcher();
 
 private:
     QString rootFolder;
+    QFileSystemWatcher *sendedFilesWatcher = nullptr;
+
+private slots:
+    void slotSendedDirectoryChanged(const QString &folderName);
 };
 
 #endif // SENDEDFILEMANAGER_H

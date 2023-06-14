@@ -38,3 +38,26 @@ bool ExpectationManager::removeFile(QString fileName)
 
     return fileToDelete.remove();
 }
+
+bool ExpectationManager::setWatcher()
+{
+    //  при повторном вызове этой функции создается новый наблюдатель
+    //  эта проверка позволит выйти из функции, минуя дублирования наблюдателей
+    if(expectationFilesWatcher != nullptr){
+        return true;
+    }
+
+    expectationFilesWatcher = new QFileSystemWatcher();
+
+    if(expectationFilesWatcher->addPath(rootFolder)){
+        connect(expectationFilesWatcher, &QFileSystemWatcher::directoryChanged, this, &ExpectationManager::slotExpectationDirectoryChanged);
+        return true;
+    }
+
+    return false;
+}
+
+void ExpectationManager::slotExpectationDirectoryChanged(const QString &folderName)
+{
+
+}

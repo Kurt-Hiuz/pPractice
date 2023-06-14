@@ -58,7 +58,7 @@ public:
     QString saveSettings(QJsonObject m_currentJsonObject);
     QString createSettingFiles();
     void setRootFolder(QString incomingRootFolder);
-    QString setEntryWatcher();
+    QString setFolderWatcher();
     QString copyToExpectation(QString filePath);
     QString copyToSended(QString filePath);
     QString deleteEntryFile(QString fileName);
