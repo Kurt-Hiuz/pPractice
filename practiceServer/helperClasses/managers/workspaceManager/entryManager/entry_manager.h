@@ -5,7 +5,7 @@
 #include <QFileSystemWatcher>
 #include <QFileInfoList>
 #include <QDebug>
-#include "helperClasses/managers/processingManager/processing_manager.h"
+#include <QDir>
 
 class EntryManager : public QObject
 {
@@ -23,7 +23,6 @@ signals:
 private:
     QString rootFolder;
     QFileSystemWatcher *entryFilesWatcher = nullptr;
-    ProcessingManager *processingManager;
     QFileInfoList currentEntryInfo;
     QStringList currentEntryFiles;
 
