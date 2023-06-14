@@ -34,10 +34,14 @@
         <item row="0" column="1">
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
-           <widget class="QTextBrowser" name="ChatTextBrowser"/>
+           <widget class="QTextEdit" name="chatTextEdit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="lineEdit">
+           <widget class="QLineEdit" name="serverMessageLineEdit">
             <property name="placeholderText">
              <string>Напишите сообщение от лица сервера</string>
             </property>
@@ -58,13 +62,13 @@
        <attribute name="title">
         <string>Файловый менеджер</string>
        </attribute>
-       <widget class="QFrame" name="frame">
+       <widget class="QFrame" name="fileFrame">
         <property name="geometry">
          <rect>
-          <x>40</x>
-          <y>60</y>
-          <width>811</width>
-          <height>371</height>
+          <x>10</x>
+          <y>10</y>
+          <width>1211</width>
+          <height>461</height>
          </rect>
         </property>
         <property name="frameShape">
@@ -73,6 +77,16 @@
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
+        <widget class="QTreeView" name="fileSystemTreeView">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>10</y>
+           <width>1191</width>
+           <height>441</height>
+          </rect>
+         </property>
+        </widget>
        </widget>
       </widget>
       <widget class="QWidget" name="consoleTab">
@@ -116,7 +130,7 @@
             <bool>false</bool>
            </property>
            <property name="text">
-            <string>Подтвердить выбор папки</string>
+            <string>Организовать файлы настроек</string>
            </property>
           </widget>
          </item>
