@@ -40,6 +40,7 @@ private:
 
 signals:
     void signalStatusRRManager(QString status);
+    void signalChatNewMessage(QString message);
     void signalSendToAllClientsRRManager(QString typeOfMsg, QString str);
 };
 
