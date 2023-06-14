@@ -1,25 +1,66 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
-#include <QObject>
-#include <QTcpSocket>   //  класс сервера
+///     Класс MainWindow определяет главную форму приложения
+///     Переменные:
+///         delimiter - строка разделитель для чата
+///         * клиентские:
+///             client - сам клиент
+///             ui - сама форма
+///             server - экземпляр класса сервера
+///         * менеджеры:
+///             workspaceManager - отвечает за работу с рабочей директорией
+///         * графические компоненты:
+///             mainContainer - контейнер главной вкладки
+///             settingsContainer - контейнер настроек
+///             connectFrame - фрейм подключения
+///             possibleProcessingFrame - фрейм возможных обработок
+///             chatFrame - фрейм чата
+///             fileFrame - фрейм выбора файлов
+///             selectWorkspaceFrame - фрейм выбора рабочей папки
+///     Методы:
+///         setEnabledInterface() - устанавливает видимость интерфейса
+///         SendTextToServer() - отправка текста серверу
+///         SendFileToServer() - отправка файла серверу
+///         SendToServer() - отправка разнотипного сообщения
+///     Сигналы:
+///         signalSendTextToServer() - сигнал отправки текста
+///         signalSendFileToServer() - сигнал отправки файла
+///         signalSendToServer() - сигнал отправки разнотипного сообщения
+///     Слоты:
+///         slotStatusClient - отображение статуса сервера
+///         slotMessageTextBrowser - отображение текста
+///         slotSetCBDataForm - сигнал для установки обработок
+///         slotSetFilePathLabel - отображение пути до файла
+///         slotDisconnectClient - обработка отключения клиента
+///         slotEnableInterface - отображение интерфейса
+///         on_chooseWorkspaceDirPushButton_clicked - по нажатию на "Выбрать рабочую папку"
+///         on_chooseProcessingPushButton_clicked - по нажатию на "Выбрать"
 
+/// =========================   классы для работы формы
+#include <QMainWindow>          //  класс-родитель
+#include <QObject>              //  сигналы-слоты
+/// =========================
+///
+/// =========================   для работы клиента
+#include <QTcpSocket>           //  класс сокета
+/// =========================
+///
 /// =========================   Для работы с файлами
-#include <QFile>
-#include <QFileInfo>
-#include <QFileDialog>  //  класс работы с диалоговыми окнами (выбор файла)
+#include <QFile>                //  определитель файла
+#include <QFileInfo>            //  информация о файле
+#include <QFileDialog>          //  класс работы с диалоговыми окнами (выбор файла)
 /// =========================
 ///
 /// =========================   Для работы автодополнения ввода
-#include <QCompleter>   //  дополняет строку при вводе пути к файлу
-#include <QFileSystemModel> //  работа с файловой моделью
+#include <QCompleter>           //  дополняет строку при вводе пути к файлу
+#include <QFileSystemModel>     //  работа с файловой моделью
 #include <QFileSystemWatcher>   //  наблюдатель за файловой системой
 /// =========================
 ///
 /// =========================   Разные дополнения
-#include <QTime>    //  для отображения времени отправки
-#include <QMap>     //  определение глоссария для приходящих данных сокета
+#include <QTime>                //  для отображения времени отправки
+#include <QMap>                 //  определение глоссария для приходящих данных сокета
 #include <QVBoxLayout>
 /// =========================
 ///
@@ -27,6 +68,7 @@
 #include "client.h"             //  класс клиента
 #include "components/frames/cardFrame/I_cardframe.h"    //  интерфейс виджета-карточки
 #include "helperClasses/managers/workspaceManager/workspace_manager.h"  //  менеджер рабочей папки
+/// =========================
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

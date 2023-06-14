@@ -19,7 +19,6 @@ void DisconnectManager::processData(QDataStream &inStream)
 {
     readDataFromStream(inStream);
 
-    qDebug() << "DisconnectManager::processData:     str:" << string;  //  выводим в консоль
     emit signalStatusRRManager(string);
     emit signalEnableInterface(string);
 }

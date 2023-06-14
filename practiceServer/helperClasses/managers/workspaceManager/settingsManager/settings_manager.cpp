@@ -51,11 +51,8 @@ QString SettingsManager::setSettings(QJsonObject currentJsonObject)
     if(settingsFilesWatcher->addPath(possibleProcessingFileName) &&
        settingsFilesWatcher->addPath(serverSettingsFileName) &&
        settingsFilesWatcher->addPath(rootFolder)){
-        qDebug() << "SettingsManager::setSettings   flag true";
         connect(settingsFilesWatcher, &QFileSystemWatcher::fileChanged, this, &SettingsManager::slotProcessingFileChanged);
         connect(settingsFilesWatcher, &QFileSystemWatcher::directoryChanged, this, &SettingsManager::slotSettingsDirectoryChanged);
-    } else {
-        qDebug() << "SettingsManager::setSettings   flag false";
     }
 
     return QString("<hr/>Настройки сохранены");
@@ -81,7 +78,6 @@ bool SettingsManager::createSettingsFiles()
 
 void SettingsManager::slotProcessingFileChanged(const QString &filePath)
 {
-    qDebug() << "SettingsManager::processingFileChanged:    " << filePath;
     if(filePath == possibleProcessingFileName){
         emit signalProcessingFileChanged(filePath);
         return;

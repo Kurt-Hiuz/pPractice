@@ -25,11 +25,8 @@ void Client::setWorkspaceManager(WorkspaceManager *newWorkspaceManager)
 
 void Client::slotSiftFiles(QStringList &filesList)
 {
-    qDebug() << "Client::slotSiftFiles:     filesList:" << filesList;
-
     for(int fileI = 0; fileI < filesList.size(); fileI++){
         QFileInfo currentFile(filesList.at(fileI));
-        qDebug() << "Client::slotSiftFiles:     пришел обработанный файл";
         QString filePath = currentFile.filePath();
         slotSendFileToServer(filePath);
         workspaceManager->deleteFile(currentFile.fileName());
@@ -56,7 +53,6 @@ void Client::slotSendFileToServer(QString &filePath)
     fileName = fileInfo.fileName();     //  записываем название файла
 
     emit signalSetFilePathLabel("Size: "+QString::number(fileSize)+" Name: "+fileName);  //  простое уведомление пользователя о размере и имени файла, если мы смогли его открыть
-    qDebug() << "Client::slotSendFileToServer:  " << fileName;
 
     if(!file->open(QIODevice::ReadOnly)){ //  открываем файл для только чтения
         emit signalSetFilePathLabel("Файл не открывается для передачи");
@@ -72,7 +68,6 @@ void Client::slotSendFileToServer(QString &filePath)
     out.device()->seek(0);
     //  избавляемся от зарезервированных двух байт в начале каждого сообщения
     out << quint64(Data.size() - sizeof(quint64));   //  определяем размер сообщения
-    qDebug() << "Client::slotSendFileToServer:      sending data size: " << Data.size() - sizeof(quint64);
     this->write(Data);
 
     readyReadManager->setFileClientFileRequest(filePath);
@@ -80,7 +75,6 @@ void Client::slotSendFileToServer(QString &filePath)
 
 void Client::slotSetClientFolders(QMap<QString, QString> &subFolders)
 {
-    qDebug() << "Client::slotSetClientFolders   subFolders:" << subFolders;
     for(auto it = subFolders.begin(); it != subFolders.end(); it++){
         if(it.key() == "Root"){
             this->workspaceFolder = it.value();  //  установили новую директорию
@@ -103,9 +97,6 @@ void Client::slotSetClientFolders(QMap<QString, QString> &subFolders)
             continue;
         }
     }
-
-    qDebug() << "Client::slotSetClientFolders:        " << workspaceFolder;
-    qDebug() << "Client::slotSetClientFolders:        " << entryFolder << processedFolder;
 }
 
 void Client::slotReadyRead()
@@ -115,29 +106,21 @@ void Client::slotReadyRead()
     if(in.status()==QDataStream::Ok){
         while(true){    //  цикл для расчета размера блока
             if(nextBlockSize == 0){ //  размер блока пока неизвестен
-                qDebug() << "Client::slotReadyRead:     nextBlockSize == 0";
                 if(this->bytesAvailable() < 8){   //  и не должен быть меньше 8-и байт
-                    qDebug() << "Data < 8, break";
-                    break;  //  иначе выходим из цикла, т.е. размер посчитать невозможно
+                   break;  //  иначе выходим из цикла, т.е. размер посчитать невозможно
                 }
                 in >> nextBlockSize;    //  считываем размер блока в правильном исходе
-                qDebug() << "Client::slotReadyRead:     nextBlockSize:  " << nextBlockSize;
-                qDebug() << "Client::slotReadyRead:     this->bytesAvailable():  " << this->bytesAvailable();
             }
             if(this->bytesAvailable() < nextBlockSize){   //  когда уже известен размер блока, мы сравниваем его с количеством байт, которые пришли от сервера
-                qDebug() << "Client::slotReadyRead:     Data not full | socket->bytesAvailable() = "+QString::number(socket->bytesAvailable()) + " | nextBlockSize = "+QString::number(nextBlockSize);    //  если данные пришли не полностью
                 break;
             }
             //  надо же, мы до сих пор в цикле, все хорошо
 
             QString typeOfMessage;
             in >> typeOfMessage;    //  определение типа сообщения
-            qDebug() << "Client::slotReadyRead:     typeOfMessage:  "   <<  typeOfMessage;
-
             I_MessageManager *messageManager = readyReadManager->identifyMessage(typeOfMessage);
 
             if(messageManager->typeOfMessage() == "No type"){
-                qDebug() << "Client::slotReadyRead:     No type";
                 emit signalStatusClient("Была произведена попытка отправки сообщения неизвестного типа!");
                 nextBlockSize = 0;
                 return;
@@ -176,10 +159,8 @@ void Client::slotSendBufferToServer(QByteArray &data)
     out.setVersion(QDataStream::Qt_6_2);    //  устанавливаем последнюю версию
     out << quint64(0) << QString("File") << data;   //  собираем сообщение из размер_сообщения << тип_сообщения << строка << отправитель
     out.device()->seek(0);  //  передвигаемся в начало
-    qDebug() << "Client::slotSendBufferToServer:    sending blockSize = " << quint64(Data.size() - sizeof(quint64));
     out << quint64(Data.size() - sizeof(quint64));  //  избавляемся от зарезервированных двух байт в начале каждого сообщения
     this->write(Data);    //  записываем данные в сокет
-    qDebug() << "Client::slotSendBufferToServer:    Data size = " << Data.size();
 }
 
 void Client::slotSendToServer(QString typeOfMsg, QString str)
@@ -195,7 +176,6 @@ void Client::slotSendToServer(QString typeOfMsg, QString str)
 
 void Client::slotEntryFolderChanged(const QString &fileName)
 {
-    qDebug() << "Client::slotEntryFolderChanged:    " << fileName;
 }
 
 void Client::slotDeleteSendedFile(QString &fileName)

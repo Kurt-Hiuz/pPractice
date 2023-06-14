@@ -88,7 +88,6 @@ QString WorkspaceManager::setFolderWatcher()
 QString WorkspaceManager::deleteEntryFile(QString fileName)
 {
     if(m_entryManager->removeFile(fileName)){
-        qDebug() << "WorkspaceManager::deleteEntryFile:   файл " << fileName << " удален в папке";
         return QString("Файл "+fileName+" удален в папке "+entryFolder);
     }
     return QString("Файл "+fileName+" не удален в папке "+entryFolder);
@@ -97,7 +96,6 @@ QString WorkspaceManager::deleteEntryFile(QString fileName)
 QString WorkspaceManager::deleteExpectationFile(QString fileName)
 {
     if(m_expectationManager->removeFile(fileName)){
-        qDebug() << "WorkspaceManager::deleteExpectationFile:   файл " << fileName << " удален в папке";
         return QString("Файл "+fileName+" удален в папке "+expectationFolder);
     }
     return QString("Файл "+fileName+" не удален в папке "+expectationFolder);
@@ -146,22 +144,18 @@ QStringList WorkspaceManager::getExpectationFolderFiles()
 QString WorkspaceManager::copyToExpectation(QString filePath)
 {
     if(m_expectationManager->createFile(filePath)){
-        qDebug() << "WorkspaceManager::copyToExpectation:   файл " << filePath << " создан в папке";
         return QString("Файл "+filePath+" создан в папке ожидания");
     }
 
-    qDebug() << "WorkspaceManager::copyToExpectation:   файл не создан в папке";
     return QString("Файл "+filePath+" НЕ создан в папке ожидания");
 }
 
 QString WorkspaceManager::copyToSended(QString filePath)
 {
     if(m_sendedFileManager->createFile(filePath)){
-        qDebug() << "WorkspaceManager::copyToSended:   файл " << filePath << " создан в папке";
         return QString("Файл "+filePath+" создан в папке отправленных файлов");
     }
 
-    qDebug() << "WorkspaceManager::copyToSended:   файл не создан в папке";
     return QString("Файл "+filePath+" НЕ создан в папке отправленных файлов");
 }
 
@@ -172,12 +166,11 @@ void WorkspaceManager::slotWorkspaceFileChanged(const QString &fileName)
 
 void WorkspaceManager::slotWorkspaceDirectoryChanged(const QString &folderName)
 {
-    qDebug() << "WorkspaceManager::workspaceDirectoryChanged:   " << folderName;
+
 }
 
 void WorkspaceManager::slotEntryFiles(QStringList &fileInfoList)
 {
-    qDebug() << "WorkspaceManager::slotEntryFiles   fileList:" << fileInfoList;
     emit signalSiftFiles(fileInfoList);
 }
 

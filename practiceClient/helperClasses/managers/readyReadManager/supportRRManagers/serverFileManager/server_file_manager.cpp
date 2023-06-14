@@ -91,6 +91,5 @@ QString ServerFileManager::typeOfMessage()
 void ServerFileManager::setEntryFolderName(QString &entryFolder)
 {
     this->entryFolderName = entryFolder;
-    qDebug() << "ServerFileManager::setEntryFolderName:        установлена папка: " << entryFolder;
 }
 

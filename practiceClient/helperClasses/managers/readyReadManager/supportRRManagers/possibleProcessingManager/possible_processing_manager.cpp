@@ -21,7 +21,6 @@ void PossibleProcessingManager::processData(QDataStream &inStream)
 
     emit signalStatusRRManager("Отправка "+QString::number(possibleProcessingData.size())+" обработок");     //  оформляем чат на стороне клиента
     emit signalSetCBDataRRManager(possibleProcessingData);
-    qDebug() << "ServerMessageManager::processData:        possibleProcessingData.size():" << possibleProcessingData.size();
 }
 
 QString PossibleProcessingManager::typeOfMessage()

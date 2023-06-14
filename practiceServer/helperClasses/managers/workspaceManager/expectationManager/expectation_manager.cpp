@@ -34,7 +34,6 @@ bool ExpectationManager::removeFile(QString fileName)
     QDir::setCurrent(fileInfo.path());
     // Создаём объект файла
     QFile fileToDelete(rootFolder+"/"+fileName);
-    qDebug() << "EntryManager::removeFile:      " << rootFolder+"/"+fileName;
 
     return fileToDelete.remove();
 }

@@ -1,11 +1,28 @@
 #ifndef PROCESSEDMANAGER_H
 #define PROCESSEDMANAGER_H
 
+///     Класс ProcessedManager определяет зону ответственности за папку Processed
+///     Переменные:
+///         rootFolder - корневая папка менеджера
+///         processedFilesWatcher - наблюдатель за папкой
+///     Методы:
+///         setWatcher() - устанавливаем наблюдателя
+///         removeFile() - удаляем файл
+///     Сигналы:
+///         signalProcessedFiles() - отправляем содержимое папки
+///         signalFolderStatus() - статус папки
+///     Слоты:
+///         slotProcessedDirectoryChanged - папка Processed изменилась
+
+///  ========================    классы для работы
 #include <QObject>
-#include <QFileSystemWatcher>
-#include <QFileInfoList>
-#include <QDir>
-#include <QDebug>
+///  ========================
+///
+///  ========================    для работы с файлами
+#include <QFileSystemWatcher>   //  наблюдатель
+#include <QFileInfoList>        //  данные о файлах
+#include <QDir>                 //  определитель папок
+///  ========================
 
 class ProcessedManager : public QObject
 {

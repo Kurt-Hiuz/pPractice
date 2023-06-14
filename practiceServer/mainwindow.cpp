@@ -1,13 +1,5 @@
-// #include "components/frames/cardFrame/cardframe.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-
-#include <QVBoxLayout>
-
-#include "components/frames/cardFrame/selectWorkspaceFrame/select_workspace_frame.h"
-#include "components/frames/cardFrame/possibleProcessingComboBoxFrame/possible_processing_combobox_frame.h"
-#include "components/frames/cardFrame/changePortSpinBoxFrame/change_port_spinbox_frame.h"
-#include "components/frames/cardFrame/maxConnectionSpinBoxFrame/max_connection_spinbox_frame.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -25,7 +17,6 @@ MainWindow::MainWindow(QWidget *parent)
         return;
     }
     ui->infoAboutServerTextEdit->append("Сервер запущен на "+QString::number(server->serverPort())+" порту");  //  уведомление
-
 
     connect(server, &Server::signalStatusServer, this, &MainWindow::slotStatusServer);  //  связка для отображения статуса сервера, вывод в консоль
     connect(server, &Server::signalChatNewMessage, this, &MainWindow::slotChatNewMessage);
@@ -92,7 +83,6 @@ void MainWindow::setServerSettingsFromFile(const QString &filePath)
 
     QJsonParseError error;
     QJsonDocument document = QJsonDocument::fromJson(val.toUtf8(), &error);
-    qDebug() << "MainWindow::readServerSettingsFile:     Error: " << error.errorString() << error.offset << error.error;
 
     QJsonObject documentObject = document.object();
     QString keyObject = ""; //  ключ всегда строка
@@ -162,13 +152,11 @@ void MainWindow::setFileSystemModel(QString folderPath)
 
 void MainWindow::slotStatusServer(QString status)   //  обработчик состояния
 {
-    qDebug() << "MainWindow::slotStatusServer:      " << status; //  вывод в консоль статуса
     ui->infoAboutServerTextEdit->append(delimiter+QTime::currentTime().toString()+" | <font color = black><\\font>"+status);    //  и также в textEdit
 }
 
 void MainWindow::slotChatNewMessage(QString message)
 {
-    qDebug() << "MainWindow::slotChatNewMessage:    " << message;
     ui->chatTextEdit->append(QTime::currentTime().toString()+" | <font color = black><\\font>"+message);
 }
 
@@ -176,7 +164,6 @@ void MainWindow::slotAddSocketToListWidget(QTcpSocket *socketToAdd)
 {
     //  TODO:   сделать обращение к clientsListWidget и добавление данных с сокета
     ui->clientsListWidget->addItem("Клиент дескриптор:"+QString::number(socketToAdd->socketDescriptor())+" | IP: "+socketToAdd->localAddress().toString());
-//    qDebug() << QString::number(socketToAdd->socketDescriptor()) << socketToAdd->localAddress().toString();
     MainWindow::signalSocketDisplayed(socketToAdd);
 }
 
@@ -226,7 +213,6 @@ void MainWindow::slotDisconnectClient()
 
             //  и отправляем запрос на сервер, чтобы по нему удалили сокет
             emit signalDisconnectSocket(socketText.toInt());
-            qDebug() << "MainWindow::slotDisconnectClient:      descriptor to delete: " << socketText;
         }
     }
 }
@@ -239,8 +225,6 @@ void MainWindow::on_chooseWorkspaceDirPushButton_clicked()   //  по нажат
         //  при вызове setValue данный виджет сам вызовет сигнал для установки директории на сервере
         m_selectWorkspaceFrame->setValue(folderPath);
         ui->infoAboutServerTextEdit->append(m_selectWorkspaceFrame->getValue().firstKey());
-
-        qDebug() << "MainWindow::on_chooseWorkspaceDirPushButton_clicked:   " << folderPath;
 
         //  теперь можно сохранить настройки
         ui->saveSettingsPushButton->setEnabled(true);
@@ -259,8 +243,6 @@ void MainWindow::on_chooseWorkspaceDirPushButton_clicked()   //  по нажат
 
 void MainWindow::on_clientsListWidget_customContextMenuRequested(const QPoint &pos)
 {
-    qDebug() << "MainWindow::on_clientsListWidget_customContextMenuRequested:       contextMenu clicked";
-
     //  Создаем объект контекстного меню
     QMenu* menu = new QMenu(this);
     //  Создаём действия для контекстного меню
@@ -292,7 +274,6 @@ void MainWindow::on_saveSettingsPushButton_clicked()
     ui->infoAboutServerTextEdit->append(workspaceManager->setFolderWatcher());
 
     //  устанавливаем модель рабочей папки в файловом менеджере
-    qDebug() << "MainWindow::on_saveSettingsPushButton_clicked:     ??" << m_selectWorkspaceFrame->getValue().first().toString();
     setFileSystemModel(m_selectWorkspaceFrame->getValue().first().toString());
 
     //  проходимся по сгенерированному списку настроек
@@ -306,7 +287,6 @@ void MainWindow::on_saveSettingsPushButton_clicked()
 
         //  получаем json вариант данных с элемента, приведённого от QObject* к I_CardFrame*
         m_currentJsonValue = m_jsonPacker.getJsonVersionValue(dynamic_cast<I_CardFrame*>(item));
-        qDebug() << "MainWindow::on_saveSettingsPushButton_clicked:     m_currentJsonValue: " << m_currentJsonValue;
 
         //  выводим в консоль сообщение, получая первый ключ
         ui->infoAboutServerTextEdit->append(dynamic_cast<I_CardFrame*>(item)->getValue().firstKey());
@@ -328,8 +308,6 @@ void MainWindow::on_saveSettingsPushButton_clicked()
 
 void MainWindow::slotUpdateUiComboBox(const QString &fileName)
 {
-    qDebug() << "MainWindow::slotUpdateUiComboBox !!!   " << fileName;
-
     QFile fileJSONSetting;
     fileJSONSetting.setFileName(fileName);
 
@@ -342,7 +320,6 @@ void MainWindow::slotUpdateUiComboBox(const QString &fileName)
 
     QJsonParseError error;
     QJsonDocument document = QJsonDocument::fromJson(val.toUtf8(), &error);
-    qDebug() << "MainWindow::slotUpdateUiComboBox:     Error: " << error.errorString() << error.offset << error.error;
 
     QJsonObject documentObject = document.object();
     QString keyObject = ""; //  ключ всегда строка
@@ -354,7 +331,6 @@ void MainWindow::slotUpdateUiComboBox(const QString &fileName)
 
         //  получаем значение по ключу
         valueObject = documentObject.value(keyObject);
-        qDebug() << "MainWindow::slotUpdateUiComboBox:  valueObject:    " << valueObject;
 
         ui->settingsFrame->findChild<PossibleProcessingComboBoxFrame*>("Possible processing Frame")->setValue(valueObject);
     }

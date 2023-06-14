@@ -3,22 +3,34 @@
 
 ///     Класс ReadyReadManager определяет зону ответственности за принимаемые сервером сообщения
 ///     Переменные:
-///     messageManagers - хранит название обработчика и его указатель
-///     serverMessageManager - указатель на менеджер типа "Message"
-///     clientsFileManager - указатель на менеджер типа "File"
-///     nullManager - указатель на менеджер типа "No type"
+///         messageManagers - хранит название обработчика и его указатель
+///         serverMessageManager - указатель на менеджер типа "Message"
+///         serverFileManager - указатель на менеджер типа "File"
+///         possibleProcessingManager - указатель на менеджер типа "Possible processing ComboBox data"
+///         clientFileRequestPartManager - указатель на менеджер типа "Request part of file"
+///         fileDownloadedManager - указатель на менеджер типа "File downloaded"
+///         disconnectManager - указатель на менеджер типа "Disconnect"
+///         nullManager - указатель на менеджер типа "No type"
 ///     Методы:
-///     identifyMessage() - определяет тип сообщения и возвращает указатель на необходимого обработчика
-///     setEntryFolder() - установки EntryFolder для ClientsFileManager
+///         identifyMessage() - определяет тип сообщения и возвращает указатель на необходимого обработчика
+///         setEntryFolder() - установки EntryFolder для ClientsFileManager
+///         setFileClientFileRequest() - установка файлов
 ///     Сигналы:
-///     signalStatusRRManagerServer() - отправляет серверу статус
-///     signalSendToAllClientsServer() - отправляет сообщение всем клиентам, обращаясь к серверу
-///     signalSendToOneRRManager() - отправляет сообщение указанному клиенту, обращаясь к серверу
-///     Слоты:
-///     slotStatusRRManager() - принимает статусы на сервер от дочерних менеджеров
-///     slotSendToAllClientsRRManager() - принимает сообщения для всех клиентов от дочерних менеджеров
-///     slotSendToOneRRManager() - принимает сообщения для указанного сокета от дочерних менеджеров
+///         signalStatusRRManagerClient() - отправляет клиенту статус
+///         signalMessageRRManagerClient() - отправляет клиенту сообщение
+///         signalSetCBData() - устанавливает данные в комбобокс
+///         signalSendToAllClientsServer() - отправляет сообщение всем клиентам, обращаясь к серверу
+///         signalSendToOneRRManager() - отправляет сообщение указанному клиенту, обращаясь к серверу
+///         signalSendBufferToServer() - отправляет буфер данных серверу
+///         signalSendToServer() - отправляет серверу некоторое сообщение
+///         signalDeleteSendedFile() - удаляет отправленные файлы
+///         signalEnableInterface() - вкл/выкл интерфейс
 
+///  ========================    классы для работы
+#include <QObject>              //  класс для сигналов и слотов
+#include <QMap>                 //  для хранения менеджеров
+///  ========================
+///
 ///  ========================    классы проекта
 #include "supportRRManagers/I_message_manager.h"    //  для работы с ссылками обработчиков
 //  для определения менеджера..
@@ -30,10 +42,6 @@
 #include "supportRRManagers/serverFileManager/server_file_manager.h"    //..приёма файлов
 #include "supportRRManagers/disconnectManager/disconnect_manager.h"     //..обработки отключения
 ///  ========================
-///
-///  ========================    классы для работы
-#include <QObject>
-#include <QMap>                 //  для хранения менеджеров
 
 class ReadyReadManager : public QObject
 {

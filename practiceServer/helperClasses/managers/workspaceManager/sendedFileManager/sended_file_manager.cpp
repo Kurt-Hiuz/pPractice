@@ -19,7 +19,6 @@ bool SendedFileManager::createFile(QString filePath)
 QString SendedFileManager::getFile(QString fileName)
 {
     QFileInfo fileInfo(rootFolder+"/"+fileName);
-    qDebug() << "SendedFileManager::getFile rootFolder"<<"/"<<"fileName: " << rootFolder+"/"+fileName;
 
     if(fileInfo.exists()){
         return rootFolder+"/"+fileName;

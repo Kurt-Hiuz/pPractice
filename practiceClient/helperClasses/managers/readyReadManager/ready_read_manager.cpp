@@ -50,13 +50,11 @@ I_MessageManager *ReadyReadManager::identifyMessage(QString typeOfMess)
 
 void ReadyReadManager::setEntryFolder(QString &entryFolder)
 {
-    qDebug() << "ReadyReadManager::setEntryFolder   entryFolder:" << entryFolder;
     serverFileManager->setEntryFolderName(entryFolder);
 }
 
 void ReadyReadManager::setFileClientFileRequest(QString &filePath)
 {
-    qDebug() << "ReadyReadManager::setFileClientFileRequest:    " << filePath;
     clientFileRequestPartManager->setFilePath(filePath);
 }
 

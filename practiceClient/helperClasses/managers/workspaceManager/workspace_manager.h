@@ -9,14 +9,22 @@
 ///         entryFolder - путь до папки Entry
 ///         parentUi - ссылка на родителя
 ///         workspaceWatcher - наблюдатель за состоянием рабочего пространства
+///         m_entryManager - менеджер для папки Entry
+///         m_processedManager - менеджер для папки Processed
 ///     Методы:
 ///         createWorkspaceFolders() - создаёт структуру папки и возвращает отчёт в консоль
 ///         setRootFolder() - устанавливает новые пути для папок
+///         setEntryWatcher() - установка наблюдателя за папкой Entry
+///         setProcessedWatcher() - установка наблюдателя за папкой Processed
+///         deleteFile() - удаление файла по названию
 ///     Слоты:
 ///         workspaceDirectoryChanged() - обработка сигнала от QFileSystemWatcher::directoryChanged
+///         slotNewEntryFile() - обработка новых файлов
+///         slotProcessedFiles() - обработка обработанных файлов
 ///     Сигналы:
 ///         signalStatusClient() - сигнал для отображения состояния клиента
 ///         signalSetClientFolders() - сигнал для установки папок на клиенте
+///         signalSiftFiles() - сигнал отправки файлов
 
 
 ///  ========================    классы проекта

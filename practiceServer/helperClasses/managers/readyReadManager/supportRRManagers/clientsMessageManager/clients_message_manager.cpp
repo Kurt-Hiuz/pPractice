@@ -23,7 +23,6 @@ void ClientsMessageManager::processData(QDataStream &inStream, QTcpSocket *socke
     emit signalChatNewMessage("Клиент "+senderName+" "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+message);
     emit signalStatusRRManager("Клиент "+senderName+" "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+message);     //  оформляем чат на стороне Сервера
     emit signalSendToAllClientsRRManager("Message","<font color = black><\\font>User "+senderName+" "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": "+message);      //  мы просто избавляемся от префикса "MESS:" и пересылаем клиенту сообщение
-    qDebug() << "ClientsMessageManager::processData:        " << message << "from" << senderName;
 }
 
 QString ClientsMessageManager::typeOfMessage()

@@ -1,8 +1,26 @@
 #ifndef POSSIBLEPROCESSINGMANAGER_H
 #define POSSIBLEPROCESSINGMANAGER_H
 
-#include "../I_message_manager.h"
-#include <QDataStream>
+///     Класс PossibleProcessingManager реализует интерфейс I_MessageManager
+///     обрабатывает всё необходимое, что связанно с возможными обработками
+///     Переменные:
+///         possibleProcessingData - данные об обработках
+///     Методы:
+///         readDataFromStream() - чтение данных с потока
+///         writeDataFromStream() - запись данных в поток
+///         processData() - обрабатывает приходящие данные
+///         typeOfMessage() - возвращает строку тип менеджера
+///     Сигналы:
+///         signalStatusRRManager() - отправка статуса ReadyReadManager'у
+///         signalSetCBDataRRManager() - установка обработок
+
+///  ========================       классы проекта
+#include "../I_message_manager.h"   //  класс-родитель
+///  ========================
+///
+///  ========================       для работы с потоком
+#include <QDataStream>              //  поток данных
+///  ========================
 
 class PossibleProcessingManager : public I_MessageManager
 {

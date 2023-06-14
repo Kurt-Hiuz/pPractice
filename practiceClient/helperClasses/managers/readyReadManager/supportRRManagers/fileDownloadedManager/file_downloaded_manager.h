@@ -1,7 +1,23 @@
 #ifndef FILEDOWNLOADEDMANAGER_H
 #define FILEDOWNLOADEDMANAGER_H
 
-#include "../I_message_manager.h"
+///     Класс FileDownloadedManager реализует интерфейс I_MessageManager
+///     обрабатывает всё необходимое, что связанно с загруженными файлами
+///     Переменные:
+///         string - строка из потока
+///     Методы:
+///         readDataFromStream() - чтение данных с потока
+///         writeDataFromStream() - запись данных в поток
+///         processData() - обрабатывает приходящие данные
+///         typeOfMessage() - возвращает строку тип менеджера
+///     Сигналы:
+///         signalStatusRRManager() - отправка статуса ReadyReadManager'у
+///         signalClearFileData() - очистка данных о файле
+///         signalDeleteSendedFile() - удаление отправленных файлов
+
+///  ========================       классы проекта
+#include "../I_message_manager.h"   //  класс-родитель
+///  ========================
 
 class FileDownloadedManager : public I_MessageManager
 {

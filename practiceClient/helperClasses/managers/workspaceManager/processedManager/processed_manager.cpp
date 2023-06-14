@@ -36,7 +36,6 @@ bool ProcessedManager::removeFile(QString fileName)
 
 void ProcessedManager::slotProcessedDirectoryChanged(const QString &folderName)
 {
-    qDebug() << "ProcessedManager::slotProcessedDirectoryChanged:        ";
     QDir workWithDirectory(rootFolder);
     QFileInfoList listFiles = workWithDirectory.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);     //  получаем список файлов директории
 
@@ -61,7 +60,4 @@ void ProcessedManager::slotProcessedDirectoryChanged(const QString &folderName)
     }
 
     emit signalProcessedFiles(nowFilesList);
-
-    qDebug() << "ProcessedManager::slotProcessedDirectoryChanged:        " << folderName;
-    qDebug() << "ProcessedManager::slotProcessedDirectoryChanged:        " << "================";     // переводим строку
 }

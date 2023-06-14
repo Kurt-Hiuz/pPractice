@@ -54,8 +54,6 @@ void MainWindow::setEnableInteface()
 {
     QMap<QString, QVariant> mapValue = connectFrame->getValue();
 
-    qDebug() << mapValue["IPLineEdit"].toString() << " | " << mapValue["portLineEdit"].toInt();
-
     int port = mapValue["portLineEdit"].toInt();
     QString IP = mapValue["IPLineEdit"].toString();
 
@@ -140,8 +138,6 @@ void MainWindow::on_chooseWorkspaceDirPushButton_clicked(){
         //  при вызове setValue данный виджет сам вызовет сигнал для установки директории на сервере
         selectWorkspaceFrame->setValue(folderPath);
         ui->consoleTextBrowser->append(selectWorkspaceFrame->getValue().firstKey());
-
-        qDebug() << "MainWindow::on_chooseWorkspaceDirPushButton_clicked:   " << folderPath;
 
         workspaceManager->setRootFolder(folderPath);
         client->setWorkspaceManager(workspaceManager);

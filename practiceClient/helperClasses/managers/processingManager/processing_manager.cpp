@@ -7,7 +7,6 @@ ProcessingManager::ProcessingManager()
 
 QFileInfoList ProcessingManager::entryFiles(const QString &folderName)
 {
-    qDebug() << "ProcessingManager::entryFiles  " << folderName;
     QDir workWithDirectory;     //  создаем рабочую директорию
     workWithDirectory.cd(folderName); //  переходим в нужный каталог
 

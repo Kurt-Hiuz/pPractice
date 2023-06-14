@@ -54,6 +54,5 @@ void ReadyReadManager::setEntryFolder(QString &entryFolder)
 
 void ReadyReadManager::setFileClientFileRequest(QString &filePath)
 {
-    qDebug() << "ReadyReadManager::setFileClientFileRequest:    " << filePath;
     serverRequestPartFileManager->setFilePath(filePath);
 }

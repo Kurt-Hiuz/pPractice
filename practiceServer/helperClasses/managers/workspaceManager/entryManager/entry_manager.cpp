@@ -30,13 +30,6 @@ bool EntryManager::removeFile(QString fileName)
     QDir::setCurrent(fileInfo.path());
     // Создаём объект файла
     QFile fileToDelete(rootFolder+"/"+fileName);
-    qDebug() << "EntryManager::removeFile:      " << rootFolder+"/"+fileName;
-
-    if(fileToDelete.exists()){
-        qDebug() << "EntryManager::removeFile:      файл " << fileToDelete.fileName() << " существует";
-    } else {
-        qDebug() << "EntryManager::removeFile:      файл " << fileToDelete.fileName() << " НЕ существует";
-    }
 
     return fileToDelete.remove();
 }
@@ -44,7 +37,6 @@ bool EntryManager::removeFile(QString fileName)
 QString EntryManager::getFile(QString fileName)
 {
     QFileInfo fileInfo(rootFolder+"/"+fileName);
-    qDebug() << "EntryManager::getFile rootFolder"<<"/"<<"fileName: " << rootFolder+"/"+fileName;
 
     if(fileInfo.exists()){
         return rootFolder+"/"+fileName;
@@ -58,13 +50,11 @@ void EntryManager::slotEntryDirectoryChanged(const QString &folderName)
     QDir entryDirectory(rootFolder);
     //  получаем текущие файлы
     QFileInfoList nowEntryFiles = entryDirectory.entryInfoList(QDir::NoDotAndDotDot | QDir::Files);
-    qDebug() << "EntryManager::slotEntryDirectoryChanged:   nowEntryFiles.count():" << nowEntryFiles.count();
 
     QList<QString> nowFilesList = {};
 
     for(auto file : nowEntryFiles){
         if(file.fileName().startsWith("processed_")){
-            qDebug() << "Server::slotSiftFiles:     пришел обработанный файл";
 
             continue;
         }

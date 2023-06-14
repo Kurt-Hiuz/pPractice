@@ -1,7 +1,22 @@
 #ifndef DISCONNECTMANAGER_H
 #define DISCONNECTMANAGER_H
 
-#include "../I_message_manager.h"
+///     Класс DisconnectManager реализует интерфейс I_MessageManager
+///     обрабатывает всё необходимое, что связанно с отключением
+///     Переменные:
+///         string - строка из потока
+///     Методы:
+///         readDataFromStream() - чтение данных с потока
+///         writeDataFromStream() - запись данных в поток
+///         processData() - обрабатывает приходящие данные
+///         typeOfMessage() - возвращает строку тип менеджера
+///     Сигналы:
+///         signalStatusRRManager() - отправка статуса ReadyReadManager'у
+///         signalEnableInterface() - вкл/выкл интерфейс
+
+///  ========================       классы проекта
+#include "../I_message_manager.h"   //  класс-родитель
+///  ========================
 
 class DisconnectManager : public I_MessageManager
 {

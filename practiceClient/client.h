@@ -1,16 +1,65 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-#include <QTcpSocket>
-#include <QObject>
-#include <QFile>
-#include <QFileInfo>
-#include <QDataStream>
-#include <QFileSystemWatcher>
+///     Класс Server определяет сам сервер
+///     Переменные:
+///         * серверные:
+///             socket - сокет для подключения
+///             Data - то, что отправляется между сервером и клиентом
+///             nextBlockSize - блок нового сообщения
+///         * для работы с файлами:
+///             fileSystemWatcher - наблюдатель за файлами
+///             file - определяем файл
+///             fileSize - размер файла
+///             fileName - его название
+///             workspaceFolder - путь до рабочей директории
+///             entryFolder -  путь до папки для файлов извне
+///             processedFolder - путь до папки обработанных файлов
+///         * менеджеры:
+///             workspaceManager - менеджер для рабочей папки
+///             readyReadManager - менеджер для чтения сообщений
+///     Методы:
+///         setWorkspaceManager() - установка workspaceManager
+///     Сигналы:
+///         signalStatusClient() - отправляет клиенту статус
+///         signalMessageTextBrowser() - отображение сообщения в чате
+///         signalSetCBDataForm() - установка обработок
+///         signalSetFilePathLabel() - установка пути в метку
+///         signalSetFileClientFileRequest() - установка файла на скачивание
+///         signalEnableInterface() - вкл/выкл интерфейс
+///     Слоты:
+///         slotSendBufferToServer() - отправляет буфер данных серверу
+///         slotSiftFiles() - отправка файлов по клиентам
+///         slotReadyRead() - слот чтения сообщений
+///         slotMessageServer - отправка сообщений
+///         slotStatusClient - отображение статуса
+///         slotSetCBData - установка обработок
+///         slotSendTextToServer - отправка текста
+///         slotSendFileToServer - отправка данных о файле
+///         slotSetClientFolders - установка путей папок в переменные
+///         slotSendToServer - отправка сообщения разного типа
+///         slotDeleteSendedFile - удалить отправленные файлы
 
+///  ========================   классы для работы клиента
+#include <QTcpSocket>           //  определение сокета
+#include <QDataStream>          //  работа с потоком данных
+///  ========================
+///
+///  ========================   для работы класса
+#include <QObject>              //  сигналы и слоты
+///  ========================
+///
+///  ========================   для работы с файлами
+#include <QFile>                //  определитель файла
+#include <QFileInfo>            //  информация о файлах
+#include <QFileSystemWatcher>   //  наблюдатель
+///  ========================
+///
+///  ========================   классы проекта
 #include "helperClasses/managers/readyReadManager/ready_read_manager.h" //  класс для распределения файлов на обработчиков
 #include "helperClasses/managers/readyReadManager/supportRRManagers/I_message_manager.h"    //  класс для работы с обработчиками сообщений
 #include "helperClasses/managers/workspaceManager/workspace_manager.h"
+///  ========================
 
 class Client : public QTcpSocket
 {

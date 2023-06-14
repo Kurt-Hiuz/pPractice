@@ -19,22 +19,16 @@ void ServerRequestPartFileManager::processData(QDataStream &inStream, QTcpSocket
 {
     readDataFromStream(inStream);
 
-    qDebug() << "ServerRequestPartFileManager::processData:     str = " << string;  //  выводим в консоль
     emit signalStatusRRManager(string); //  выводим клиенту
 
-    qDebug() << "ServerRequestPartFileManager::processData:     file->pos():" << file->pos();
     if((fileSize - file->pos()) < blockData){   //  если остаток файла будет меньше блока байт
         blockData = fileSize - file->pos();     //  мы просто будем читать этот остаток
     }
 
     bytes = new char[blockData];   //  выделяем байты под файл, то есть передача пройдет в несколько этапов
 
-    qDebug() << "ServerRequestPartFileManager::processData:     read: " << file->read(bytes, blockData);     //  читаем файл и записываем данные в байты
-    qDebug() << "ServerRequestPartFileManager::processData:     blockData: " << blockData;   //  нужно, чтобы видеть текущий размер блоков
-
     buffer.clear();
     buffer.append(bytes, blockData);
-    qDebug() << "ServerRequestPartFileManager::processData:     block size" << blockData << "buffer size" << buffer.size();
 
     if(bytes != nullptr){
         delete[] bytes;
@@ -63,8 +57,6 @@ void ServerRequestPartFileManager::setFilePath(QString &filePath)
 
 void ServerRequestPartFileManager::slotClearFileData()
 {
-    qDebug() << "File "+fileName+" downloaded";   //  выводим консоль, какой файл был загружен
-
     file->close();  //  закрываем файл
     delete file; //  удаляем файл
     file = nullptr; //  удаляем файл

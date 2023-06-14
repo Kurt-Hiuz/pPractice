@@ -30,7 +30,6 @@ void WorkspaceManager::setRootFolder(QString incomingRootFolder)
         subFolders.insert("Root", rootFolder);
         subFolders.insert("Entry", entryFolder);
         subFolders.insert("Processed", processedFolder);
-        qDebug() << "WorkspaceManager::setRootFolder    subFolders:" << subFolders;
         emit signalSetClientFolders(subFolders);
     } else {
         status = "Корневая папка НЕ отслеживается";
@@ -75,17 +74,13 @@ void WorkspaceManager::slotNewEntryFile(QFileInfo &fileInfo)
 
 void WorkspaceManager::slotProcessedFiles(QStringList &fileInfoList)
 {
-    qDebug() << "WorkspaceManager::slotEntryFiles   fileList:" << fileInfoList;
     emit signalSiftFiles(fileInfoList);
 }
 
 void WorkspaceManager::deleteFile(QString fileName)
 {
     if(m_processedManager->removeFile(fileName)){
-        qDebug() << "WorkspaceManager::copyToExpectation:   файл " << fileName << " удален в папке";
         return;
     }
-
-    qDebug() << "WorkspaceManager::copyToExpectation:   файл " << fileName << " не удален в папке";
 }
 

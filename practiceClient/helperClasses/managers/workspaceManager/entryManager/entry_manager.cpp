@@ -36,18 +36,13 @@ bool EntryManager::removeFile(QString filePath)
 
 void EntryManager::slotEntryDirectoryChanged(const QString &folderName)
 {
-    qDebug() << "EntryManager::slotEntryDirectoryChanged:        ";
     processingManager = new ProcessingManager();
     QFileInfoList list = processingManager->entryFiles(folderName);     //  получаем список файлов директории
 
     for (int i = 0; i < list.size(); i++) {
         QFileInfo fileInfo = list.at(i);
-        qDebug() << "EntryManager::slotEntryDirectoryChanged:        " << qPrintable(QString("%1 %2").arg(fileInfo.size(), 10).arg(fileInfo.fileName(), 5));   //  выводим в формате "размер имя"
         emit signalNewEntryFile(fileInfo);
     }
-    qDebug() << "EntryManager::slotEntryDirectoryChanged:        " << folderName;
-    qDebug() << "EntryManager::slotEntryDirectoryChanged:        " << "================";     // переводим строку
-
     if(processingManager != nullptr){
         delete processingManager;
         processingManager = nullptr;

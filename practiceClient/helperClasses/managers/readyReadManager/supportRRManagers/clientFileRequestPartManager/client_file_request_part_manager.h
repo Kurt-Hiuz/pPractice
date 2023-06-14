@@ -1,8 +1,36 @@
 #ifndef CLIENTFILEREQUESTPARTMANAGER_H
 #define CLIENTFILEREQUESTPARTMANAGER_H
 
+///     Класс ClientFileRequestPartManager реализует интерфейс I_MessageManager
+///     обрабатывает всё необходимое, что связанно с частями файлов
+///     Переменные:
+///         string - строка из потока
+///         file - определяем файл
+///         bytes - массив байт данных
+///         fileSize - размер файла
+///         fileName - его название
+///         blockData - размер данных
+///         entryFolderName - папка для файлов извне
+///         buffer - буфер данных
+///     Методы:
+///         readDataFromStream() - чтение данных с потока
+///         writeDataFromStream() - запись данных в поток
+///         processData() - обрабатывает приходящие данные
+///         typeOfMessage() - возвращает строку тип менеджера
+///         setFilePath() - установка пути файла
+///     Сигналы:
+///         signalStatusRRManager() - отправка статуса ReadyReadManager'у
+///         signalSendBufferRRManager() - отправка буфера
+///     Слоты:
+///         slotClearFileData() - очистка данных
+
+///  ========================    классы проекта
 #include "../I_message_manager.h"
-#include <QFile>
+///  ========================
+///
+///  ========================    для работы с файлами
+#include <QFile>                //  определитель файла
+///  ========================
 
 class ClientFileRequestPartManager : public I_MessageManager
 {
