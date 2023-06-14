@@ -48,7 +48,6 @@
 ///
 ///  ========================   классы проекта
 #include "helperClasses/managers/workspaceManager/workspace_manager.h"
-#include "helperClasses/managers/processingManager/processing_manager.h"    //  класс для распределения файлов на обработчиков
 #include "helperClasses/managers/readyReadManager/ready_read_manager.h"     //  класс для работы слота ReadyRead
 #include "helperClasses/managers/readyReadManager/supportRRManagers/I_message_manager.h"    //  класс для работы с обработчиками сообщений
 ///  ========================
@@ -63,9 +62,9 @@ public:
     void setMaxConnections(int count);
 
 private:
-    int generatedServerPort = 0;
+    int generatedServerPort = 0;    //  дефолтное значение отсутствия порта. Порт сгенерируется позже
     QMap<QTcpSocket*, QString> mapSockets;
-    int maxConnections = 30;
+    int maxConnections = 30;    //  дефолтное значение
     QByteArray Data;
 
     QMap<QString,QString> mapRequest;
@@ -88,7 +87,6 @@ private:
 
     QFileSystemWatcher *fileSystemWatcher;
 
-    ProcessingManager *processingManager;
     ReadyReadManager *readyReadManager;
 
     void SendPossibleProcessing(QTcpSocket* socket, QMap<QString, QVariant> possibleProcessingData);  //  функция передачи возможных обработок
@@ -100,7 +98,6 @@ private:
     void SendPartOfFile();      //  функция отправки части файла (продолжение)
 
 private slots:
-    void slotStatusServer(QString status);
     void slotSendToAllClients(QString typeOfMsg, QString str);
     void slotSendToOneClient(QTcpSocket* sendSocket, QString typeOfMsg, QString str);
     void slotSendBufferToClient(QTcpSocket *socketToSend, QByteArray &buffer);
@@ -120,9 +117,11 @@ public slots:
     void slotDisconnectAll(QString reason);    //  обработчик для принудительного удаления сокета
     void slotUpdatePossibleProcessing(QVariant newPossibleProcessingData);
     void slotSetServerFolders(QMap<QString, QString> &subFolders);
+    void slotSendMessage(QString message);
 
 signals:
-    void signalStatusServer(QString);   //  слот для обработки состояния сервера
+    void signalStatusServer(QString status);   //  слот для обработки состояния сервера
+    void signalChatNewMessage(QString message);   //  слот для обработки состояния сервера
     void signalAddSocketToListWidget(QTcpSocket* socketToAdd);     //  слот для добавления сокета в clientsListWidget
     void signalDeleteSocketFromListWidget(QMap<QTcpSocket*, QString> mapSockets);  //  слот для удаления сокета из clientsListWidget при его отключении
     //    void signalChatServer(QString);     //  слот для обработки чата сервераы

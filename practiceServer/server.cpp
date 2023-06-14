@@ -16,13 +16,9 @@ Server::Server(bool &server_started, int serverPort){
 
     nextBlockSize = 0;  //  обнуляем размер сообщения в самом начале работы
 
-    /// Глоссарий, описывающий тип отправляемого сообщения
-    /// первое число определяет тип (0 - простой сигнал о чем-то \ 1 - запрос чего-то)
-    /// второе число определяет конец какого-то действия, если оно в несколько этапов, например, передача файла
-    /// третье и последующие числа определяют тип передаваемых данных
-
     readyReadManager = new ReadyReadManager();
-    connect(readyReadManager, &ReadyReadManager::signalStatusRRManagerServer, this, &Server::slotStatusServer);
+    connect(readyReadManager, &ReadyReadManager::signalStatusRRManagerServer, this, &Server::signalStatusServer);
+    connect(readyReadManager, &ReadyReadManager::signalChatNewMessage, this, &Server::signalChatNewMessage);
     connect(readyReadManager, &ReadyReadManager::signalSendToAllClientsServer, this, &Server::slotSendToAllClients);
     connect(readyReadManager, &ReadyReadManager::signalSendToOneRRManager, this, &Server::slotSendToOneClient);
     connect(readyReadManager, &ReadyReadManager::signalSendBufferToClient, this, &Server::slotSendBufferToClient);
@@ -36,7 +32,7 @@ Server::Server(bool &server_started, int serverPort){
 void Server::setWorkspaceManager(WorkspaceManager *newWorkspaceManager)
 {
     this->workspaceManager = newWorkspaceManager;
-
+    qDebug() << "Server::setWorkspaceManager:   установлен workspaceManager";
     connect(workspaceManager, &WorkspaceManager::signalSiftFiles, this, &Server::slotSiftFiles);
 }
 
@@ -86,6 +82,12 @@ void Server::slotSiftFiles(QStringList &filesList)
 {
     for(int fileI = 0; fileI < filesList.size(); fileI++){
         QFileInfo currentFile(filesList.at(fileI));
+
+        if(mapSockets.size() == 0){
+            emit signalStatusServer(workspaceManager->copyToExpectation(currentFile.filePath()));
+            emit signalStatusServer(workspaceManager->deleteEntryFile(currentFile.fileName()));
+            continue;
+        }
 
         for(auto it = mapSockets.begin(); it != mapSockets.end(); it++){
 
@@ -144,12 +146,17 @@ void Server::slotDisconnectSocket(int socketDiscriptorToDelete) //  обрабо
 {
     for(auto item = mapSockets.begin(); item != mapSockets.end(); item++){  //  пробегаемся по сокетам
         if(item.key()->socketDescriptor() == socketDiscriptorToDelete){     //  ищем совпадение по сокету
+            socket = item.key();
             SendToOneClient(item.key(), QString("Disconnect"), "Отключен с хоста"); //  отправляем клиенту сигнал на отключение
-
             qDebug() << "Server::slotDisconnectSocket       " << "pop quantity of clients: "+QString::number(mapSockets.size());
             break;
         }
     }
+
+    mapSockets.remove(socket);
+    emit signalStatusServer("<font color = red><\\font>Пользователь  "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+": принудительно отключён <br/>");
+    emit signalDeleteSocketFromListWidget(mapSockets);
+    socket->disconnectFromHost();
 }
 
 void Server::slotDisconnectAll(QString reason)
@@ -215,6 +222,11 @@ void Server::slotSetServerFolders(QMap<QString, QString> &subFolders)
     qDebug() << "Server::slotSetServerFolders:      all Data folders:   " << entryFolder << storageFolder << expectationFolder;
 }
 
+void Server::slotSendMessage(QString message)
+{
+    SendToAllClients("Message", message);
+}
+
 void Server::incomingConnection(qintptr socketDescriptor){  //  обработчик нового подключения
     socket = new QTcpSocket;    //  создание нового сокета под нового клиента
     socket->setSocketDescriptor(socketDescriptor);  //  устанавливаем в него дескриптор (- неотрицательное число, идентифицирующее  поток ввода-вывода)
@@ -261,10 +273,9 @@ void Server::slotReadyRead(){
             qDebug() << "Server::slotReadyRead:     Data not full | socket->bytesAvailable() = "+QString::number(socket->bytesAvailable()) + " | nextBlockSize = "+QString::number(nextBlockSize);    //  если данные пришли не полностью
             break;
         }
-        //  надо же, мы до сих пор в цикле, все хорошо
 
         QString typeOfMess;
-        in >> typeOfMess;   //  считываем тип сообщения
+        in >> typeOfMess;
 
         qDebug() << "Server::slotReadyRead:     остаток после чтения с in: " << socket->bytesAvailable();
         qDebug() << "Server::slotReadyRead:     Тип сообщения:     " << typeOfMess;
@@ -279,8 +290,8 @@ void Server::slotReadyRead(){
         messageManager->processData(in, socket);
 
         nextBlockSize = 0;  //  обнуляем для новых сообщений
-        break;  //  выходим, делать больше нечего
-    }   //  конец while
+        break;
+    }
 }
 
 void Server::slotDisconnect()
@@ -288,8 +299,8 @@ void Server::slotDisconnect()
     QTcpSocket* disconnectedSocket = static_cast<QTcpSocket*>(QObject::sender());
     mapSockets.remove(disconnectedSocket);
     qDebug() << "Server::slotDisconnect:        pop quantity of clients: "+QString::number(mapSockets.size());
-    SendToAllClients(QString("Message"), "<font color = red><\\font>Пользователь  "+disconnectedSocket->localAddress().toString()+": отключился <br/>");
-    emit signalStatusServer("<font color = red><\\font>Пользователь  "+disconnectedSocket->localAddress().toString()+": отключился <br/>");
+    SendToAllClients(QString("Message"), "<font color = red><\\font>Пользователь  "+QString::number(socket->socketDescriptor())+" "+disconnectedSocket->localAddress().toString()+": отключился <br/>");
+    emit signalStatusServer("<font color = red><\\font>Пользователь  "+QString::number(socket->socketDescriptor())+" "+disconnectedSocket->localAddress().toString()+": отключился <br/>");
     emit signalDeleteSocketFromListWidget(mapSockets);
     disconnectedSocket->disconnectFromHost();  //  оставляем удаление сокета программе
 }
@@ -378,11 +389,6 @@ void Server::SendPartOfFile()
     out << quint64(Data.size() - sizeof(quint64));   //  определяем размер сообщения
     socket->write(Data);
     qDebug() << "Server::SendPartOfFile:        Data size = " << Data.size();
-}
-
-void Server::slotStatusServer(QString status)
-{
-    emit signalStatusServer(status);
 }
 
 void Server::slotSendToAllClients(QString typeOfMsg, QString str)
