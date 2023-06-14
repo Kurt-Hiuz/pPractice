@@ -20,8 +20,7 @@ void ServerFileManager::writeDataToStream(QDataStream &outStream)
 void ServerFileManager::processData(QDataStream &inStream)
 {
     if(fileName.isEmpty()){    //  если файла не существует
-        inStream >> fileName;  //  записываем из потока название файла
-        inStream >> fileSize; //  считываем его размер
+        readDataFromStream(inStream); //  считываем его имя и размер
 
         if(fileSize < blockData){   //  если размер файла меньше выделенного блока
             blockData = fileSize;   //  устанавливаем размер блока ровно по файлу (передача произойдет в один этап)
@@ -59,10 +58,10 @@ void ServerFileManager::processData(QDataStream &inStream)
         if(file->size() < fileSize){    //  если размер до сих пор не полон
             emit signalStatusRRManager("Текущий размер файла "+fileName+" от сервера = "+QString::number(file->size())+"\n"+"Ожидаемый размер = "+QString::number(fileSize));
 
-            emit signalSendToServer("Request part of processing file", "<font color = black><\\font>Downloading new part of file...<font color = black><\\font>");    //  запрашиваем первую часть файла
+            emit signalSendToServer("Request part of processing file", "<font color = black><\\font>Загрузка новой части файла...<font color = black><\\font>");    //  запрашиваем первую часть файла
         } else {
             //  оформляем чат на стороне Сервера
-            emit signalStatusRRManager("Server: send file by name \""+fileName+"\"");
+            emit signalStatusRRManager("Сервер: отправляет файл \""+fileName+"\"");
 
             emit signalSendToServer("File downloaded", fileName);
 

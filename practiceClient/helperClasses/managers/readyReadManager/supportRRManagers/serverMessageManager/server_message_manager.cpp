@@ -17,7 +17,7 @@ void ServerMessageManager::writeDataToStream(QDataStream &outStream)
 
 void ServerMessageManager::processData(QDataStream &inStream)
 {
-    inStream >> this->message;
+    readDataFromStream(inStream);
     emit signalMessageRRManager(message);     //  оформляем чат на стороне клиента
     qDebug() << "ServerMessageManager::processData:        " << message;
 }
@@ -25,14 +25,4 @@ void ServerMessageManager::processData(QDataStream &inStream)
 QString ServerMessageManager::typeOfMessage()
 {
     return QString("Message");
-}
-
-QDataStream &operator >>(QDataStream &in, ServerMessageManager &serverMessageManager){
-    in >> serverMessageManager.message;
-    return in;
-}
-
-QDataStream &operator <<(QDataStream &out, ServerMessageManager &serverMessageManager){
-    out << serverMessageManager.message;
-    return out;
 }
