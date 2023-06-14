@@ -7,21 +7,20 @@ ClientFileRequestPartManager::ClientFileRequestPartManager()
 
 void ClientFileRequestPartManager::readDataFromStream(QDataStream &inStream)
 {
-    inStream >> this->str;
+    inStream >> this->string;
 }
 
 void ClientFileRequestPartManager::writeDataToStream(QDataStream &outStream)
 {
-    outStream << this->str;
+    outStream << this->string;
 }
 
 void ClientFileRequestPartManager::processData(QDataStream &inStream)
 {
-    QString str;    //  определяем переменную, в которую сохраним уведомление от запроса
-    inStream >> str;  //  выводим в переменную сообщение
+    readDataFromStream(inStream);
 
-    qDebug() << "ClientFileRequestPartManager::processData:     str:" << str;  //  выводим в консоль
-    emit signalStatusRRManager(str);
+    qDebug() << "ClientFileRequestPartManager::processData:     str:" << string;  //  выводим в консоль
+    emit signalStatusRRManager(string);
 
     qDebug() << "ClientFileRequestPartManager::processData:     file->pos():" << file->pos();
     if((fileSize - file->pos()) < blockData){   //  если остаток файла будет меньше блока байт

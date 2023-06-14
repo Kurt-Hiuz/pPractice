@@ -15,7 +15,7 @@ public:
     QString typeOfMessage() override;
 
 private:
-    QString str;
+    QString string;
 
 signals:
     void signalStatusRRManager(QString status);

@@ -18,7 +18,7 @@ public:
     void setFilePath(QString &filePath);
 
 private:
-    QString str;
+    QString string;
     int fileSize;   //  размер файла
     QString fileName;   //  его название
     QFile *file;     //  сам файлик

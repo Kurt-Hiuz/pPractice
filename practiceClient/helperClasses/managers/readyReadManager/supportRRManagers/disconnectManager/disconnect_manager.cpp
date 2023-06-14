@@ -7,22 +7,21 @@ DisconnectManager::DisconnectManager()
 
 void DisconnectManager::readDataFromStream(QDataStream &inStream)
 {
-    inStream >> this->str;
+    inStream >> this->string;
 }
 
 void DisconnectManager::writeDataToStream(QDataStream &outStream)
 {
-    outStream << this->str;
+    outStream << this->string;
 }
 
 void DisconnectManager::processData(QDataStream &inStream)
 {
-    QString str;    //  определяем переменную, в которую сохраним уведомление от запроса
-    inStream >> str;  //  выводим в переменную сообщение
+    readDataFromStream(inStream);
 
-    qDebug() << "DisconnectManager::processData:     str:" << str;  //  выводим в консоль
-    emit signalStatusRRManager(str);
-    emit signalEnableInterface(str);
+    qDebug() << "DisconnectManager::processData:     str:" << string;  //  выводим в консоль
+    emit signalStatusRRManager(string);
+    emit signalEnableInterface(string);
 }
 
 QString DisconnectManager::typeOfMessage()

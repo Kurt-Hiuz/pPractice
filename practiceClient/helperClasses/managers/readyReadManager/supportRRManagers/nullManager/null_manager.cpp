@@ -7,12 +7,12 @@ NullManager::NullManager()
 
 void NullManager::readDataFromStream(QDataStream &inStream)
 {
-
+    return;
 }
 
 void NullManager::writeDataToStream(QDataStream &outStream)
 {
-
+    return;
 }
 
 void NullManager::processData(QDataStream &inStream)
