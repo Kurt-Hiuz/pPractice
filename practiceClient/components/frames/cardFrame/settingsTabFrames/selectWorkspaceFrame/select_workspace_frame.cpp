@@ -33,7 +33,7 @@ void SelectWorkspaceFrame::setValue(QVariant value)
     dataLabel->setText(value.toString());
 }
 
-void SelectWorkspaceFrame::switchEnabledInteface()
+void SelectWorkspaceFrame::setEnabledInteface(bool value)
 {
 
 }

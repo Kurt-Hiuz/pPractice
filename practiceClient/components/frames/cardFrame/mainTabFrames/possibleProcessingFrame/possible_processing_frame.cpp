@@ -47,10 +47,10 @@ void PossibleProcessingFrame::setValue(QVariant value)
     }
 }
 
-void PossibleProcessingFrame::switchEnabledInteface()
+void PossibleProcessingFrame::setEnabledInteface(bool value)
 {
-    chooseProcessingComboBox->setEnabled(!chooseProcessingComboBox->isEnabled());
-    chooseProcessingPushButton->setEnabled(!chooseProcessingPushButton->isEnabled());
+    chooseProcessingComboBox->setEnabled(value);
+    chooseProcessingPushButton->setEnabled(value);
 }
 
 QString PossibleProcessingFrame::getCurrentData()

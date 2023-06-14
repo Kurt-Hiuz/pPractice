@@ -46,9 +46,11 @@ void ConnectFrame::setValue(QVariant value)
 
 }
 
-void ConnectFrame::switchEnabledInteface()
+void ConnectFrame::setEnabledInteface(bool value)
 {
-    connectToServerPuchButton->setEnabled(!connectToServerPuchButton->isEnabled());
+    IPLineEdit->setEnabled(value);
+    portLineEdit->setEnabled(value);
+    connectToServerPuchButton->setEnabled(value);
 }
 
 void ConnectFrame::slotConnectToServerPushButtonClicked()

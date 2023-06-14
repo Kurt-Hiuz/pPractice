@@ -61,12 +61,12 @@ void FileFrame::setValue(QVariant value)
     filePathLabel->setText(value.toString());
 }
 
-void FileFrame::switchEnabledInteface()
+void FileFrame::setEnabledInteface(bool value)
 {
     filePathLabel->clear();
-    filePathLineEdit->setEnabled(!filePathLineEdit->isEnabled());
-    openFilePushButton->setEnabled(!openFilePushButton->isEnabled());
-    sendFilePushButton->setEnabled(!sendFilePushButton->isEnabled());
+    filePathLineEdit->setEnabled(value);
+    openFilePushButton->setEnabled(value);
+    sendFilePushButton->setEnabled(value);
 }
 
 void FileFrame::sendFilePushButtonClicked()

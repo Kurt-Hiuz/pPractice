@@ -16,7 +16,7 @@ public:
     void createInterface() override;
     QMap<QString, QVariant> getValue() override;
     void setValue(QVariant value) override;
-    void switchEnabledInteface() override;
+    void setEnabledInteface(bool value) override;
     QString getCurrentData();
 
 private:

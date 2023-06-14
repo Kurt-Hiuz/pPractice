@@ -21,7 +21,7 @@ public:
     virtual void createInterface() = 0;
     virtual QMap<QString, QVariant> getValue() = 0;
     virtual void setValue(QVariant value) = 0;
-    virtual void switchEnabledInteface() = 0;
+    virtual void setEnabledInteface(bool value) = 0;
 };
 
 #endif // CARDFRAME_H

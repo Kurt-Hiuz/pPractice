@@ -53,17 +53,22 @@ void ChatFrame::setValue(QVariant value)
     chatTextBrowser->append(QTime::currentTime().toString()+" | "+value.toString());
 }
 
-void ChatFrame::switchEnabledInteface()
+void ChatFrame::setEnabledInteface(bool value)
 {
-    callMeLineEdit->setEnabled(!callMeLineEdit->isEnabled());
-    chatTextBrowser->setEnabled(!chatTextBrowser->isEnabled());
-    messageLineEdit->setEnabled(!messageLineEdit->isEnabled());
-    sendMessagePushButton->setEnabled(!sendMessagePushButton->isEnabled());
+    callMeLineEdit->setEnabled(value);
+    chatTextBrowser->setEnabled(value);
+    messageLineEdit->setEnabled(value);
+    sendMessagePushButton->setEnabled(value);
+}
+
+void ChatFrame::clearChat()
+{
+    chatTextBrowser->clearHistory();
 }
 
 void ChatFrame::slotSendMessagePushButton()
 {
-    QString text = "MESS:"+messageLineEdit->text();
+    QString text = messageLineEdit->text();
     QString senderName = callMeLineEdit->text();
     emit parentUi->signalSendTextToServer(text, senderName);
     messageLineEdit->clear();
