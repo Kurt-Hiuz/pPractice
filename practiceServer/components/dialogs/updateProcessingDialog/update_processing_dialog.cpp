@@ -5,6 +5,8 @@ UpdateProcessingDialog::UpdateProcessingDialog(MainWindow *parentUi)
     this->setObjectName("Update processing Dialog");
     this->parentUi = parentUi;
 
+    this->setModal(true);
+
     dataLabel = new QLabel("Отредактируйте данные:");
     jsonDataTextEdit = new QTextEdit();
 
