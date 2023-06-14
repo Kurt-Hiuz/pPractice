@@ -8,7 +8,6 @@
 ///             socket - создаваемый сокет сервера
 ///             ui - сама форма
 ///             server - экземпляр класса сервера
-///             nextBlockSize - размер блока сообщения
 ///         * менеджеры:
 ///             workspaceManager - отвечает за работу с рабочей директорией
 ///         * графические компоненты:
@@ -21,8 +20,14 @@
 ///             m_currentJsonObject - для работы с json объектами
 ///             m_currentJsonValue - для работы с json значениями
 ///             m_currentJsonArray - для работы с json массивами
+///         * работа с файлами:
+///             m_fileSystemModel - для работы с файловой моделью
+///     Методы:
+///         setServerSettingsFromFile - устанавливает настройки из файла
+///         setFileSystemModel - устанавливает модель файловой системы
 ///     Сигналы:
-///         signalNewWorkspaceFolder - установка новой рабочей папки на сервере
+///         signalDisconnectAll - сообщению серверу об отключении всех клиентов
+///         signalSendMessage - обращение к серверу отправить сообщение
 ///         signalSocketDisplayed - сообщение серверу, что клиент отобразился
 ///         signalDisconnectSocket - сообщение серверу, что клиент убран
 ///         signalUpdatePossibleProcessing - сообщение серверу о новых обработках
@@ -36,7 +41,13 @@
 ///         on_clientsListWidget_customContextMenuRequested - отображение контекстного меню
 ///         on_openJSONSettingsFilePushButton_clicked - по нажатию на "Открыть файл настроек"
 ///         on_saveSettingsPushButton_clicked - по нажатию на "Сохранить настройки"
-///         updateUiComboBoxSlot - обновление комбобокса
+///         slotUpdateUiComboBox - обновление комбобокса
+///         slotSettingsFileChanged - файл настроек изменён
+///         slotClearEntryFolder - отчет о чистке /Entry
+///         slotChatNewMessage - обработка нового сообщения
+///         on_restartServerPushButton_clicked - перезапуск сервера
+///         on_sendMsgPushButton_clicked - отправка сообщения
+///         on_serverMessageLineEdit_returnPressed - отправка сообщения по нажатию Enter
 
 ///  ========================    классы для работы сервера
 #include <QTcpServer>           //  Работа с сервером
@@ -47,6 +58,7 @@
 #include <QFileDialog>          //  вызов диалогового окна для файлов
 #include <QFile>                //  работа с файлами
 #include <QDir>                 //  работа с директориями
+#include <QFileSystemModel>     //  работа с моделью файлов
 ///  ========================
 ///
 ///  ========================   классы для работы с json
@@ -64,12 +76,17 @@
 #include <QMessageBox>          //  работа со всплывающими окнами
 #include <QFileSystemModel>     //  модель файловой системы
 #include <QTreeView>            //  отображение в виде дерева
+#include <QVBoxLayout>          //  вертикальное позиционирование
 ///  ========================
 ///
 ///  ========================   классы проекта
 #include "components/frames/cardFrame/I_cardframe.h"    //  интерфейс работы с карточками настройки
 #include "helperClasses/jsonPacker/json_packer.h"       //  упаковщик карточки в json вариант
 #include "helperClasses/managers/workspaceManager/workspace_manager.h"  //  менеджер рабочего пространства
+#include "components/frames/cardFrame/selectWorkspaceFrame/select_workspace_frame.h"    //  фрейм выбора рабочей директории
+#include "components/frames/cardFrame/possibleProcessingComboBoxFrame/possible_processing_combobox_frame.h" //  фрейм возможных обработок
+#include "components/frames/cardFrame/changePortSpinBoxFrame/change_port_spinbox_frame.h"   //  фрейм смены порта
+#include "components/frames/cardFrame/maxConnectionSpinBoxFrame/max_connection_spinbox_frame.h" //  фрейм макс. подключений
 #include "server.h"             //  работа с сервером
 ///  ========================
 
@@ -80,7 +97,6 @@ QT_END_NAMESPACE
 class MainWindow : public QMainWindow
 {
 Q_OBJECT
-
 
 public:
     MainWindow(QWidget *parent = nullptr);
@@ -106,9 +122,10 @@ private:
     QJsonValue m_currentJsonValue;
     QJsonArray m_currentJsonArray;
 
-    quint16 nextBlockSize;
+    QFileSystemModel *m_fileSystemModel;
 
     void setServerSettingsFromFile(const QString &filePath);
+    void setFileSystemModel(QString folderPath);
 
 public slots:
     void slotStatusServer(QString status);
@@ -125,13 +142,17 @@ private slots:
     void slotUpdateUiComboBox(const QString &fileName);
     void slotSettingsFileChanged(const QString &filePath);
     void slotClearEntryFolder(QString message);
+    void slotChatNewMessage(QString message);
     void on_restartServerPushButton_clicked();
+    void on_sendMsgPushButton_clicked();
+    void on_serverMessageLineEdit_returnPressed();
 
 signals:
     void signalSocketDisplayed(QTcpSocket* displayedSocket);
     void signalDisconnectSocket(int socketDiscriptor);
     void signalUpdatePossibleProcessing(QVariant newPossibleProcessingData);
     void signalDisconnectAll(QString reason);
+    void signalSendMessage(QString message);
 };
 
 #endif // MAINWINDOW_H

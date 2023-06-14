@@ -28,14 +28,14 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     connect(server, &Server::signalStatusServer, this, &MainWindow::slotStatusServer);  //  связка для отображения статуса сервера, вывод в консоль
+    connect(server, &Server::signalChatNewMessage, this, &MainWindow::slotChatNewMessage);
     connect(server, &Server::signalAddSocketToListWidget, this, &MainWindow::slotAddSocketToListWidget);    //  связка для отображения добавления клиентов в clientsListWidget
     connect(server, &Server::signalDeleteSocketFromListWidget, this, &MainWindow::slotDeleteSocketFromListWidget);  //  связка для удаления сокета из clientsListWidget
     connect(this, &MainWindow::signalSocketDisplayed, server, &Server::slotSocketDisplayed);    //  связка для отправки подключившемуся сокету список доступных обработок
     connect(this, &MainWindow::signalDisconnectSocket, server, &Server::slotDisconnectSocket);  //  связка для принудительного удаления сокета
     connect(this, &MainWindow::signalDisconnectAll, server, &Server::slotDisconnectAll);  //  связка для принудительного удаления всех сокетов
     connect(this, &MainWindow::signalUpdatePossibleProcessing, server, &Server::slotUpdatePossibleProcessing);  //  связка для обновления списка обработок у клиентоав
-
-    nextBlockSize = 0;  //  обнуляем размер сообщения в самом начале работы
+    connect(this, &MainWindow::signalSendMessage, server, &Server::slotSendMessage);
 
     QVBoxLayout *settingsContainer = new QVBoxLayout();
 
@@ -71,6 +71,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui->clientsListWidget->setContextMenuPolicy(Qt::CustomContextMenu);
     // ждем сигнала для отображения меню
     connect(ui->clientsListWidget, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(slotShowContextMenu(QPoint)));
+
+    m_fileSystemModel = new QFileSystemModel();
+    //  отображение всего содержимого
+    m_fileSystemModel->setFilter(QDir::Dirs | QDir::NoDotAndDotDot | QDir::Files);
 }
 
 MainWindow::~MainWindow()
@@ -114,6 +118,8 @@ void MainWindow::setServerSettingsFromFile(const QString &filePath)
 
     }
 
+    setFileSystemModel(m_selectWorkspaceFrame->getValue().firstKey());
+
     ui->infoAboutServerTextEdit->append("Настройки установлены<hr/>");
 
     //  устанавливаем количество макс. подключений
@@ -132,21 +138,38 @@ void MainWindow::setServerSettingsFromFile(const QString &filePath)
             return;
         }
         connect(server, &Server::signalStatusServer, this, &MainWindow::slotStatusServer);  //  связка для отображения статуса сервера, вывод в консоль
+        connect(server, &Server::signalChatNewMessage, this, &MainWindow::slotChatNewMessage);
         connect(server, &Server::signalAddSocketToListWidget, this, &MainWindow::slotAddSocketToListWidget);    //  связка для отображения добавления клиентов в clientsListWidget
         connect(server, &Server::signalDeleteSocketFromListWidget, this, &MainWindow::slotDeleteSocketFromListWidget);  //  связка для удаления сокета из clientsListWidget
         connect(this, &MainWindow::signalSocketDisplayed, server, &Server::slotSocketDisplayed);    //  связка для отправки подключившемуся сокету список доступных обработок
         connect(this, &MainWindow::signalDisconnectSocket, server, &Server::slotDisconnectSocket);  //  связка для принудительного удаления сокета
         connect(this, &MainWindow::signalDisconnectAll, server, &Server::slotDisconnectAll);  //  связка для принудительного удаления всех сокетов
         connect(this, &MainWindow::signalUpdatePossibleProcessing, server, &Server::slotUpdatePossibleProcessing);  //  связка для обновления списка обработок у клиентоав
+        connect(this, &MainWindow::signalSendMessage, server, &Server::slotSendMessage);
 
         ui->infoAboutServerTextEdit->append("Сервер запущен на новом, "+QString::number(server->serverPort())+", порту");  //  уведомление
     }
+}
+
+void MainWindow::setFileSystemModel(QString folderPath)
+{
+    m_fileSystemModel->setRootPath(folderPath);
+    ui->fileSystemTreeView->setModel(m_fileSystemModel);
+    ui->fileSystemTreeView->setRootIndex(m_fileSystemModel->setRootPath(folderPath));
+
+    ui->fileSystemTreeView->resizeColumnToContents(0);
 }
 
 void MainWindow::slotStatusServer(QString status)   //  обработчик состояния
 {
     qDebug() << "MainWindow::slotStatusServer:      " << status; //  вывод в консоль статуса
     ui->infoAboutServerTextEdit->append(delimiter+QTime::currentTime().toString()+" | <font color = black><\\font>"+status);    //  и также в textEdit
+}
+
+void MainWindow::slotChatNewMessage(QString message)
+{
+    qDebug() << "MainWindow::slotChatNewMessage:    " << message;
+    ui->chatTextEdit->append(QTime::currentTime().toString()+" | <font color = black><\\font>"+message);
 }
 
 void MainWindow::slotAddSocketToListWidget(QTcpSocket *socketToAdd)
@@ -159,15 +182,6 @@ void MainWindow::slotAddSocketToListWidget(QTcpSocket *socketToAdd)
 
 void MainWindow::slotDeleteSocketFromListWidget(QMap<QTcpSocket *, QString> mapSockets)
 {
-//    qDebug() << "User desc :"+QString::number(mapSockets->socketDescriptor())+" | IP: "+mapSockets->localAddress().toString();
-//    for(int i = 0; i < ui->clientsListWidget->count(); i++){    //  перебираем все элементы clietnsListWidget
-//        //  ↓↓↓ Если текст элемента совпадает с удаляемым сокетом, ....
-//        if(ui->clientsListWidget->item(i)->text() == "User desc:"+QString::number(mapSockets->socketDescriptor())+" | IP: "+mapSockets->localAddress().toString()){
-//            QListWidgetItem* itemSocketToDelete = ui->clientsListWidget->takeItem(i);   //  ...., то удаляем из clientsListWidget сокет
-//            delete itemSocketToDelete;  //  но он останется в памяти, поэтому его надо удалить вручную по совету документации
-//            break;
-//        }
-//    }
     ui->clientsListWidget->clear();
     for(auto itemSocket = mapSockets.begin(); itemSocket != mapSockets.end(); itemSocket++){
         ui->clientsListWidget->addItem("Клиент дескриптор:"+QString::number(itemSocket.key()->socketDescriptor())+" | IP: "+itemSocket.key()->localAddress().toString());
@@ -211,7 +225,7 @@ void MainWindow::slotDisconnectClient()
             socketText = socketText.remove(4, socketText.length());
 
             //  и отправляем запрос на сервер, чтобы по нему удалили сокет
-            MainWindow::signalDisconnectSocket(socketText.toInt());
+            emit signalDisconnectSocket(socketText.toInt());
             qDebug() << "MainWindow::slotDisconnectClient:      descriptor to delete: " << socketText;
         }
     }
@@ -274,8 +288,12 @@ void MainWindow::on_saveSettingsPushButton_clicked()
     if(ui->saveSettingsPushButton->text() != "Сохранить настройки"){
         ui->saveSettingsPushButton->setText("Сохранить настройки");
     }
-    //  создаем наблюдатель за папкой Entry
-    ui->infoAboutServerTextEdit->append(workspaceManager->setEntryWatcher());
+    //  создаем наблюдателей на все папки
+    ui->infoAboutServerTextEdit->append(workspaceManager->setFolderWatcher());
+
+    //  устанавливаем модель рабочей папки в файловом менеджере
+    qDebug() << "MainWindow::on_saveSettingsPushButton_clicked:     ??" << m_selectWorkspaceFrame->getValue().first().toString();
+    setFileSystemModel(m_selectWorkspaceFrame->getValue().first().toString());
 
     //  проходимся по сгенерированному списку настроек
     for(auto item : ui->settingsFrame->children()){
@@ -370,13 +388,37 @@ void MainWindow::on_restartServerPushButton_clicked()
         return;
     }
     connect(server, &Server::signalStatusServer, this, &MainWindow::slotStatusServer);  //  связка для отображения статуса сервера, вывод в консоль
+    connect(server, &Server::signalChatNewMessage, this, &MainWindow::slotChatNewMessage);
     connect(server, &Server::signalAddSocketToListWidget, this, &MainWindow::slotAddSocketToListWidget);    //  связка для отображения добавления клиентов в clientsListWidget
     connect(server, &Server::signalDeleteSocketFromListWidget, this, &MainWindow::slotDeleteSocketFromListWidget);  //  связка для удаления сокета из clientsListWidget
     connect(this, &MainWindow::signalSocketDisplayed, server, &Server::slotSocketDisplayed);    //  связка для отправки подключившемуся сокету список доступных обработок
     connect(this, &MainWindow::signalDisconnectSocket, server, &Server::slotDisconnectSocket);  //  связка для принудительного удаления сокета
     connect(this, &MainWindow::signalDisconnectAll, server, &Server::slotDisconnectAll);  //  связка для принудительного удаления всех сокетов
     connect(this, &MainWindow::signalUpdatePossibleProcessing, server, &Server::slotUpdatePossibleProcessing);  //  связка для обновления списка обработок у клиентоав
+    connect(this, &MainWindow::signalSendMessage, server, &Server::slotSendMessage);
 
     ui->infoAboutServerTextEdit->append("Сервер перезапущен на "+QString::number(server->serverPort())+" порту");  //  уведомление
+}
+
+void MainWindow::on_sendMsgPushButton_clicked()
+{
+    QString message = ui->serverMessageLineEdit->text();
+    if(message == ""){
+        return;
+    }
+    ui->chatTextEdit->append(QTime::currentTime().toString()+" | <font color = black><\\font> <b>СЕРВЕР</b> - "+message);
+    emit signalSendMessage("<b>СЕРВЕР</b> - "+message);
+    ui->serverMessageLineEdit->clear();
+}
+
+void MainWindow::on_serverMessageLineEdit_returnPressed()
+{
+    QString message = ui->serverMessageLineEdit->text();
+    if(message == ""){
+        return;
+    }
+    ui->chatTextEdit->append(QTime::currentTime().toString()+" | <font color = black><\\font> <b>СЕРВЕР</b> - "+message);
+    emit signalSendMessage("<b>СЕРВЕР</b> - "+message);
+    ui->serverMessageLineEdit->clear();
 }
 
