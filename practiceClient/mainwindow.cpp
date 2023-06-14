@@ -15,8 +15,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->setWindowTitle("D.I.P. Client++");
 
-    client = new Client();
-
     connectFrame = new ConnectFrame(this);
 
     possibleProcessingFrame = new PossibleProcessingFrame(this);
@@ -65,13 +63,22 @@ void MainWindow::setEnableInteface()
         fileFrame->setValue("Проверьте IP и порт сервера! Вы не подключились");
         return;
     }
+    if(client == nullptr){
+        client = new Client();
+    }
+
     client->connectToHost(IP, port);   //  подключение к серверу (локальный адрес + порт такой же, как у сервера)
+
+    if(client->state() != 2){
+        chatFrame->setValue("Ошибка подключения"+delimiter);
+        return;
+    }
 
     for(auto mainTabChild : ui->mainFrame->children()){
         if(QString(mainTabChild->metaObject()->className()).contains("Layout")){
             continue;
         }
-        dynamic_cast<I_CardFrame*>(mainTabChild)->switchEnabledInteface();
+        dynamic_cast<I_CardFrame*>(mainTabChild)->setEnabledInteface(true);
     }
 
     connect(this, &MainWindow::signalSendTextToServer, client, &Client::slotSendTextToServer);
@@ -86,14 +93,13 @@ void MainWindow::setEnableInteface()
 
     chatFrame->setValue("Вы подключились!"+delimiter);
 
-    connectFrame->switchEnabledInteface();
-    possibleProcessingFrame->switchEnabledInteface();
-    fileFrame->switchEnabledInteface();
+    possibleProcessingFrame->setEnabledInteface(false);
+    fileFrame->setEnabledInteface(false);
 }
 
 void MainWindow::slotStatusClient(QString status)
 {
-    ui->consoleTextBrowser->append(QTime::currentTime().toString()+" | "+status+"</hr>");
+    ui->consoleTextBrowser->append(QTime::currentTime().toString()+" | "+status+"</br>");
 }
 
 void MainWindow::slotMessageTextBrowser(QString message)
@@ -117,9 +123,13 @@ void MainWindow::slotEnableInterface(QString message)
         if(QString(mainTabChild->metaObject()->className()).contains("Layout")){
             continue;
         }
-        dynamic_cast<I_CardFrame*>(mainTabChild)->switchEnabledInteface();
+        //  выключаем весь интерфейс
+        dynamic_cast<I_CardFrame*>(mainTabChild)->setEnabledInteface(false);
     }
-    possibleProcessingFrame->switchEnabledInteface();
+    client->disconnectFromHost();
+    client = nullptr;
+    //  включаем возможность подключения
+    connectFrame->setEnabledInteface(true);
     chatFrame->setValue(message);
 }
 
@@ -136,16 +146,16 @@ void MainWindow::on_chooseWorkspaceDirPushButton_clicked(){
         workspaceManager->setRootFolder(folderPath);
         client->setWorkspaceManager(workspaceManager);
         if(workspaceManager->createWorkspaceFolders()){
-            ui->consoleTextBrowser->append("<hr/>Рабочая папка организована!");
+            ui->consoleTextBrowser->append("<br/>Рабочая папка организована!");
             //  создаем наблюдатель за папкой Entry
             ui->consoleTextBrowser->append(workspaceManager->setEntryWatcher());
             ui->consoleTextBrowser->append(workspaceManager->setProcessedWatcher());
 
             //  включаем выбор обработок
-            possibleProcessingFrame->switchEnabledInteface();
+            possibleProcessingFrame->setEnabledInteface(true);
 
             //  и включаем выбор файла для отправки
-            fileFrame->switchEnabledInteface();
+            fileFrame->setEnabledInteface(true);
         } else {
             ui->consoleTextBrowser->append("<hr/>Рабочая папка не организована!");
         }

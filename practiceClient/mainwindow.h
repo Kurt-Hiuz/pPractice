@@ -49,7 +49,7 @@ signals:
 
 private:
     Ui::MainWindow *ui;
-    Client *client;
+    Client *client = nullptr;
 
     QString delimiter = "<font color = black><\\font><br>=======================";  //  создаем разделитель для сообщений
 
