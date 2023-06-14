@@ -55,6 +55,7 @@ public:
 
 signals:
     void signalStatusRRManagerServer(QString status);
+    void signalChatNewMessage(QString message);
     void signalSendToAllClientsServer(QString typeOfMsg, QString str);
     void signalSendToOneRRManager(QTcpSocket* socket, QString typeOfMsg, QString str);
     void signalSendBufferToClient(QTcpSocket *socketToSend, QByteArray &buffer);
@@ -63,6 +64,7 @@ signals:
     void signalDeleteExpectationFile(QString &fileName);
     void signalSaveData(QString fileName);
     void signalCheckExpectationFolder(QTcpSocket *socket);
+
 };
 
 #endif // READYREADMANAGER_H

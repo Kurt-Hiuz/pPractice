@@ -4,6 +4,7 @@ ReadyReadManager::ReadyReadManager()
 {
     clientsMessageManager = new ClientsMessageManager();
     connect(clientsMessageManager, &ClientsMessageManager::signalStatusRRManager, this, &ReadyReadManager::signalStatusRRManagerServer);
+    connect(clientsMessageManager, &ClientsMessageManager::signalChatNewMessage, this, &ReadyReadManager::signalChatNewMessage);
     connect(clientsMessageManager, &ClientsMessageManager::signalSendToAllClientsRRManager, this, &ReadyReadManager::signalSendToAllClientsServer);
 
     clientsFileManager = new ClientsFileManager();
