@@ -7,8 +7,8 @@ ClientsFileManager::ClientsFileManager()
 
 void ClientsFileManager::readDataFromStream(QDataStream &inStream)
 {
-    inStream >> this->fileName;
-    inStream >> this->fileSize;
+    inStream >> this->fileName; //  записываем из потока название файла
+    inStream >> this->fileSize; //  считываем его размер
 }
 
 void ClientsFileManager::writeDataToStream(QDataStream &outStream)
@@ -20,8 +20,7 @@ void ClientsFileManager::writeDataToStream(QDataStream &outStream)
 void ClientsFileManager::processData(QDataStream &inStream, QTcpSocket *socket)
 {
     if(fileName.isEmpty()){    //  если файла не существует
-        inStream >> fileName;  //  записываем из потока название файла
-        inStream >> fileSize; //  считываем его размер
+        readDataFromStream(inStream);   //  считываем данные
 
         if(fileSize < blockData){   //  если размер файла меньше выделенного блока
             blockData = fileSize;   //  устанавливаем размер блока ровно по файлу (передача произойдет в один этап)
@@ -76,7 +75,10 @@ void ClientsFileManager::processData(QDataStream &inStream, QTcpSocket *socket)
             fileName.clear();   //  очищаем его название
             fileSize = 0;   //  очищаем его размер
             blockData = 1000000;  //  устанавливаем прежний размер байтов
-            delete[] bytes; //  удаляем байты из кучи
+            if(bytes != nullptr){   //  удаляем байты из кучи, делая проверку на случай двойного удаления
+                delete[] bytes;
+                bytes = nullptr;
+            }
 
             return; //  выходим
         }

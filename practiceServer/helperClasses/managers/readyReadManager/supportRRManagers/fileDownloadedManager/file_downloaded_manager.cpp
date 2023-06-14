@@ -7,22 +7,21 @@ FileDownloadedManager::FileDownloadedManager()
 
 void FileDownloadedManager::readDataFromStream(QDataStream &inStream)
 {
-
+    inStream >> string;
 }
 
 void FileDownloadedManager::writeDataToStream(QDataStream &outStream)
 {
-
+    outStream << string;
 }
 
 void FileDownloadedManager::processData(QDataStream &inStream, QTcpSocket *socket)
 {
-    QString str;    //  определяем переменную, в которую сохраним данные
-    inStream >> str;  //  выводим в переменную сообщение
-
+    readDataFromStream(inStream);
     emit signalClearFileData();
-    emit signalDeleteSendedFile(str);
-    emit signalStatusRRManager("<font color = green><\\font>Файл \""+str+"\" загружен");  //  и то же самое клиенту
+    emit signalDeleteSendedFile(string);
+    emit signalDeleteExpectationFile(string);
+    emit signalStatusRRManager("<font color = green><\\font>Файл от "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+" \""+string+"\" загружен");  //  и то же самое клиенту
 }
 
 QString FileDownloadedManager::typeOfMessage()

@@ -18,6 +18,9 @@
 class ClientsProcessingManager : public I_MessageManager
 {
     Q_OBJECT
+private:
+    QString currentProcessing;
+
 public:
     ClientsProcessingManager();
     void readDataFromStream(QDataStream &inStream) override;

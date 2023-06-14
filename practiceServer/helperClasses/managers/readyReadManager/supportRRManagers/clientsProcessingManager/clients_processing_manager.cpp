@@ -7,18 +7,17 @@ ClientsProcessingManager::ClientsProcessingManager()
 
 void ClientsProcessingManager::readDataFromStream(QDataStream &inStream)
 {
-
+    inStream >> currentProcessing;
 }
 
 void ClientsProcessingManager::writeDataToStream(QDataStream &outStream)
 {
-
+    outStream << currentProcessing;
 }
 
 void ClientsProcessingManager::processData(QDataStream &inStream, QTcpSocket *socket)
 {
-    QString currentProcessing;
-    inStream >> currentProcessing;
+    readDataFromStream(inStream);
 
     emit signalSetClientProcessing(socket, currentProcessing);
     emit signalCheckExpectationFolder(socket);

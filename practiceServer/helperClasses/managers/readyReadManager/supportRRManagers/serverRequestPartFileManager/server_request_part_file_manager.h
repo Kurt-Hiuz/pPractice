@@ -1,7 +1,7 @@
 #ifndef CLIENTSREQUESTPARTPROCESSINGFILE_H
 #define CLIENTSREQUESTPARTPROCESSINGFILE_H
 
-///     Класс ClientsRequestPartFileManager реализует интерфейс I_MessageManager
+///     Класс ServerRequestPartFileManager реализует интерфейс I_MessageManager
 ///     обрабатывает всё необходимое, что связанно с запросами на части файлов
 ///     Переменные:
 ///         str - сообщение в консоль
@@ -39,7 +39,7 @@ signals:
     void signalSendBufferRRManager(QTcpSocket *socketToSend, QByteArray &buffer);
 
 private:
-    QString str;
+    QString string;
     int fileSize;   //  размер файла
     QString fileName;   //  его название
     QFile *file;     //  сам файлик

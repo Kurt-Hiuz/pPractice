@@ -6,6 +6,8 @@
 class FileDownloadedManager : public I_MessageManager
 {
     Q_OBJECT
+private:
+    QString string;
 public:
     FileDownloadedManager();
     void readDataFromStream(QDataStream &inStream) override;
