@@ -32,11 +32,6 @@ void UpdateProcessingDialog::createInterface()
     frameLayout->addWidget(applyDataPushButton);
 }
 
-QVariant UpdateProcessingDialog::getValue()
-{
-    return 0;
-}
-
 void UpdateProcessingDialog::on_openJsonFilePushButton_clicked()
 {
     QString openFileName = QFileDialog::getOpenFileName(this,
@@ -49,7 +44,6 @@ void UpdateProcessingDialog::on_openJsonFilePushButton_clicked()
     QFile jsonFile(openFileName);
     if(!jsonFile.open(QIODevice::ReadOnly | QIODevice::Text)){
         dataLabel->setText("Невозможно открыть файл!");
-        qDebug() << "Невозможно открыть файл";
         return;
     }
     QByteArray saveData = jsonFile.readAll();
@@ -64,8 +58,6 @@ void UpdateProcessingDialog::on_openJsonFilePushButton_clicked()
 
     jsonFile.close();
 
-    qDebug() << openFileName;
-    qDebug() << QJsonDocument(m_currentJsonObject).toJson(QJsonDocument::Indented);
     jsonFilePath = openFileName;
 }
 

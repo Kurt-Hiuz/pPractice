@@ -2,6 +2,7 @@
 #define SPINBOXFRAME_H
 
 ///     Класс ChangePortSpinBoxFrame реализует интерфейс I_CardFrame
+///     используется для фрейма смены порта
 ///     Переменные:
 ///         consoleMessage - сообщение в консоль сервера
 ///         changePortSpinBox - поле ввода порта сервера

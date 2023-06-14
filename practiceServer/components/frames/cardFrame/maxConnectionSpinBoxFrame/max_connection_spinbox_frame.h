@@ -2,6 +2,7 @@
 #define MAXCONNECTIONSPINBOXFRAME_H
 
 ///     Класс MaxConnectionSpinBoxFrame реализует интерфейс I_CardFrame
+///     Используется для фрейма макс. подключений
 ///     Переменные:
 ///         consoleMessage - сообщение в консоль сервера
 ///         maxConnectionSpinBox - поле ввода натуральных чисел

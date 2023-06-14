@@ -5,19 +5,26 @@
 ///     Переменные:
 ///         messageManagers - хранит название обработчика и его указатель
 ///         clientsMessageManager - указатель на менеджер типа "Message"
-///         clientsFileManager - указатель на менеджер типа "File"
+///         clientsFileManager - -//- типа "File"
+///         fileDownloadedManager - -//- типа "File Downloaded"
+///         serverRequestPartFileManager - -//- типа "Request part of processing file"
+///         clientsProcessingManager - -//- типа "Set processing on client"
 ///         nullManager - указатель на менеджер типа "No type"
 ///     Методы:
 ///         identifyMessage() - определяет тип сообщения и возвращает указатель на необходимого обработчика
 ///         setEntryFolder() - установки EntryFolder для ClientsFileManager
+///         setFileClientFileRequest() - установка данных о файле, который попросил клиент
 ///     Сигналы:
 ///         signalStatusRRManagerServer() - отправляет серверу статус
 ///         signalSendToAllClientsServer() - отправляет сообщение всем клиентам, обращаясь к серверу
 ///         signalSendToOneRRManager() - отправляет сообщение указанному клиенту, обращаясь к серверу
-///     Слоты:
-///         slotStatusRRManager() - принимает статусы на сервер от дочерних менеджеров
-///         slotSendToAllClientsRRManager() - принимает сообщения для всех клиентов от дочерних менеджеров
-///         slotSendToOneRRManager() - принимает сообщения для указанного сокета от дочерних менеджеров
+///         signalChatNewMessage() - отправляет новое сообщение
+///         signalSendBufferToClient() - отправка буфера данных
+///         signalSetClientProcessing() - закрепляем обработку
+///         signalDeleteSendedFile() - удаляем файл из /SendedFiles
+///         signalDeleteExpectationFile() - удаляем файл из /Expectation
+///         signalSaveData() - сохраняем даннные
+///         signalCheckExpectationFolder() - проверяем папку /Expectation
 
 ///  ========================    классы проекта
 #include "supportRRManagers/I_message_manager.h"    //  для работы с ссылками обработчиков

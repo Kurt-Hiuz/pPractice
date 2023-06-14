@@ -1,11 +1,28 @@
 #ifndef EXPECTATIONMANAGER_H
 #define EXPECTATIONMANAGER_H
 
-#include <QObject>
-#include <QFile>
-#include <QDir>
-#include <QFileInfo>
-#include <QFileSystemWatcher>
+///     Класс ExpectationManager определяет зону ответственности за папку Expectation
+///     Переменные:
+///         rootFolder - корневая папка менеджера
+///         expectationFilesWatcher - наблюдатель за папкой
+///     Методы:
+///         setWatcher() - устанавливаем наблюдателя
+///         removeFile() - удаляем файл
+///         createFile() - создаем файл
+///         getFile() - получаем путь до файла
+///     Слоты:
+///         slotExpectationDirectoryChanged - папка Expectation изменилась
+
+///  ========================    классы для работы
+#include <QObject>              //  для создания объекта
+///  ========================
+///
+///  ========================    для работы с файлами
+#include <QFile>                //  определитель файла
+#include <QDir>                 //  определитель директории
+#include <QFileInfo>            //  данные о файлах
+#include <QFileSystemWatcher>   //  наблюдатель
+///  ========================
 
 class ExpectationManager : public QObject
 {

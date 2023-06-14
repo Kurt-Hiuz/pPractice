@@ -2,6 +2,7 @@
 #define SELECTWORKSPACEFRAME_H
 
 ///     Класс SelectWorkspaceFrame реализует интерфейс I_CardFrame
+///     Используется для фрейма выбора рабочей папки
 ///     Переменные:
 ///         consoleMessage - сообщение в консоль сервера
 ///         chooseWorkspaceDirPushButton - кнопка выбора папки для работы сервера

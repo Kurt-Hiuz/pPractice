@@ -13,7 +13,8 @@
 ///         typeOfMessage() - возвращает строку тип менеджера
 ///     Сигналы:
 ///         signalStatusRRManager() - отправка статуса ReadyReadManager'у
-///         signalSendToOneRRManager() - отправка сообщения одному клиенту через ReadyReadManager
+///         signalSendToAllClientsRRManager() - отправка сообщения всем клиентам
+///         signalChatNewMessage() - сигнал для новых сообщений
 
 ///  ========================    классы проекта
 #include "../I_message_manager.h"   //  реализуем интерфейс

@@ -10,10 +10,13 @@
 ///         typeOfMessage() - возвращает строку тип менеджера
 ///     Сигналы:
 ///         signalStatusRRManager() - отправка статуса ReadyReadManager'у
-///         signalSendToOneRRManager() - отправка сообщения одному клиенту через ReadyReadManager
+///         signalSendToAllClientsRRManager() - отправка сообщения всем клиентам
+///         signalSetClientProcessing() - закрепление обработки за клиентом
+///         signalCheckExpectationFolder() - проверка папки ожидания
 
 ///  ========================    классы проекта
 #include "../I_message_manager.h"   //  реализуем интерфейс
+///  ========================
 
 class ClientsProcessingManager : public I_MessageManager
 {

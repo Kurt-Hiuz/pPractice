@@ -10,11 +10,18 @@
 ///         settingsfilesWatcher - наблюдатель за файлами
 ///     Методы:
 ///         saveSettings() - принимает json объект и создаёт из него файл.json, возвращая отчёт в консоль
+///         createSettingsFiles() - создает файлы настроек
 ///     Сигналы:
-///         processingFileChangedSignal - передает путь до измененного файла обработок
+///         signalProcessingFileChanged - передает путь до измененного файла обработок
+///         signalSettingsFileChanged - передает путь до измененного файла настроек
 ///     Слоты:
-///         processingFileChanged - обрабатывает слот наблюдателя за possibleProcessing.json
+///         slotProcessingFileChanged - обрабатывает слот наблюдателя за possibleProcessing.json
+///         slotSettingsDirectoryChanged - обрабатывает слот наблюдателя за папкой
 
+///  ========================    классы для работы
+#include <QObject>              //  работа с MainWindow
+///  ========================
+///
 ///  ========================    классы для работы с json
 #include <QJsonObject>          //  работа с json объектами
 #include <QJsonDocument>        //  работа с json документами
@@ -25,10 +32,6 @@
 #include <QDir>                 //  работа с директориями
 #include <QFile>                //  работа с файлами
 #include <QFileSystemWatcher>   //  наблюдатель за файлами
-///  ========================
-///
-///  ========================    классы для работы
-#include <QObject>              //  работа с MainWindow
 ///  ========================
 
 class SettingsManager : public QObject

@@ -3,29 +3,60 @@
 
 ///     Класс Server определяет сам сервер
 ///     Переменные:
-///         socket - сокет для подключения
-///         generatedServerPort - сгенерированный порт
-///         mapSockets - хранит сокет и закреплённую за ним обработку
-///         Data - то, что отправляется между сервером и клиентом
-///         mapRequest - определяем глоссарий запросов к сторонам
-///         possibleProcessing - определяем возможные обработки с приставкой и её человеческим описанием
-///         nextBlockSize - блок нового сообщения
 ///         delimiter - создаем разделитель для сообщений
-///         fileSystemWatcher - наблюдатель за файлами
-///         processingManager - менеджер для обработок
-///         readyReadManager - менеджер для чтения сообщений
+///         * серверные:
+///             socket - сокет для подключения
+///             generatedServerPort - сгенерированный порт
+///             mapSockets - хранит сокет и закреплённую за ним обработку
+///             Data - то, что отправляется между сервером и клиентом
+///             mapRequest - определяем глоссарий запросов к сторонам
+///             possibleProcessing - определяем возможные обработки с приставкой и её человеческим описанием
+///             nextBlockSize - блок нового сообщения
+///             maxConnections - макс. подключений
+///         * для работы с файлами:
+///             fileSystemWatcher - наблюдатель за файлами
+///             file - определяем файл
+///             bytes - массив байт данных
+///             fileSize - размер файла
+///             fileName - его название
+///             blockData - размер данных
+///             workspaceFolder - путь до рабочей директории
+///             entryFolder -  путь до папки для файлов извне
+///             storageFolder -  путь до папки с приходящей обработанной информацией от клиентов
+///             expectationFolder - путь до папки ожидания
+///             sendedFilesFolder - путь до папки отправленных файлов
+///         * менеджеры:
+///             processingManager - менеджер для обработок
+///             readyReadManager - менеджер для чтения сообщений
 ///     Методы:
 ///         SendPossibleProcessing - отправка всех возможных обработок
 ///         SendToAllClients - отправка всем клиентам необходимых данных
 ///         SendToOneClient - отправка сообщений конкретному клиенту
+///         SendFileToClient - отправка данных о файлах
 ///     Сигналы:
-///         signalStatusRRManagerServer() - отправляет серверу статус
-///         signalSendToAllClientsServer() - отправляет сообщение всем клиентам, обращаясь к серверу
-///         signalSendToOneRRManager() - отправляет сообщение указанному клиенту, обращаясь к серверу
+///         signalStatusServer() - отправляет серверу статус
+///         signalChatNewMessage() - сигнал нового сообщений
+///         signalAddSocketToListWidget() - сигнал для добавления сокета в clientsListWidget
+///         signalDeleteSocketFromListWidget() - сигнал для удаления сокета из clientsListWidget при его отключении
 ///     Слоты:
-///         slotStatusRRManager() - принимает статусы на сервер от дочерних менеджеров
+///         slotSendBufferToClient() - отправляет буфер данных клиенту
 ///         slotSendToAllClientsRRManager() - принимает сообщения для всех клиентов от дочерних менеджеров
 ///         slotSendToOneRRManager() - принимает сообщения для указанного сокета от дочерних менеджеров
+///         slotSetClientProcessing() - закрепление обработки за клиентом
+///         slotSiftFiles() - отправка файлов по клиентам
+///         slotDeleteSendedFile() - удаление отправленных файлов
+///         slotDeleteExpectationFile() - удаление ожидающих файлов
+///         slotSaveData() - сохранение данных
+///         slotCheckExpectationFolder() - проверка папки ожидания
+///         incomingConnection() - прием новых подключений
+///         slotReadyRead() - слот чтения сообщений
+///         slotDisconnect() - обработчик отключения клиента
+///         slotSocketDisplayed() - обработчик отображаемого клиента
+///         slotDisconnectSocket() - отключение клиента
+///         slotDisconnectAll() - отключение всех клиентов
+///         slotUpdatePossibleProcessing() - обновление возможных обработок
+///         slotSetServerFolders() - установка папок в переменные
+///         slotSendMessage() - отправка сообщений
 
 ///  ========================   классы для работы сервера
 #include <QTcpServer>           //  сам сервер
@@ -72,15 +103,15 @@ private:
 
     qint64 nextBlockSize;
 
-    QFile *file;    //  определяем файл
-    char *bytes = {0};     //  массив байт данных
-    int fileSize;   //  размер файла
-    QString fileName;   //  его название
-    int blockData = 1000000;  //  размер данных
+    QFile *file;
+    char *bytes = {0};
+    int fileSize;
+    QString fileName;
+    int blockData = 1000000;
 
-    QString workspaceFolder = "";   //  путь до рабочей директории
-    QString entryFolder = ""; //  путь до папки для файлов извне
-    QString storageFolder = "";  //  путь до папки с приходящей обработанной информацией от клиентов
+    QString workspaceFolder = "";
+    QString entryFolder = "";
+    QString storageFolder = "";
     QString expectationFolder = "";
     QString sendedFilesFolder = "";
     QString delimiter = "<font color = black><\\font><br>=======================";
@@ -89,13 +120,12 @@ private:
 
     ReadyReadManager *readyReadManager;
 
-    void SendPossibleProcessing(QTcpSocket* socket, QMap<QString, QVariant> possibleProcessingData);  //  функция передачи возможных обработок
+    void SendPossibleProcessing(QTcpSocket* socket, QMap<QString, QVariant> possibleProcessingData);
 
-    void SendToAllClients(QString typeOfMsg, QString str);      //  функция для передачи данных всем клиентам
-    void SendToOneClient(QTcpSocket* socket, QString typeOfMsg, QString str);       //  функция для передачи данных одному клиенту
+    void SendToAllClients(QString typeOfMsg, QString str);
+    void SendToOneClient(QTcpSocket* socket, QString typeOfMsg, QString str);
 
-    void SendFileToClient(QTcpSocket *socket, QString filePath);    //  функция отправки файл (начало)
-    void SendPartOfFile();      //  функция отправки части файла (продолжение)
+    void SendFileToClient(QTcpSocket *socket, QString filePath);
 
 private slots:
     void slotSendToAllClients(QString typeOfMsg, QString str);
@@ -109,22 +139,21 @@ private slots:
     void slotCheckExpectationFolder(QTcpSocket* checkingSocket);
 
 public slots:
-    void incomingConnection(qintptr socketDescriptor);  //  обработчик новых подключений
-    void slotReadyRead();   //  обработчик полученных от клиента сообщений и файлов
-    void slotDisconnect();  //  обработчик отключившихся клиентов
-    void slotSocketDisplayed(QTcpSocket* displayedSocket);  //  обработчик для размещенного сокета
-    void slotDisconnectSocket(int socketDiscriptorToDelete);    //  обработчик для принудительного удаления сокета
-    void slotDisconnectAll(QString reason);    //  обработчик для принудительного удаления сокета
+    void incomingConnection(qintptr socketDescriptor);
+    void slotReadyRead();
+    void slotDisconnect();
+    void slotSocketDisplayed(QTcpSocket* displayedSocket);
+    void slotDisconnectSocket(int socketDiscriptorToDelete);
+    void slotDisconnectAll(QString reason);
     void slotUpdatePossibleProcessing(QVariant newPossibleProcessingData);
     void slotSetServerFolders(QMap<QString, QString> &subFolders);
     void slotSendMessage(QString message);
 
 signals:
-    void signalStatusServer(QString status);   //  слот для обработки состояния сервера
-    void signalChatNewMessage(QString message);   //  слот для обработки состояния сервера
-    void signalAddSocketToListWidget(QTcpSocket* socketToAdd);     //  слот для добавления сокета в clientsListWidget
-    void signalDeleteSocketFromListWidget(QMap<QTcpSocket*, QString> mapSockets);  //  слот для удаления сокета из clientsListWidget при его отключении
-    //    void signalChatServer(QString);     //  слот для обработки чата сервераы
+    void signalStatusServer(QString status);
+    void signalChatNewMessage(QString message);
+    void signalAddSocketToListWidget(QTcpSocket* socketToAdd);
+    void signalDeleteSocketFromListWidget(QMap<QTcpSocket*, QString> mapSockets);
 };
 
 #endif // SERVER_H

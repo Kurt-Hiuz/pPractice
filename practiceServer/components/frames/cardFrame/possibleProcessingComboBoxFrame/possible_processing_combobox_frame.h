@@ -2,6 +2,7 @@
 #define COMBOBOXFRAME_H
 
 ///     Класс PossibleProcessingComboBoxFrame реализует интерфейс I_CardFrame
+///     Используется для фрейма возможных обработок
 ///     Переменные:
 ///         consoleMessage - сообщение в консоль сервера
 ///         dataLabel - метка с подсказкой/данными для наглядности

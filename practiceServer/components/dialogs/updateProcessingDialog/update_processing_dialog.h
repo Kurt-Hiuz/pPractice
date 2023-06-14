@@ -2,7 +2,9 @@
 #define UPDATEPROCESSINGDIALOG_H
 
 ///     Класс UpdateProcessingDialog реализует интерфейс I_DialogWindow
+///     отвечает за обновление списка обработок
 ///     Переменные:
+///         parentUi - ссылка на форму-родителя
 ///         jsonDataTextEdit - поле для отображения содержимого json файла
 ///         dataLabel - метка с подсказкой/данными для наглядности
 ///         openJsonFilePushButton - кнопка для открытия json файла
@@ -10,6 +12,7 @@
 ///         applyDataPushButton - кнопка для подтверждения новых данных
 ///         m_currentJsonObject - json объект для работы с файлом
 ///         m_jsonParser - сущность, определяющая ликвидность принимаемой json структуры
+///         jsonFilePath - путь до json файла
 ///     Методы:
 ///         createInterface() - создание графического представления
 ///     Слоты:
@@ -47,8 +50,6 @@ public:
     UpdateProcessingDialog(MainWindow *parentUi);
 
     void createInterface() override;
-    QVariant getValue() override;
-
 private:
     MainWindow *parentUi;
     QTextEdit *jsonDataTextEdit;

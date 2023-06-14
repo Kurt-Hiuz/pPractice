@@ -99,5 +99,4 @@ QString ClientsFileManager::typeOfMessage()
 void ClientsFileManager::setEntryFolderName(QString &entryFolder)
 {
     this->entryFolderName = entryFolder;
-    qDebug() << "ClientsFileManager::setEntryFolderName:        установлена папка: " << entryFolder;
 }

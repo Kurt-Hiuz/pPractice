@@ -4,22 +4,31 @@
 ///     Класс ServerRequestPartFileManager реализует интерфейс I_MessageManager
 ///     обрабатывает всё необходимое, что связанно с запросами на части файлов
 ///     Переменные:
-///         str - сообщение в консоль
+///         string - сообщение в консоль
+///         file - определяем файл
+///         bytes - массив байт данных
+///         fileSize - размер файла
+///         fileName - его название
+///         blockData - размер данных
+///         buffer - буфер байтов
 ///     Методы:
 ///         readDataFromStream() - чтение данных с потока
 ///         writeDataFromStream() - запись данных в поток
 ///         processData() - обрабатывает приходящие данные
 ///         typeOfMessage() - возвращает строку тип менеджера
+///         setFilePath() - устанавливаем путь до файла
 ///     Сигналы:
 ///         signalStatusRRManager() - передача ReadyReadManager статуса сервера
-///         signalSendToOneRRManager() - отправка данных конкретному сокету через ReadyReadManager
+///         signalSendBufferRRManager() - отправка данных конкретному сокету
+///     Слоты:
+///         slotClearFileData() - обработчик чистки данных о файле
 
 ///  ========================    классы проекта
 #include "../I_message_manager.h"   //  реализуем интерфейс
 ///  ========================
 ///
 ///  ========================    для работы с файлами
-#include <QFile>
+#include <QFile>                //  определение файла
 ///  ========================
 
 class ServerRequestPartFileManager : public I_MessageManager

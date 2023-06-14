@@ -9,7 +9,6 @@ Server::Server(bool &server_started, int serverPort){
 
     if(this->listen(QHostAddress::Any, generatedServerPort)){  //  статус будет передаваться, когда сервер будет прослушивать любой из адресов
         server_started = true;  //  меняем состояние сервера
-        qDebug() << "Server::Server:        start on "+QString::number(generatedServerPort)+" port";    //  уведомляем в консоли
     } else {
         server_started = false; //  иначе что-то пошло не так
     }
@@ -32,7 +31,6 @@ Server::Server(bool &server_started, int serverPort){
 void Server::setWorkspaceManager(WorkspaceManager *newWorkspaceManager)
 {
     this->workspaceManager = newWorkspaceManager;
-    qDebug() << "Server::setWorkspaceManager:   установлен workspaceManager";
     connect(workspaceManager, &WorkspaceManager::signalSiftFiles, this, &Server::slotSiftFiles);
 }
 
@@ -61,16 +59,13 @@ void Server::slotSendBufferToClient(QTcpSocket *socketToSend, QByteArray &buffer
     out.setVersion(QDataStream::Qt_6_2);    //  устанавливаем последнюю версию
     out << quint64(0) << QString("File") << buffer;   //  собираем сообщение из размер_сообщения << тип_сообщения << строка << отправитель
     out.device()->seek(0);  //  передвигаемся в начало
-    qDebug() << "Server::slotSendBufferToClient:    sending blockSize = " << quint64(Data.size() - sizeof(quint64));
     out << quint64(Data.size() - sizeof(quint64));  //  избавляемся от зарезервированных двух байт в начале каждого сообщения
     socketToSend->write(Data);    //  записываем данные в сокет
-    qDebug() << "Server::slotSendBufferToClient:    Data size = " << Data.size();
 }
 
 void Server::slotSetClientProcessing(QTcpSocket *socket, QString currentProcessing)
 {
     mapSockets[socket] = currentProcessing;
-    qDebug() << "Server::setClientProcessing:     mapSockets = " << mapSockets;
     if(currentProcessing != ""){
         emit signalStatusServer("<font color = blue><\\font>Клиент "+QString::number(socket->socketDescriptor())+" "+socket->localAddress().toString()+" выбрал \""+currentProcessing+"\" обработку</hr>");
     } else {
@@ -91,10 +86,7 @@ void Server::slotSiftFiles(QStringList &filesList)
 
         for(auto it = mapSockets.begin(); it != mapSockets.end(); it++){
 
-            qDebug() << "Server::slotSiftFiles  it.value(): " << it.value();
-            qDebug() << "Server::slotSiftFiles currentFile.fileName(): " << currentFile.fileName();
             if(currentFile.fileName().endsWith(it.value()) && it.value() != ""){
-                qDebug() << "Server::slotSiftFiles:     " << currentFile.filePath();
                 emit signalStatusServer(workspaceManager->copyToSended(currentFile.filePath()));
                 SendFileToClient(it.key(), currentFile.filePath());
             } else {
@@ -127,10 +119,7 @@ void Server::slotCheckExpectationFolder(QTcpSocket *checkingSocket)
     for(int fileI = 0; fileI < filesList.size(); fileI++){
         QFileInfo currentFile(filesList.at(fileI));
         QString processing = mapSockets[checkingSocket];
-        qDebug() << "Server::slotCheckExpectationFolder  обработка: " << processing;
-        qDebug() << "Server::slotCheckExpectationFolder currentFile.fileName(): " << currentFile.fileName();
         if(currentFile.fileName().endsWith(processing) && processing != ""){
-            qDebug() << "Server::slotCheckExpectationFolder:     " << currentFile.filePath();
             emit signalStatusServer(workspaceManager->copyToSended(currentFile.filePath()));
             SendFileToClient(checkingSocket, currentFile.filePath());
         }
@@ -148,7 +137,6 @@ void Server::slotDisconnectSocket(int socketDiscriptorToDelete) //  обрабо
         if(item.key()->socketDescriptor() == socketDiscriptorToDelete){     //  ищем совпадение по сокету
             socket = item.key();
             SendToOneClient(item.key(), QString("Disconnect"), "Отключен с хоста"); //  отправляем клиенту сигнал на отключение
-            qDebug() << "Server::slotDisconnectSocket       " << "pop quantity of clients: "+QString::number(mapSockets.size());
             break;
         }
     }
@@ -185,7 +173,6 @@ void Server::slotUpdatePossibleProcessing(QVariant newPossibleProcessingData)
     }
 
     emit signalStatusServer("Список обработок отправлен всем клиентам!");
-    qDebug() << "Server::slotUpdatePossibleProcessing:      " << this->possibleProcessing;
 }
 
 void Server::slotSetServerFolders(QMap<QString, QString> &subFolders)
@@ -218,8 +205,6 @@ void Server::slotSetServerFolders(QMap<QString, QString> &subFolders)
             continue;
         }
     }
-
-    qDebug() << "Server::slotSetServerFolders:      all Data folders:   " << entryFolder << storageFolder << expectationFolder;
 }
 
 void Server::slotSendMessage(QString message)
@@ -244,8 +229,6 @@ void Server::incomingConnection(qintptr socketDescriptor){  //  обработч
     emit signalAddSocketToListWidget(socket);    //  отображаем на форме в clientsListWidget этот сокет
     SendToAllClients(QString("Message"), "Новый клиент " + QString::number(socketDescriptor));
     SendPossibleProcessing(socket, possibleProcessing);
-    qDebug() << "Server::incomingConnection:        new client on " << socketDescriptor;
-    qDebug() << "Server::incomingConnection:        push quantity of clients: "+QString::number(mapSockets.size());
 }
 
 void Server::slotReadyRead(){
@@ -259,26 +242,18 @@ void Server::slotReadyRead(){
 
     while(true){    //  цикл для расчета размера блока
         if(nextBlockSize == 0){ //  размер блока пока неизвестен
-            qDebug() << "Server::slotReadyRead:     nextBlockSize == 0";
-            qDebug() << "Server::slotReadyRead:     size of waiting bytes" << socket->bytesAvailable();   //  выводим размер ожидающих байтов
             if(socket->bytesAvailable() < 8){   //  и не должен быть меньше 8-и байт
-                qDebug() << "Server::slotReadyRead:     Data < 8, break";
                 break;  //  иначе выходим из цикла, т.е. размер посчитать невозможно
             }
             in >> nextBlockSize;    //  считываем размер блока в правильном исходе
-            qDebug() << "Server::slotReadyRead:     nextBlockSize: " << nextBlockSize;
-            qDebug() << "Server::slotReadyRead:     размер данных:  " << nextBlockSize - 26;
         }
         if(socket->bytesAvailable() < nextBlockSize){   //  когда уже известен размер блока, мы сравниваем его с количеством байт, которые пришли от сервера
-            qDebug() << "Server::slotReadyRead:     Data not full | socket->bytesAvailable() = "+QString::number(socket->bytesAvailable()) + " | nextBlockSize = "+QString::number(nextBlockSize);    //  если данные пришли не полностью
             break;
         }
 
         QString typeOfMess;
         in >> typeOfMess;
 
-        qDebug() << "Server::slotReadyRead:     остаток после чтения с in: " << socket->bytesAvailable();
-        qDebug() << "Server::slotReadyRead:     Тип сообщения:     " << typeOfMess;
         I_MessageManager *messageManager = readyReadManager->identifyMessage(typeOfMess);
 
         if(messageManager->typeOfMessage() == "No type"){
@@ -298,7 +273,6 @@ void Server::slotDisconnect()
 {
     QTcpSocket* disconnectedSocket = static_cast<QTcpSocket*>(QObject::sender());
     mapSockets.remove(disconnectedSocket);
-    qDebug() << "Server::slotDisconnect:        pop quantity of clients: "+QString::number(mapSockets.size());
     SendToAllClients(QString("Message"), "<font color = red><\\font>Пользователь  "+QString::number(socket->socketDescriptor())+" "+disconnectedSocket->localAddress().toString()+": отключился <br/>");
     emit signalStatusServer("<font color = red><\\font>Пользователь  "+QString::number(socket->socketDescriptor())+" "+disconnectedSocket->localAddress().toString()+": отключился <br/>");
     emit signalDeleteSocketFromListWidget(mapSockets);
@@ -356,44 +330,13 @@ void Server::SendFileToClient(QTcpSocket* socket, QString filePath)
     out.device()->seek(0);
     //  избавляемся от зарезервированных двух байт в начале каждого сообщения
     out << quint64(Data.size() - sizeof(quint64));   //  определяем размер сообщения
-    qDebug() << "Server::SendFileToClient:      Отправляемый размер данных: " << Data.size() - sizeof(quint64);
     socket->write(Data);
 
     readyReadManager->setFileClientFileRequest(filePath);
 }
 
-void Server::SendPartOfFile()
-{
-    if((fileSize - file->pos()) < blockData){   //  если остаток файла будет меньше блока байт
-        blockData = fileSize - file->pos();     //  мы просто будем читать этот остаток
-    }
-
-    socket->waitForBytesWritten();  //  мы ждем того, чтобы все байты записались
-    Data.clear();
-
-    qDebug() << "Server::SendPartOfFile:        read " << file->read(bytes, blockData);     //  читаем файл и записываем данные в байты
-    qDebug() << "Server::SendPartOfFile:        block: "+QString::number(blockData);   //  нужно, чтобы видеть текущий размер блоков
-
-
-    QByteArray buffer;
-    buffer = buffer.fromRawData(bytes, blockData);
-
-    qDebug() << "Server::SendPartOfFile:        block size" << blockData << "buffer size" << buffer.size();
-
-    QDataStream out(&Data, QIODevice::WriteOnly);   //  определяем поток отправки
-    out.setVersion(QDataStream::Qt_6_2);
-    out << quint64(0) << QString("Request part of processing file") << buffer;   //  отправляем байты
-    out.device()->seek(0);
-    //  избавляемся от зарезервированных двух байт в начале каждого сообщения
-    qDebug() << "Server::SendPartOfFile:        sending blockSize = " << quint64(Data.size() - sizeof(quint64));
-    out << quint64(Data.size() - sizeof(quint64));   //  определяем размер сообщения
-    socket->write(Data);
-    qDebug() << "Server::SendPartOfFile:        Data size = " << Data.size();
-}
-
 void Server::slotSendToAllClients(QString typeOfMsg, QString str)
 {
-    qDebug() << "Server::slotSendToAllClients:      typeOfMsg: " << typeOfMsg << "  str: "<< str;
     SendToAllClients(typeOfMsg, str);
 }
 

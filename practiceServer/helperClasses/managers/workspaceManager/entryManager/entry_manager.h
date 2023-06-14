@@ -1,11 +1,31 @@
 #ifndef ENTRYMANAGER_H
 #define ENTRYMANAGER_H
 
-#include <QObject>
-#include <QFileSystemWatcher>
-#include <QFileInfoList>
-#include <QDebug>
-#include <QDir>
+///     Класс EntryManager определяет зону ответственности за папку Entry
+///     Переменные:
+///         rootFolder - корневая папка менеджера
+///         entryFilesWatcher - наблюдатель за папкой
+///         currentEntryInfo - файловые данные папки
+///         currentEntryFiles - текущие файлы
+///     Методы:
+///         setWatcher() - устанавливаем наблюдателя
+///         removeFile() - удаляем файл
+///         getFile() - получаем путь до файла
+///     Сигналы:
+///         signalEntryFiles() - отправляем содержимое папки
+///         signalClearEntryFolder() - очищаем папку по причине
+///     Слоты:
+///         slotEntryDirectoryChanged - папка Entry изменилась
+
+///  ========================    классы для работы
+#include <QObject>              //  для создания объекта
+///  ========================
+///
+///  ========================    для работы с файлами
+#include <QFileSystemWatcher>   //  наблюдатель
+#include <QFileInfoList>        //  данные о файлах
+#include <QDir>                 //  определитель директории
+///  ========================
 
 class EntryManager : public QObject
 {

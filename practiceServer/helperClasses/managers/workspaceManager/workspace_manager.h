@@ -10,27 +10,49 @@
 ///         entryFolder - путь до папки Entry
 ///         expectationFolder - путь до папки Excectation
 ///         storageFolder - путь до папки Storage
-///         parentUi - ссылка на родителя
+///         sendedFilesFolder - путь до папки SendedFiles
 ///         m_settingsManager - экземпляр менеджера папки Settings
+///         m_entryManager - экземпляр менеджера папки Entry
+///         m_expectationManager - экземпляр менеджера папки Excectation
+///         m_sendedFileManager - экземпляр менеджера папки SendedFiles
+///         m_storageManager - экземпляр менеджера папки Storage
 ///         workspaceWatcher - наблюдатель за состоянием рабочего пространства
 ///     Методы:
 ///         createWorkspaceFolders() - создаёт структуру папки и возвращает отчёт в консоль
 ///         saveSettings() - принимает json объект и создаёт из него файл.json, возвращая отчёт в консоль
 ///         setRootFolder() - устанавливает новые пути для папок
+///         createSettingFiles() - создание файлов настроек
+///         setFolderWatcher() - установка наблюдателя
+///         copyToExpectation() - копирование файла в Expectation
+///         copyToSended() - копирование файла в SendedFiles
+///         deleteEntryFile() - удаление файла в Entry
+///         deleteExpectationFile() - удаление файла в Expectation
+///         saveProcessingFile() - сохранение обработанных файлов
+///         getExpectationFolderFiles() - получение файлов из Expectation
 ///     Слоты:
-///         workspaceDirectoryChanged() - обработка сигнала от QFileSystemWatcher::directoryChanged
-///         workspaceFileChanged() - обработка сигнала от QFileSystemWatcher::fileChanged
+///         slotWorkspaceDirectoryChanged() - обработка сигнала изменения рабочей папки
+///         slotWorkspaceFileChanged() - обработка сигнала изменения файлов в рабочей папке
+///         slotEntryFiles() - обработка входящих файлов
+///         slotClearEntryFolder() - обработка сигнала очистить Entry
 ///     Сигналы:
 ///         signalUpdateUiComboBox() - сигнал для смены данных в ComboBox обработок
 ///         signalStatusServer() - сигнал для отображения статуса сервера
 ///         signalSetServerFolders() - сигнал для установки папок сервера
+///         signalSettingsFileChanged() - сигнал изменения файла настроек
+///         signalSetServerFolders() - установка папок в переменные сервера
+///         signalSiftFiles() - сигнал отправить файлы
+///         signalClearEntryFolder() - сигнал почистить папку Entry
 
+///  ========================    классы для работы класса
+#include <QObject>              //  класс для работы connect()
+///  ========================
+///
 ///  ========================    классы проекта
-#include "settingsManager/settings_manager.h"   //  менеджер для папки /Settings
-#include "entryManager/entry_manager.h"         //  менеджер для папки /Entry
+#include "settingsManager/settings_manager.h"       //  менеджер для папки /Settings
+#include "entryManager/entry_manager.h"             //  менеджер для папки /Entry
 #include "expectationManager/expectation_manager.h" //  менеджер для папки /ExpectationManager
 #include "sendedFileManager/sended_file_manager.h"  //  менеджер для папки /SendedFileManager
-#include "storageManager/storage_manager.h"           //  менеджер для папки /Data
+#include "storageManager/storage_manager.h"         //  менеджер для папки /Data
 ///  ========================
 ///
 ///  ========================    классы для работы с директориями
@@ -42,10 +64,6 @@
 ///  ========================    классы для работы с json
 #include <QJsonDocument>        //  для создания json документов
 #include <QJsonObject>          //  для использования переменных типа QJsonObject
-///  ========================
-///
-///  ========================    классы для работы класса
-#include <QObject>              //  класс для работы connect()
 ///  ========================
 
 class WorkspaceManager : public QObject

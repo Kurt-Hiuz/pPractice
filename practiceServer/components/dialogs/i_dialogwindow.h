@@ -18,7 +18,6 @@ public:
     I_DialogWindow();
 
     virtual void createInterface() = 0;
-    virtual QVariant getValue() = 0;
 };
 
 #endif // I_DIALOGWINDOW_H

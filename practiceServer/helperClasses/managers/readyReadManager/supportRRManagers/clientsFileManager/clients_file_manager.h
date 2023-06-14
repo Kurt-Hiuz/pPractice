@@ -19,6 +19,7 @@
 ///     Сигналы:
 ///         signalStatusRRManager() - отправка статуса ReadyReadManager'у
 ///         signalSendToOneRRManager() - отправка сообщения одному клиенту через ReadyReadManager
+///         signalSaveData() - сохранение данных
 
 ///  ========================    классы проекта
 #include "../I_message_manager.h"   //  реализуем интерфейс
