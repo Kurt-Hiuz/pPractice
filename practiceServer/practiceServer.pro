@@ -19,7 +19,6 @@ SOURCES += \
     components/frames/cardFrame/possibleProcessingComboBoxFrame/possible_processing_combobox_frame.cpp \
     helperClasses/jsonPacker/json_packer.cpp \
     helperClasses/jsonParser/json_parser.cpp \
-    helperClasses/managers/processingManager/processing_manager.cpp \
     helperClasses/managers/readyReadManager/ready_read_manager.cpp \
     helperClasses/managers/readyReadManager/supportRRManagers/I_message_manager.cpp \
     helperClasses/managers/readyReadManager/supportRRManagers/serverRequestPartFileManager/server_request_part_file_manager.cpp \
@@ -48,7 +47,6 @@ HEADERS += \
     components/frames/cardFrame/possibleProcessingComboBoxFrame/possible_processing_combobox_frame.h \
     helperClasses/jsonPacker/json_packer.h \
     helperClasses/jsonParser/json_parser.h \
-    helperClasses/managers/processingManager/processing_manager.h \
     helperClasses/managers/readyReadManager/ready_read_manager.h \
     helperClasses/managers/readyReadManager/supportRRManagers/I_message_manager.h \
     helperClasses/managers/readyReadManager/supportRRManagers/serverRequestPartFileManager/server_request_part_file_manager.h \
